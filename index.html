@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0d1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Баркоин — Кликер</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg-top: #1a1f3a;
+    --bg-bottom: #0a0d1a;
+    --card-bg: linear-gradient(135deg, #161b33 0%, #0d1126 100%);
+    --card-border: #2a3154;
+    --gold: #ffd700;
+    --green: #00e676;
+    --red: #ff5252;
+    --text-dim: #8892b0;
+    --text-darker: #4a5474;
+  }
+
+  html, body {
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 50% 0%, var(--bg-top) 0%, var(--bg-bottom) 70%);
+    color: #fff;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 16px);
+    overflow-x: hidden;
+    transition: background 0.6s ease;
+  }
+
+  /* ============================================================
+     ЗАГОЛОВОК
+     ============================================================ */
+  .header {
+    text-align: center;
+    margin-bottom: 12px;
+    padding-top: 12px;
+  }
+
+  h1 {
+    font-size: 28px;
+    background: linear-gradient(90deg, #ffd700, #ff9500, #ffd700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ============================================================
+     КОНТЕЙНЕР — по умолчанию один столбец (мобилка)
+     ============================================================ */
+  .container {
+    width: 100%;
+    max-width: 540px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0 auto;
+  }
+
+  .left-col, .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .label {
+    color: var(--text-dim);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  /* ============================================================
+     ТОП-ПАНЕЛЬ
+     ============================================================ */
+  .top-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  .player-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .player-rank {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .rank-badge {
+    background: linear-gradient(135deg, #ffd700, #ff9500);
+    color: #2b1406;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .rank-title { color: var(--text-dim); font-size: 12px; }
+
+  .bar-wrap { display: flex; align-items: center; gap: 10px; }
+  .bar-icon { font-size: 16px; width: 22px; text-align: center; }
+  .bar-track {
+    flex: 1;
+    height: 14px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.3s ease, background 0.3s;
+  }
+  .bar-fill.energy { background: linear-gradient(90deg, #ffca28, #ff8f00); }
+  .bar-fill.xp { background: linear-gradient(90deg, #42a5f5, #1565c0); }
+  .bar-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    letter-spacing: 1px;
+  }
+
+  /* ============================================================
+     КУРС + ГРАФИК
+     ============================================================ */
+  .rate-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 14px 16px 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  .rate-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .rate-price-row { display: flex; align-items: center; gap: 10px; }
+  .rate-price {
+    font-size: 22px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.3s;
+  }
+  .rate-price.up { color: var(--green); }
+  .rate-price.down { color: var(--red); }
+
+  .arrow {
+    font-size: 18px;
+    font-weight: bold;
+    transition: all 0.3s;
+  }
+  .arrow.up { color: var(--green); text-shadow: 0 0 12px rgba(0,230,118,0.8); }
+  .arrow.down { color: var(--red); text-shadow: 0 0 12px rgba(255,82,82,0.8); }
+
+  .rate-change { font-size: 11px; font-weight: 600; margin-top: 2px; }
+  .rate-change.up { color: var(--green); }
+  .rate-change.down { color: var(--red); }
+
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 160px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--card-border);
+    overflow: hidden;
+  }
+  #chart { display: block; width: 100%; height: 100%; }
+
+  .chart-legend {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-darker);
+    margin-top: 6px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .event-row {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .event {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    animation: eventPulse 2s infinite;
+  }
+  @keyframes eventPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .event.bull { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.4); }
+  .event.bear { background: rgba(255,82,82,0.15); color: var(--red); border: 1px solid rgba(255,82,82,0.4); }
+  .event.crash { background: rgba(183,28,28,0.25); color: #ff8a80; border: 1px solid var(--red); }
+  .event.moon { background: rgba(255,215,0,0.15); color: var(--gold); border: 1px solid rgba(255,215,0,0.5); }
+  .event.volatile { background: rgba(179,136,255,0.15); color: #b388ff; border: 1px solid rgba(179,136,255,0.4); }
+
+  .rate-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 10px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .rate-stats b { color: #fff; font-weight: 700; }
+
+  /* ============================================================
+     БАЛАНС
+     ============================================================ */
+  .balance-card {
+    background: linear-gradient(135deg, #1f2647 0%, #131834 100%);
+    border: 1px solid #ffd70033;
+    border-radius: 16px;
+    padding: 14px 18px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(255,215,0,0.08);
+  }
+
+  .balance-value {
+    font-size: 34px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #ffd700, #ffb300);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+
+  .balance-usd {
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ============================================================
+     МОНЕТА
+     ============================================================ */
+  .coin-zone {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 0;
+    position: relative;
+    min-height: 220px;
+  }
+
+  .coin {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 72px;
+    font-weight: 900;
+    transition: transform 0.08s ease, box-shadow 0.3s, background 0.6s, filter 0.3s;
+    position: relative;
+    animation: coinFloat 3s ease-in-out infinite;
+  }
+
+  @keyframes coinFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .coin:active { transform: scale(0.92) translateY(0) !important; animation: none; }
+  .coin.no-energy { filter: grayscale(0.8) brightness(0.6); cursor: not-allowed; animation: none; }
+  .coin.crit { animation: critFlash 0.3s; }
+
+  @keyframes critFlash {
+    0% { box-shadow: 0 0 0 rgba(255,215,0,0); }
+    50% { box-shadow: 0 0 60px rgba(255,215,0,1), 0 0 120px rgba(255,215,0,0.6); }
+    100% { box-shadow: 0 0 40px rgba(255,215,0,0.5); }
+  }
+
+  .float-num {
+    position: absolute;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold);
+    text-shadow: 0 0 12px rgba(255,215,0,0.9);
+    pointer-events: none;
+    animation: floatUp 0.9s ease-out forwards;
+    z-index: 10;
+  }
+
+  .float-num.crit {
+    font-size: 28px;
+    color: var(--red);
+    text-shadow: 0 0 16px rgba(255,82,82,1);
+  }
+
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
+  }
+
+  .coin-name {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.4s;
+  }
+
+  .coin-name-sub {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    margin-top: 3px;
+    letter-spacing: 1px;
+  }
+
+  .regen-info {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* ============================================================
+     МАГАЗИН
+     ============================================================ */
+  .shop-title {
+    color: var(--text-dim);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  .upgrade-main {
+    background: linear-gradient(135deg, #1f2647 0%, #131834 100%);
+    border: 1px solid #ffd70055;
+    border-radius: 16px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .upgrade-main::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.15), transparent);
+    transition: left 0.6s;
+  }
+
+  .upgrade-main:hover:not(.disabled)::before { left: 100%; }
+  .upgrade-main:hover:not(.disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255,215,0,0.25);
+    border-color: var(--gold);
+  }
+  .upgrade-main.disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--card-border); }
+  .upgrade-main.maxed {
+    border-color: var(--green);
+    background: linear-gradient(135deg, #0d3320 0%, #061a10 100%);
+    cursor: default;
+  }
+
+  .upgrade-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .upgrade-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .upgrade-arrow { font-size: 18px; color: var(--gold); }
+
+  .upgrade-body { display: flex; align-items: center; gap: 10px; }
+  .upgrade-icon {
+    font-size: 34px;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .upgrade-info { flex: 1; min-width: 0; }
+  .upgrade-new-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .upgrade-desc { font-size: 10px; color: var(--text-dim); margin-bottom: 3px; }
+  .upgrade-bonus { font-size: 11px; color: var(--green); font-weight: 600; }
+  .upgrade-cost {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    margin-top: 3px;
+  }
+
+  .upgrades-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .upgrade {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .upgrade:hover:not(.disabled) {
+    border-color: #ffd70066;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,215,0,0.15);
+  }
+  .upgrade.disabled { opacity: 0.45; cursor: not-allowed; }
+  .upgrade-name { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+  .upgrade-effect { font-size: 10px; color: var(--green); margin-bottom: 5px; }
+  .upgrade-cost-small {
+    font-size: 10px;
+    color: var(--gold);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ============================================================
+     КНОПКИ
+     ============================================================ */
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    touch-action: manipulation;
+    min-height: 44px;
+  }
+
+  .btn-sell {
+    background: linear-gradient(135deg, var(--green), #00994d);
+    color: #002200;
+    box-shadow: 0 6px 20px rgba(0,230,118,0.3);
+  }
+  .btn-sell:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,230,118,0.5);
+  }
+  .btn-sell:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-reset {
+    background: transparent;
+    color: var(--red);
+    border: 1px solid #ff525244;
+  }
+  .btn-reset:hover { background: #ff525211; }
+
+  /* ============================================================
+     ТОСТ
+     ============================================================ */
+  .toast {
+    position: fixed;
+    bottom: calc(env(safe-area-inset-bottom) + 20px);
+    left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    background: linear-gradient(135deg, var(--green), #00994d);
+    color: #002200;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: 0 10px 30px rgba(0,230,118,0.4);
+    opacity: 0;
+    transition: all 0.4s;
+    z-index: 100;
+    pointer-events: none;
+    max-width: calc(100% - 32px);
+    text-align: center;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.bad {
+    background: linear-gradient(135deg, var(--red), #b71c1c);
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(255,82,82,0.4);
+  }
+
+  .footer {
+    color: var(--text-darker);
+    font-size: 10px;
+    text-align: center;
+    margin-top: 16px;
+    letter-spacing: 1px;
+    padding-bottom: 12px;
+  }
+
+  /* ============================================================
+     ПЛАНШЕТ (минимум 720px)
+     ============================================================ */
+  @media (min-width: 720px) {
+    body { padding: 20px 24px; }
+    h1 { font-size: 34px; }
+    .header { margin-bottom: 20px; }
+
+    .container { max-width: 720px; }
+
+    .coin { width: 200px; height: 200px; font-size: 82px; }
+    .coin-zone { min-height: 260px; }
+
+    .rate-price { font-size: 26px; }
+    .chart-wrap { height: 200px; }
+
+    .balance-value { font-size: 42px; }
+
+    .upgrades-grid { grid-template-columns: repeat(3, 1fr); }
+
+    .btn { padding: 16px; font-size: 13px; }
+  }
+
+  /* ============================================================
+     ПК (минимум 1024px) — ДВЕ КОЛОНКИ
+     ============================================================ */
+  @media (min-width: 1024px) {
+    body {
+      padding: 24px 32px;
+      justify-content: flex-start;
+    }
+
+    h1 { font-size: 40px; letter-spacing: 4px; }
+    .subtitle { font-size: 12px; }
+    .header { margin-bottom: 24px; }
+
+    .container {
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .left-col, .right-col {
+      gap: 16px;
+      position: sticky;
+      top: 24px;
+      align-self: start;
+    }
+
+    /* Левая колонка: игрок + курс + график */
+    .left-col .top-panel { order: 1; }
+    .left-col .rate-card { order: 2; }
+
+    /* Правая колонка: баланс, монета, магазин */
+    .right-col .balance-card { order: 1; }
+    .right-col .coin-zone { order: 2; }
+    .right-col .coin-info { order: 3; }
+    .right-col .upgrade-main { order: 4; }
+    .right-col .upgrades-grid { order: 5; }
+    .right-col .actions { order: 6; }
+
+    .coin { width: 240px; height: 240px; font-size: 100px; }
+    .coin-zone { min-height: 320px; padding: 24px 0; }
+
+    .balance-value { font-size: 48px; }
+    .balance-card { padding: 20px 24px; }
+
+    .chart-wrap { height: 240px; }
+    .rate-price { font-size: 30px; }
+    .rate-card { padding: 20px 24px 14px; }
+
+    .top-panel { padding: 16px 20px; }
+
+    .upgrade-main { padding: 18px; }
+    .upgrade-icon { width: 60px; height: 60px; font-size: 38px; }
+    .upgrade-new-name { font-size: 16px; }
+    .upgrade-cost { font-size: 14px; }
+
+    .upgrades-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .upgrade { padding: 14px; }
+    .upgrade-name { font-size: 13px; }
+
+    .btn { padding: 16px; font-size: 13px; }
+
+    .footer { font-size: 11px; margin-top: 24px; }
+  }
+
+  /* ============================================================
+     БОЛЬШОЙ ПК (минимум 1440px)
+     ============================================================ */
+  @media (min-width: 1440px) {
+    .container { max-width: 1360px; gap: 32px; }
+    .coin { width: 280px; height: 280px; font-size: 120px; }
+    .coin-zone { min-height: 380px; }
+    .chart-wrap { height: 280px; }
+    h1 { font-size: 46px; }
+    .balance-value { font-size: 56px; }
+  }
+
+  /* ============================================================
+     МАЛЕНЬКИЕ ТЕЛЕФОНЫ (до 380px)
+     ============================================================ */
+  @media (max-width: 380px) {
+    body { padding-left: 10px; padding-right: 10px; }
+    h1 { font-size: 24px; }
+    .coin { width: 150px; height: 150px; font-size: 60px; }
+    .coin-zone { min-height: 180px; }
+    .balance-value { font-size: 28px; }
+    .rate-price { font-size: 18px; }
+    .chart-wrap { height: 130px; }
+    .upgrades-grid { gap: 6px; }
+    .upgrade { padding: 8px; }
+    .upgrade-name { font-size: 11px; }
+    .upgrade-effect { font-size: 9px; }
+    .upgrade-cost-small { font-size: 9px; }
+  }
+
+  /* ============================================================
+     ЛАНДШАФТ НА ТЕЛЕФОНЕ
+     ============================================================ */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .header { display: none; }
+    body { padding-top: 8px; }
+    .coin { width: 120px; height: 120px; font-size: 50px; }
+    .coin-zone { min-height: 140px; padding: 4px 0; }
+    .chart-wrap { height: 120px; }
+  }
+
+  /* ============================================================
+     ДОСТУПНОСТЬ: уменьшенная анимация
+     ============================================================ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>БАРКОИН</h1>
+    <div class="subtitle">Кликер • BARC</div>
+  </div>
+
+  <div class="container">
+
+    <!-- ЛЕВАЯ КОЛОНКА: игрок + курс + график -->
+    <div class="left-col">
+
+      <!-- Игрок -->
+      <div class="top-panel">
+        <div class="player-row">
+          <div class="player-rank">
+            <span class="rank-badge" id="rankBadge">1 УР.</span>
+            <span class="rank-title" id="rankTitle">Новичок</span>
+          </div>
+          <div style="font-size:11px;color:#8892b0;" id="critStat">Криты: 0%</div>
+        </div>
+
+        <div class="bar-wrap">
+          <div class="bar-icon">⚡</div>
+          <div class="bar-track">
+            <div class="bar-fill energy" id="energyBar" style="width:100%"></div>
+            <div class="bar-text" id="energyText">30 / 30</div>
+          </div>
+        </div>
+        <div class="regen-info" id="regenInfo">+1 энергии за 5 сек</div>
+
+        <div class="bar-wrap">
+          <div class="bar-icon">⭐</div>
+          <div class="bar-track">
+            <div class="bar-fill xp" id="xpBar" style="width:0%"></div>
+            <div class="bar-text" id="xpText">0 / 100 XP</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Курс + график -->
+      <div class="rate-card">
+        <div class="rate-top">
+          <div>
+            <div class="label">Курс BARC</div>
+            <div class="rate-price-row">
+              <div class="rate-price" id="ratePrice">1.0000</div>
+              <div class="arrow" id="arrow">—</div>
+            </div>
+            <div class="rate-change" id="rateChange">0.00%</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="rate-stats">
+              <div>Макс: <b id="chartHigh">—</b></div>
+              <div>Мин: <b id="chartLow">—</b></div>
+            </div>
+            <div class="rate-stats" style="margin-top:4px;justify-content:flex-end;">
+              <div>Свечей: <b id="chartTicks">0</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-wrap">
+          <canvas id="chart"></canvas>
+        </div>
+
+        <div class="chart-legend">
+          <span>← 80 последних точек</span>
+          <span>сейчас →</span>
+        </div>
+
+        <div class="event-row">
+          <div class="event bull" id="eventTag">📈 Обычный рынок</div>
+          <div class="rate-stats">
+            <div>24ч изм.: <b id="dayChange">+0.00%</b></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ПРАВАЯ КОЛОНКА: баланс, монета, магазин -->
+    <div class="right-col">
+
+      <!-- Баланс -->
+      <div class="balance-card">
+        <div class="label">Твой баланс</div>
+        <div class="balance-value" id="balance">0</div>
+        <div class="balance-usd" id="balanceUsd">≈ $0.00</div>
+      </div>
+
+      <!-- Монета -->
+      <div class="coin-zone" id="coinZone">
+        <div class="coin" id="coin">₿</div>
+      </div>
+      <div class="coin-info">
+        <div class="coin-name" id="coinName">Обычная монета</div>
+        <div class="coin-name-sub" id="coinBonus">+1 за клик</div>
+      </div>
+
+      <!-- Прокачка монеты -->
+      <div class="shop-title">Прокачка монеты</div>
+      <div class="upgrade-main" id="upgradeMain">
+        <div class="upgrade-header">
+          <div class="upgrade-title" id="upgTitle">Уровень 1 / 18</div>
+          <div class="upgrade-arrow" id="upgArrow">→</div>
+        </div>
+        <div class="upgrade-body">
+          <div class="upgrade-icon" id="upgIcon">🪨</div>
+          <div class="upgrade-info">
+            <div class="upgrade-new-name" id="upgNewName">Каменная монета</div>
+            <div class="upgrade-desc" id="upgDesc">Следующий уровень</div>
+            <div class="upgrade-bonus" id="upgBonus">+5 за клик</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="upgrade-cost" id="upgCost">100 BARC</div>
+            <div style="font-size:9px;color:#8892b0;margin-top:2px;">стоимость</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Улучшения -->
+      <div class="shop-title">Улучшения</div>
+      <div class="upgrades-grid" id="upgrades"></div>
+
+      <!-- Кнопки -->
+      <div class="actions">
+        <button class="btn btn-sell" id="sellBtn" disabled>Продать всё</button>
+        <button class="btn btn-reset" id="resetBtn">Сброс</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">Клик = доход • Курс меняется каждые 2 сек</div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  // ================================================================
+  // КОНФИГ
+  // ================================================================
+  const MAX_ENERGY = 30;
+  const ENERGY_REGEN_TICKS = 5;
+  const ENERGY_PER_CLICK = 1;
+  const BASE_CRIT_CHANCE = 0.03;
+  const BASE_CRIT_MULT = 3;
+  const XP_PER_CLICK = 1;
+  const XP_PER_LEVEL_BASE = 200;
+  const XP_GROWTH = 1.6;
+  const TAX_RATE = 0.10;
+  const MAX_LEVEL = 18;
+  const CHART_POINTS = 80;
+  const COST_MULTIPLIER = 4.5;
+
+  const COIN_LEVELS = [
+    { name: 'Обычная',       icon: '🪙', bonus: 1,           cost: 0,                color: ['#9e9e9e', '#616161'], glow: 'rgba(158,158,158,0.4)', textColor: '#333' },
+    { name: 'Каменная',      icon: '🪨', bonus: 5,           cost: 100,              color: ['#a8a8a8', '#5a5a5a'], glow: 'rgba(168,168,168,0.5)', textColor: '#3a3a3a' },
+    { name: 'Деревянная',    icon: '🪵', bonus: 20,          cost: 800,              color: ['#c79a5c', '#7a4a1e'], glow: 'rgba(199,154,92,0.6)', textColor: '#3d2508' },
+    { name: 'Металлическая', icon: '⚙️', bonus: 75,          cost: 5000,             color: ['#cfd8dc', '#607d8b'], glow: 'rgba(207,216,220,0.7)', textColor: '#263238' },
+    { name: 'Бронзовая',     icon: '🥉', bonus: 250,         cost: 30000,            color: ['#cd7f32', '#8b4513'], glow: 'rgba(205,127,50,0.7)', textColor: '#2b1406' },
+    { name: 'Железная',      icon: '⛓️', bonus: 800,         cost: 200000,           color: ['#b0bec5', '#455a64'], glow: 'rgba(176,190,197,0.7)', textColor: '#1c262b' },
+    { name: 'Серебряная',    icon: '🥈', bonus: 2500,        cost: 1500000,          color: ['#e0e0e0', '#9e9e9e'], glow: 'rgba(224,224,224,0.9)', textColor: '#333' },
+    { name: 'Золотая',       icon: '🥇', bonus: 8000,        cost: 10000000,         color: ['#ffe066', '#ffb300'], glow: 'rgba(255,215,0,0.9)', textColor: '#5a3d00' },
+    { name: 'Платиновая',    icon: '💎', bonus: 25000,       cost: 80000000,         color: ['#e5f2ff', '#7fb8d6'], glow: 'rgba(160,220,255,0.9)', textColor: '#1a3d52' },
+    { name: 'Радиоактивная', icon: '☢️', bonus: 80000,       cost: 700000000,        color: ['#b2ff59', '#33691e'], glow: 'rgba(178,255,89,0.95)', textColor: '#0d2b00' },
+    { name: 'Атомная',       icon: '⚛️', bonus: 300000,      cost: 6000000000,       color: ['#40c4ff', '#003c8f'], glow: 'rgba(64,196,255,0.95)', textColor: '#001f4d' },
+    { name: 'Молекулярная',  icon: '🧬', bonus: 1000000,     cost: 50000000000,      color: ['#ff80ab', '#880e4f'], glow: 'rgba(255,128,171,0.95)', textColor: '#3d0021' },
+    { name: 'Клеточная',     icon: '🦠', bonus: 4000000,     cost: 400000000000,     color: ['#69f0ae', '#1b5e20'], glow: 'rgba(105,240,174,0.95)', textColor: '#003311' },
+    { name: 'Разумная',      icon: '🧠', bonus: 15000000,    cost: 3500000000000,    color: ['#ce93d8', '#4a148c'], glow: 'rgba(206,147,216,0.95)', textColor: '#2a004d' },
+    { name: 'Планетарная',   icon: '🌍', bonus: 60000000,    cost: 30000000000000,   color: ['#4fc3f7', '#01579b'], glow: 'rgba(79,195,247,0.95)', textColor: '#001f3d' },
+    { name: 'Звёздная',      icon: '⭐', bonus: 250000000,   cost: 250000000000000,  color: ['#fff59d', '#f57f17'], glow: 'rgba(255,245,157,1)', textColor: '#5c3d00' },
+    { name: 'Галактическая', icon: '🌌', bonus: 1000000000,  cost: 2000000000000000, color: ['#b388ff', '#1a237e'], glow: 'rgba(179,136,255,1)', textColor: '#e8eaf6' },
+    { name: 'Вселенская',    icon: '🌠', bonus: 5000000000,  cost: 20000000000000000,color:['#ffffff', '#000000'], glow: 'rgba(255,255,255,1)', textColor: '#fff' }
+  ];
+
+  const state = {
+    price: 1.0, prevPrice: 1.0,
+    balance: 0, levelIndex: 0, usdBalance: 0,
+    totalClicks: 0,
+    energy: MAX_ENERGY, maxEnergy: MAX_ENERGY,
+    energyProgress: 0,
+    xp: 0, playerLevel: 1,
+    critChance: BASE_CRIT_CHANCE, critMult: BASE_CRIT_MULT,
+    regenBonus: 0,
+    marketEvent: null,
+    priceHistory: [], startPrice: 1.0,
+    totalPlayedSeconds: 0
+  };
+
+  let autoPerSec = 0;
+  let clickMultiplier = 1;
+
+  const upgrades = [
+    { id: 'energyMax',   name: 'Запас энергии',       effect: '+15 макс. энергии',    cost: 5000,       type: 'maxEnergy',  value: 15,   bought: 0 },
+    { id: 'energyRegen', name: 'Быстрая регенерация', effect: 'реген в 2x быстрее',   cost: 50000,      type: 'regenSpeed', value: 1,    bought: 0 },
+    { id: 'critChance',  name: 'Критический удар',    effect: '+2% шанс крита',       cost: 25000,      type: 'crit',       value: 0.02, bought: 0 },
+    { id: 'critMult',    name: 'Мощь крита',          effect: '+1x множитель крита',  cost: 200000,     type: 'critMult',   value: 1,    bought: 0 },
+    { id: 'mult2',       name: 'Множитель x2',        effect: 'x2 за клик',           cost: 100000,     type: 'mult',       value: 2,    bought: 0 },
+    { id: 'auto1',       name: 'Автокликер',          effect: '+5/сек',               cost: 500000,     type: 'auto',       value: 5,    bought: 0 },
+    { id: 'mult5',       name: 'Множитель x5',        effect: 'x5 за клик',           cost: 20000000,   type: 'mult',       value: 5,    bought: 0 },
+    { id: 'auto2',       name: 'Робо-рука',           effect: '+100/сек',             cost: 150000000,  type: 'auto',       value: 100,  bought: 0 },
+    { id: 'auto3',       name: 'Ферма',               effect: '+2000/сек',            cost: 5000000000, type: 'auto',       value: 2000, bought: 0 }
+  ];
+
+  const RANKS = [
+    { minLvl: 1,  title: 'Новичок' },
+    { minLvl: 3,  title: 'Любитель' },
+    { minLvl: 5,  title: 'Трейдер' },
+    { minLvl: 8,  title: 'Инвестор' },
+    { minLvl: 11, title: 'Магнат' },
+    { minLvl: 14, title: 'Крипто-барон' },
+    { minLvl: 17, title: 'Барский лорд' },
+    { minLvl: 20, title: 'Легенда' }
+  ];
+
+  const MARKET_EVENTS = [
+    { type: 'bull',  name: 'Бычий рынок',    emoji: '📈', ticks: 15, effect: { priceDrift: +0.03 },  weight: 30 },
+    { type: 'bear',  name: 'Медвежий рынок', emoji: '📉', ticks: 15, effect: { priceDrift: -0.03 },  weight: 30 },
+    { type: 'crash', name: 'КРАХ!',          emoji: '💥', ticks: 8,  effect: { priceDrift: -0.15 },  weight: 14 },
+    { type: 'moon',  name: 'ТО THE MOON!',   emoji: '🚀', ticks: 10, effect: { priceDrift: +0.15 },  weight: 12 },
+    { type: 'volatile', name: 'Волатильность', emoji: '⚡', ticks: 12, effect: { volatility: 3 },      weight: 14 }
+  ];
+
+  const $ = id => document.getElementById(id);
+  const ratePriceEl = $('ratePrice'), arrowEl = $('arrow'), rateChangeEl = $('rateChange');
+  const balanceEl = $('balance'), balanceUsdEl = $('balanceUsd');
+  const coinEl = $('coin'), coinZoneEl = $('coinZone');
+  const coinNameEl = $('coinName'), coinBonusEl = $('coinBonus');
+  const upgradeMainEl = $('upgradeMain');
+  const upgTitleEl = $('upgTitle'), upgArrowEl = $('upgArrow'), upgIconEl = $('upgIcon');
+  const upgNewNameEl = $('upgNewName'), upgDescEl = $('upgDesc'), upgBonusEl = $('upgBonus'), upgCostEl = $('upgCost');
+  const upgradesEl = $('upgrades'), sellBtn = $('sellBtn'), resetBtn = $('resetBtn'), toastEl = $('toast');
+  const energyBar = $('energyBar'), energyText = $('energyText'), regenInfo = $('regenInfo');
+  const xpBar = $('xpBar'), xpText = $('xpText');
+  const rankBadge = $('rankBadge'), rankTitle = $('rankTitle'), critStat = $('critStat');
+  const eventTag = $('eventTag');
+  const canvas = $('chart'); const ctx = canvas.getContext('2d');
+  const chartHighEl = $('chartHigh'), chartLowEl = $('chartLow'), chartTicksEl = $('chartTicks');
+  const dayChangeEl = $('dayChange');
+
+  function formatNumber(n) {
+    n = Math.floor(n);
+    if (n < 1e6) return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const units = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+    let u = 0;
+    while (n >= 1000 && u < units.length - 1) { n /= 1000; u++; }
+    return n.toFixed(n < 10 ? 2 : n < 100 ? 1 : 0) + units[u];
+  }
+
+  function showToast(text, bad = false) {
+    toastEl.textContent = text;
+    toastEl.className = 'toast show' + (bad ? ' bad' : '');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toastEl.className = 'toast' + (bad ? ' bad' : ''), 2200);
+  }
+
+  function getPerClick() { return COIN_LEVELS[state.levelIndex].bonus * clickMultiplier; }
+
+  // ===== ГРАФИК =====
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawChart();
+  }
+
+  function drawChart() {
+    const rect = canvas.getBoundingClientRect();
+    const W = rect.width, H = rect.height;
+    if (W < 10 || H < 10) return;
+    ctx.clearRect(0, 0, W, H);
+
+    const data = state.priceHistory;
+    if (data.length < 2) {
+      ctx.fillStyle = '#4a5474';
+      ctx.font = '11px Segoe UI';
+      ctx.textAlign = 'center';
+      ctx.fillText('Накапливаю данные...', W/2, H/2);
+      return;
+    }
+
+    const padL = 46, padR = 12, padT = 10, padB = 18;
+    const chartW = W - padL - padR;
+    const chartH = H - padT - padB;
+
+    const prices = data.map(d => d.price);
+    let max = Math.max(...prices), min = Math.min(...prices);
+    const pad = (max - min) * 0.15 || 0.1;
+    max += pad; min -= pad;
+
+    ctx.strokeStyle = '#1e2540';
+    ctx.lineWidth = 1;
+    ctx.font = '9px Segoe UI';
+    ctx.fillStyle = '#4a5474';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+
+    const gridLines = 4;
+    for (let i = 0; i <= gridLines; i++) {
+      const y = padT + (chartH / gridLines) * i;
+      ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+      const val = max - ((max - min) / gridLines) * i;
+      ctx.fillText(val.toFixed(3), padL - 6, y);
+    }
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const vLines = 4;
+    for (let i = 0; i <= vLines; i++) {
+      const x = padL + (chartW / vLines) * i;
+      ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + chartH); ctx.stroke();
+    }
+
+    const stepX = chartW / (data.length - 1);
+    const toX = i => padL + stepX * i;
+    const toY = v => padT + chartH - ((v - min) / (max - min)) * chartH;
+
+    const isUp = data[data.length - 1].price >= data[0].price;
+    const lineColor = isUp ? '#00e676' : '#ff5252';
+    const fillColor = isUp ? 'rgba(0,230,118,0.18)' : 'rgba(255,82,82,0.18)';
+
+    ctx.beginPath();
+    ctx.moveTo(toX(0), toY(data[0].price));
+    for (let i = 1; i < data.length; i++) ctx.lineTo(toX(i), toY(data[i].price));
+    ctx.lineTo(toX(data.length - 1), padT + chartH);
+    ctx.lineTo(toX(0), padT + chartH);
+    ctx.closePath();
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(toX(0), toY(data[0].price));
+    for (let i = 1; i < data.length; i++) ctx.lineTo(toX(i), toY(data[i].price));
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.shadowColor = lineColor;
+    ctx.shadowBlur = 8;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    data.forEach((d, i) => {
+      const isMax = (i === 0 || data[i-1].price < d.price) && (i === data.length-1 || data[i+1].price < d.price);
+      const isMin = (i === 0 || data[i-1].price > d.price) && (i === data.length-1 || data[i+1].price > d.price);
+      if (isMax || isMin) {
+        ctx.beginPath();
+        ctx.arc(toX(i), toY(d.price), 3, 0, Math.PI * 2);
+        ctx.fillStyle = isMax ? '#ff5252' : '#00e676';
+        ctx.fill();
+      }
+    });
+
+    const lastX = toX(data.length - 1);
+    const lastY = toY(data[data.length - 1].price);
+    const pulse = 3 + Math.sin(Date.now() / 300) * 1.5;
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, pulse + 4, 0, Math.PI * 2);
+    ctx.fillStyle = isUp ? 'rgba(0,230,118,0.25)' : 'rgba(255,82,82,0.25)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+    ctx.fillStyle = lineColor;
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.font = 'bold 10px Segoe UI';
+    ctx.fillStyle = lineColor;
+    ctx.textAlign = lastX > W - 80 ? 'right' : 'left';
+    ctx.textBaseline = 'bottom';
+    const lx = lastX > W - 80 ? lastX - 8 : lastX + 8;
+    ctx.fillText(data[data.length - 1].price.toFixed(4), lx, lastY - 4);
+  }
+
+  // ===== ИГРА =====
+  function renderCoin() {
+    const lvl = COIN_LEVELS[state.levelIndex];
+    coinEl.style.background = `radial-gradient(circle at 35% 30%, ${lvl.color[0]} 0%, ${lvl.color[1]} 100%)`;
+    coinEl.style.boxShadow = `
+      0 0 40px ${lvl.glow}, 0 0 80px ${lvl.glow},
+      inset 0 -10px 20px rgba(0,0,0,0.3),
+      inset 0 10px 20px rgba(255,255,255,0.3)`;
+    coinEl.style.color = lvl.textColor;
+    coinEl.textContent = lvl.icon;
+    coinNameEl.textContent = lvl.name + ' монета';
+    coinNameEl.style.color = lvl.color[0];
+    coinBonusEl.textContent = '+' + formatNumber(getPerClick()) + ' за клик' + (state.critChance > BASE_CRIT_CHANCE ? ' • крит ' + Math.round(state.critChance*100) + '%' : '');
+    renderUpgradeMain();
+    updateBalanceDisplay();
+  }
+
+  function renderUpgradeMain() {
+    const isMaxed = state.levelIndex >= COIN_LEVELS.length - 1;
+    if (isMaxed) {
+      upgradeMainEl.classList.add('maxed');
+      upgradeMainEl.classList.remove('disabled');
+      upgTitleEl.textContent = 'Уровень ' + MAX_LEVEL + ' / ' + MAX_LEVEL;
+      upgArrowEl.textContent = '★';
+      upgIconEl.textContent = '🏆';
+      upgNewNameEl.textContent = 'МАКСИМУМ ДОСТИГНУТ';
+      upgDescEl.textContent = 'Ты прокачал монету до конца';
+      upgBonusEl.textContent = '';
+      upgCostEl.textContent = '';
+      upgradeMainEl.onclick = null;
+      return;
+    }
+    const current = COIN_LEVELS[state.levelIndex];
+    const next = COIN_LEVELS[state.levelIndex + 1];
+    const canBuy = state.balance >= next.cost;
+    upgradeMainEl.classList.remove('maxed');
+    upgradeMainEl.classList.toggle('disabled', !canBuy);
+    upgTitleEl.textContent = 'Уровень ' + (state.levelIndex + 1) + ' / ' + MAX_LEVEL;
+    upgArrowEl.textContent = '→';
+    upgIconEl.textContent = next.icon;
+    upgNewNameEl.textContent = next.name + ' монета';
+    upgNewNameEl.style.color = next.color[0];
+    upgDescEl.textContent = `С ${current.name.toLowerCase()} → ${next.name.toLowerCase()}`;
+    upgBonusEl.textContent = '+' + formatNumber(next.bonus * clickMultiplier) + ' за клик';
+    upgCostEl.textContent = formatNumber(next.cost) + ' BARC';
+    upgCostEl.style.color = canBuy ? '#ffd700' : '#8892b0';
+    upgradeMainEl.onclick = buyCoinUpgrade;
+  }
+
+  function buyCoinUpgrade() {
+    if (state.levelIndex >= COIN_LEVELS.length - 1) return;
+    const next = COIN_LEVELS[state.levelIndex + 1];
+    if (state.balance < next.cost) return;
+    state.balance -= next.cost;
+    state.levelIndex++;
+    renderCoin();
+    updateUpgradesDisplay();
+    saveGame();
+    showToast('🎉 ' + next.name + ' монета открыта!');
+  }
+
+  function xpNeeded(lvl) { return Math.floor(XP_PER_LEVEL_BASE * Math.pow(XP_GROWTH, lvl - 1)); }
+
+  function addXP(amount) {
+    state.xp += amount;
+    let leveledUp = false;
+    while (state.xp >= xpNeeded(state.playerLevel)) {
+      state.xp -= xpNeeded(state.playerLevel);
+      state.playerLevel++;
+      leveledUp = true;
+    }
+    if (leveledUp) {
+      state.critChance += 0.005;
+      state.maxEnergy += 2;
+      state.energy = state.maxEnergy;
+      updateRank();
+      showToast('⬆️ Уровень ' + state.playerLevel + '! +0.5% крит, +2 энергии');
+    }
+    renderPlayerBars();
+    saveGame();
+  }
+
+  function updateRank() {
+    let rank = RANKS[0];
+    for (const r of RANKS) if (state.playerLevel >= r.minLvl) rank = r;
+    rankBadge.textContent = state.playerLevel + ' УР.';
+    rankTitle.textContent = rank.title;
+  }
+
+  function renderPlayerBars() {
+    const ePercent = (state.energy / state.maxEnergy) * 100;
+    energyBar.style.width = ePercent + '%';
+    energyText.textContent = Math.floor(state.energy) + ' / ' + state.maxEnergy;
+    if (ePercent < 20) energyBar.style.background = 'linear-gradient(90deg, #ff5252, #b71c1c)';
+    else energyBar.style.background = 'linear-gradient(90deg, #ffca28, #ff8f00)';
+
+    const need = xpNeeded(state.playerLevel);
+    const xPercent = (state.xp / need) * 100;
+    xpBar.style.width = xPercent + '%';
+    xpText.textContent = formatNumber(state.xp) + ' / ' + formatNumber(need) + ' XP';
+
+    critStat.textContent = 'Криты: ' + Math.round(state.critChance * 100) + '% • x' + state.critMult;
+
+    const regenInterval = getRegenInterval();
+    regenInfo.textContent = '+1 энергии за ' + regenInterval + ' сек';
+
+    coinEl.classList.toggle('no-energy', state.energy < ENERGY_PER_CLICK);
+  }
+
+  function getRegenInterval() {
+    let base = ENERGY_REGEN_TICKS;
+    const speedUp = upgrades.find(u => u.type === 'regenSpeed');
+    if (speedUp && speedUp.bought > 0) {
+      base = ENERGY_REGEN_TICKS / Math.pow(2, speedUp.bought);
+    }
+    return Math.max(0.5, base).toFixed(1).replace('.0', '');
+  }
+
+  function randomChange() {
+    let volatility = 0.06;
+    let drift = (Math.random() - 0.48) * 0.01;
+    if (state.marketEvent) {
+      const ev = state.marketEvent.effect;
+      if (ev.volatility) volatility *= ev.volatility;
+      if (ev.priceDrift) drift += ev.priceDrift * 0.05;
+    }
+    return (Math.random() * 2 - 1) * volatility + drift;
+  }
+
+  function tickMarketEvent() {
+    if (state.marketEvent) {
+      state.marketEvent.ticksLeft--;
+      if (state.marketEvent.ticksLeft <= 0) {
+        state.marketEvent = null;
+        eventTag.className = 'event bull';
+        eventTag.textContent = '📈 Обычный рынок';
+      } else renderEventTag();
+    } else if (Math.random() < 0.15) startRandomEvent();
+  }
+
+  function startRandomEvent() {
+    const totalW = MARKET_EVENTS.reduce((s, e) => s + e.weight, 0);
+    let r = Math.random() * totalW;
+    let chosen = MARKET_EVENTS[0];
+    for (const e of MARKET_EVENTS) {
+      r -= e.weight;
+      if (r <= 0) { chosen = e; break; }
+    }
+    state.marketEvent = {
+      type: chosen.type, name: chosen.name, emoji: chosen.emoji,
+      ticksLeft: chosen.ticks, effect: chosen.effect
+    };
+    renderEventTag();
+    showToast(chosen.emoji + ' ' + chosen.name + '!');
+  }
+
+  function renderEventTag() {
+    if (!state.marketEvent) {
+      eventTag.className = 'event bull';
+      eventTag.textContent = '📈 Обычный рынок';
+      return;
+    }
+    const ev = state.marketEvent;
+    eventTag.className = 'event ' + ev.type;
+    eventTag.textContent = ev.emoji + ' ' + ev.name + ' (' + ev.ticksLeft + 'с)';
+  }
+
+  function updateRate() {
+    state.prevPrice = state.price;
+    const changePercent = randomChange();
+    state.price = Math.max(0.001, state.price * (1 + changePercent));
+
+    const diff = state.price - state.prevPrice;
+    const diffPercent = (diff / state.prevPrice) * 100;
+    const isUp = diff > 0, isDown = diff < 0;
+
+    ratePriceEl.textContent = state.price.toFixed(4);
+    ratePriceEl.className = 'rate-price ' + (isUp ? 'up' : isDown ? 'down' : '');
+
+    if (isUp) { arrowEl.textContent = '▲'; arrowEl.className = 'arrow up'; }
+    else if (isDown) { arrowEl.textContent = '▼'; arrowEl.className = 'arrow down'; }
+    else { arrowEl.textContent = '—'; arrowEl.className = 'arrow'; }
+
+    const sign = diffPercent >= 0 ? '+' : '';
+    rateChangeEl.textContent = `${sign}${diffPercent.toFixed(2)}%`;
+    rateChangeEl.className = 'rate-change ' + (isUp ? 'up' : isDown ? 'down' : '');
+
+    state.priceHistory.push({ price: state.price });
+    if (state.priceHistory.length > CHART_POINTS) state.priceHistory.shift();
+
+    const prices = state.priceHistory.map(p => p.price);
+    chartHighEl.textContent = Math.max(...prices).toFixed(4);
+    chartLowEl.textContent = Math.min(...prices).toFixed(4);
+    chartTicksEl.textContent = state.priceHistory.length;
+
+    const oldest = state.priceHistory[0].price;
+    const dayPct = ((state.price - oldest) / oldest) * 100;
+    dayChangeEl.textContent = (dayPct >= 0 ? '+' : '') + dayPct.toFixed(2) + '%';
+    dayChangeEl.style.color = dayPct >= 0 ? '#00e676' : '#ff5252';
+
+    drawChart();
+    tickMarketEvent();
+    updateBalanceDisplay();
+  }
+
+  function updateBalanceDisplay() {
+    balanceEl.textContent = formatNumber(state.balance);
+    const usd = state.balance * state.price;
+    balanceUsdEl.textContent = `≈ $${formatNumber(usd)} • Продано: $${state.usdBalance.toFixed(2)}`;
+    sellBtn.disabled = state.balance < 1;
+  }
+
+  function handleClick(e) {
+    if (state.energy < ENERGY_PER_CLICK) {
+      showToast('⚡ Нет энергии! Подожди восстановления', true);
+      return;
+    }
+    state.energy -= ENERGY_PER_CLICK;
+
+    const isCrit = Math.random() < state.critChance;
+    let gain = getPerClick();
+    if (isCrit) {
+      gain *= state.critMult;
+      coinEl.classList.add('crit');
+      setTimeout(() => coinEl.classList.remove('crit'), 300);
+    }
+
+    state.balance += gain;
+    state.totalClicks++;
+    addXP(XP_PER_CLICK);
+
+    // Позиционирование всплывающей цифры — работает и для touch, и для mouse
+    const zoneRect = coinZoneEl.getBoundingClientRect();
+    let x, y;
+    if (e.clientX || e.clientY) {
+      x = e.clientX - zoneRect.left;
+      y = e.clientY - zoneRect.top;
+    } else if (e.touches && e.touches[0]) {
+      x = e.touches[0].clientX - zoneRect.left;
+      y = e.touches[0].clientY - zoneRect.top;
+    } else {
+      x = zoneRect.width / 2;
+      y = zoneRect.height / 2;
+    }
+
+    const floatEl = document.createElement('div');
+    floatEl.className = 'float-num' + (isCrit ? ' crit' : '');
+    floatEl.textContent = (isCrit ? '💥 КРИТ +' : '+') + formatNumber(gain);
+    floatEl.style.left = x + 'px';
+    floatEl.style.top = y + 'px';
+    floatEl.style.transform = 'translate(-50%, -50%)';
+    if (!isCrit) floatEl.style.color = COIN_LEVELS[state.levelIndex].color[0];
+    coinZoneEl.appendChild(floatEl);
+    setTimeout(() => floatEl.remove(), 900);
+
+    renderPlayerBars();
+    updateBalanceDisplay();
+    updateUpgradesDisplay();
+    renderUpgradeMain();
+    saveGame();
+  }
+
+  function renderUpgrades() {
+    upgradesEl.innerHTML = '';
+    upgrades.forEach(u => {
+      const canBuy = state.balance >= u.cost;
+      const div = document.createElement('div');
+      div.className = 'upgrade' + (canBuy ? '' : ' disabled');
+      div.innerHTML = `
+        <div class="upgrade-name">${u.name}</div>
+        <div class="upgrade-effect">${u.effect}</div>
+        <div class="upgrade-cost-small">${formatNumber(u.cost)} BARC${u.bought > 0 ? ' • x' + u.bought : ''}</div>
+      `;
+      div.onclick = () => buyUpgrade(u);
+      upgradesEl.appendChild(div);
+    });
+  }
+
+  function updateUpgradesDisplay() {
+    const all = upgradesEl.querySelectorAll('.upgrade');
+    upgrades.forEach((u, i) => all[i] && all[i].classList.toggle('disabled', state.balance < u.cost));
+  }
+
+  function buyUpgrade(u) {
+    if (state.balance < u.cost) return;
+    state.balance -= u.cost;
+    u.bought++;
+
+    switch (u.type) {
+      case 'maxEnergy':  state.maxEnergy += u.value; break;
+      case 'regenSpeed': break;
+      case 'crit':       state.critChance += u.value; break;
+      case 'critMult':   state.critMult += u.value; break;
+      case 'mult':       clickMultiplier *= u.value; break;
+      case 'auto':       autoPerSec += u.value; break;
+    }
+
+    u.cost = Math.floor(u.cost * COST_MULTIPLIER);
+    renderUpgrades();
+    renderCoin();
+    renderPlayerBars();
+    updateUpgradesDisplay();
+    saveGame();
+    showToast('✅ ' + u.name + ' куплен!');
+  }
+
+  sellBtn.onclick = () => {
+    if (state.balance < 1) return;
+    const gross = state.balance * state.price;
+    const tax = gross * TAX_RATE;
+    const net = gross - tax;
+    state.usdBalance += net;
+    state.balance = 0;
+    updateBalanceDisplay();
+    updateUpgradesDisplay();
+    renderUpgradeMain();
+    saveGame();
+    showToast(`💰 $${net.toFixed(2)} (налог $${tax.toFixed(2)})`);
+  };
+
+  resetBtn.onclick = () => {
+    if (!confirm('Сбросить весь прогресс?')) return;
+    localStorage.removeItem('barcoin_clicker_v5');
+    location.reload();
+  };
+
+  setInterval(() => {
+    state.totalPlayedSeconds++;
+
+    if (autoPerSec > 0) {
+      state.balance += autoPerSec;
+      addXP(1);
+      updateBalanceDisplay();
+      updateUpgradesDisplay();
+      renderUpgradeMain();
+      saveGame();
+    }
+
+    if (state.energy < state.maxEnergy) {
+      const interval = parseFloat(getRegenInterval());
+      state.energyProgress += 1;
+      if (state.energyProgress >= interval) {
+        state.energyProgress = 0;
+        state.energy = Math.min(state.maxEnergy, state.energy + 1);
+        renderPlayerBars();
+      }
+    }
+  }, 1000);
+
+  setInterval(() => { if (state.priceHistory.length > 1) drawChart(); }, 100);
+
+  function saveGame() {
+    localStorage.setItem('barcoin_clicker_v5', JSON.stringify({
+      balance: state.balance,
+      levelIndex: state.levelIndex,
+      usdBalance: state.usdBalance,
+      totalClicks: state.totalClicks,
+      energy: state.energy,
+      maxEnergy: state.maxEnergy,
+      energyProgress: state.energyProgress,
+      xp: state.xp,
+      playerLevel: state.playerLevel,
+      critChance: state.critChance,
+      critMult: state.critMult,
+      price: state.price,
+      priceHistory: state.priceHistory.slice(-CHART_POINTS),
+      autoPerSec, clickMultiplier,
+      upgrades: upgrades.map(u => ({ bought: u.bought, cost: u.cost }))
+    }));
+  }
+
+  function loadGame() {
+    try {
+      const saved = localStorage.getItem('barcoin_clicker_v5');
+      if (!saved) return;
+      const d = JSON.parse(saved);
+      Object.assign(state, {
+        balance: d.balance || 0,
+        levelIndex: d.levelIndex || 0,
+        usdBalance: d.usdBalance || 0,
+        totalClicks: d.totalClicks || 0,
+        energy: d.energy ?? MAX_ENERGY,
+        maxEnergy: d.maxEnergy || MAX_ENERGY,
+        energyProgress: d.energyProgress || 0,
+        xp: d.xp || 0,
+        playerLevel: d.playerLevel || 1,
+        critChance: d.critChance || BASE_CRIT_CHANCE,
+        critMult: d.critMult || BASE_CRIT_MULT,
+        price: d.price || 1.0,
+        priceHistory: d.priceHistory || []
+      });
+      autoPerSec = d.autoPerSec || 0;
+      clickMultiplier = d.clickMultiplier || 1;
+      if (d.upgrades) {
+        d.upgrades.forEach((u, i) => {
+          if (upgrades[i]) {
+            upgrades[i].bought = u.bought || 0;
+            if (u.cost) upgrades[i].cost = u.cost;
+          }
+        });
+      }
+    } catch(e) { console.log('Ошибка загрузки', e); }
+  }
+
+  loadGame();
+  updateRank();
+  renderUpgrades();
+  renderCoin();
+  renderPlayerBars();
+  updateUpgradesDisplay();
+  coinEl.addEventListener('click', handleClick);
+  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 200));
+
+  if (state.priceHistory.length < 5) {
+    state.priceHistory = [];
+    let p = 1.0;
+    for (let i = 0; i < 30; i++) {
+      p *= (1 + (Math.random() * 2 - 1) * 0.06);
+      state.priceHistory.push({ price: p });
+    }
+    state.price = p;
+  }
+
+  resizeCanvas();
+  updateRate();
+  setInterval(updateRate, 2000);
+
+  // Перерисовка canvas после полной загрузки шрифтов/лейаута
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => setTimeout(resizeCanvas, 100));
+  }
+  setTimeout(resizeCanvas, 300);
+</script>
+
+</body>
+</html>
