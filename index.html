@@ -13,13 +13,85 @@
   :root {
     --bg-top: #1a1f3a;
     --bg-bottom: #0a0d1a;
-    --card-bg: linear-gradient(135deg, #161b33 0%, #0d1126 100%);
+    --card-from: #161b33;
+    --card-to: #0d1126;
+    --card-bg: linear-gradient(135deg, var(--card-from) 0%, var(--card-to) 100%);
     --card-border: #2a3154;
+    --accent: #ffd700;
+    --accent-soft: rgba(255,215,0,0.15);
+    --accent-glow: rgba(255,215,0,0.4);
+    --btn-text: #002200;
     --gold: #ffd700;
     --green: #00e676;
     --red: #ff5252;
+    --text: #ffffff;
     --text-dim: #8892b0;
     --text-darker: #4a5474;
+    --track: rgba(0,0,0,0.4);
+    --grid-line: #1e2540;
+    --chart-label: #4a5474;
+  }
+
+  /* ============ ТЕМЫ (переключаются в настройках) ============ */
+  body[data-theme="emerald"] {
+    --bg-top: #0c2b1e; --bg-bottom: #04120b;
+    --card-from: #0e2a1d; --card-to: #061710; --card-border: #1f4d36;
+    --accent: #35e08a; --accent-soft: rgba(53,224,138,0.15); --accent-glow: rgba(53,224,138,0.4);
+    --gold: #35e08a; --btn-text: #03150a; --text-dim: #8fb8a4; --text-darker: #4a7263;
+    --track: rgba(0,0,0,0.45); --grid-line: #123424; --chart-label: #4a7263;
+  }
+  body[data-theme="ruby"] {
+    --bg-top: #3a1020; --bg-bottom: #14040a;
+    --card-from: #300d1c; --card-to: #17050d; --card-border: #5c2438;
+    --accent: #ff5c8a; --accent-soft: rgba(255,92,138,0.15); --accent-glow: rgba(255,92,138,0.4);
+    --gold: #ff5c8a; --btn-text: #2b0512; --text-dim: #c08ea0; --text-darker: #7c4a5e;
+    --track: rgba(0,0,0,0.45); --grid-line: #401226; --chart-label: #7c4a5e;
+  }
+  body[data-theme="sunset"] {
+    --bg-top: #3a1a0a; --bg-bottom: #160802;
+    --card-from: #2e1508; --card-to: #180a03; --card-border: #5c3316;
+    --accent: #ffab40; --accent-soft: rgba(255,171,64,0.15); --accent-glow: rgba(255,171,64,0.4);
+    --gold: #ffab40; --btn-text: #2b1200; --text-dim: #c09a80; --text-darker: #7a5a44;
+    --track: rgba(0,0,0,0.45); --grid-line: #40230f; --chart-label: #7a5a44;
+  }
+  body[data-theme="ocean"] {
+    --bg-top: #06263a; --bg-bottom: #010d16;
+    --card-from: #072336; --card-to: #031420; --card-border: #144663;
+    --accent: #4fc3f7; --accent-soft: rgba(79,195,247,0.15); --accent-glow: rgba(79,195,247,0.4);
+    --gold: #4fc3f7; --btn-text: #001522; --text-dim: #82aabf; --text-darker: #44697e;
+    --track: rgba(0,0,0,0.45); --grid-line: #0a3048; --chart-label: #44697e;
+  }
+  body[data-theme="purple"] {
+    --bg-top: #241040; --bg-bottom: #0d0518;
+    --card-from: #1f0e38; --card-to: #120822; --card-border: #3f2270;
+    --accent: #b388ff; --accent-soft: rgba(179,136,255,0.15); --accent-glow: rgba(179,136,255,0.4);
+    --gold: #b388ff; --btn-text: #150530; --text-dim: #a08cc0; --text-darker: #624d84;
+    --track: rgba(0,0,0,0.45); --grid-line: #2c1450; --chart-label: #624d84;
+  }
+  body[data-theme="neon"] {
+    --bg-top: #0a1420; --bg-bottom: #02060a;
+    --card-from: #081a1a; --card-to: #031010; --card-border: #0f4d4d;
+    --accent: #00fff0; --accent-soft: rgba(0,255,240,0.12); --accent-glow: rgba(0,255,240,0.45);
+    --gold: #00fff0; --btn-text: #002220; --text-dim: #6fb8b0; --text-darker: #3a7a72;
+    --track: rgba(0,0,0,0.5); --grid-line: #0a3838; --chart-label: #3a7a72;
+  }
+  body[data-theme="candy"] {
+    --bg-top: #ffe0ec; --bg-bottom: #ffc9dd;
+    --card-from: #fff4f8; --card-to: #ffe3ef; --card-border: #ffb3cd;
+    --accent: #e040a0; --accent-soft: rgba(224,64,160,0.12); --accent-glow: rgba(224,64,160,0.35);
+    --gold: #e040a0; --text: #4a1030; --btn-text: #ffffff;
+    --text-dim: #9a5a7a; --text-darker: #b08aa0;
+    --track: rgba(0,0,0,0.12); --grid-line: #ffd0e2; --chart-label: #b06a8a;
+    --green: #00b060; --red: #ff4d6d;
+  }
+  body[data-theme="light"] {
+    --bg-top: #f4f6fb; --bg-bottom: #dde3f0;
+    --card-from: #ffffff; --card-to: #eef1f8; --card-border: #ccd4e4;
+    --accent: #1565c0; --accent-soft: rgba(21,101,192,0.12); --accent-glow: rgba(21,101,192,0.3);
+    --gold: #c98a00; --text: #1c2338; --btn-text: #ffffff;
+    --text-dim: #5a668a; --text-darker: #97a1bd;
+    --track: rgba(0,0,0,0.1); --grid-line: #dfe5f0; --chart-label: #8a94ad;
+    --green: #00a152; --red: #e03434;
   }
 
   html, body {
@@ -32,7 +104,8 @@
   body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: radial-gradient(circle at 50% 0%, var(--bg-top) 0%, var(--bg-bottom) 70%);
-    color: #fff;
+    background-attachment: fixed;
+    color: var(--text);
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
@@ -44,17 +117,63 @@
   }
 
   /* ============================================================
-     ЗАГОЛОВОК
+     ЗАГОЛОВОК + КНОПКА НАСТРОЕК + ЛОГОТИП
      ============================================================ */
   .header {
     text-align: center;
     margin-bottom: 12px;
     padding-top: 12px;
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .logo-coin {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 18px var(--accent-glow), 0 4px 10px rgba(0,0,0,0.4);
+    animation: coinFloat 3s ease-in-out infinite;
+  }
+
+  .settings-btn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-dim);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    z-index: 30;
+  }
+  .settings-btn:hover, .settings-btn:active {
+    color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-50%) rotate(40deg);
+    box-shadow: 0 0 18px var(--accent-glow);
   }
 
   h1 {
     font-size: 28px;
-    background: linear-gradient(90deg, #ffd700, #ff9500, #ffd700);
+    background: linear-gradient(90deg, var(--accent), var(--gold));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -125,8 +244,8 @@
   }
 
   .rank-badge {
-    background: linear-gradient(135deg, #ffd700, #ff9500);
-    color: #2b1406;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    color: var(--btn-text);
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 11px;
@@ -140,7 +259,7 @@
   .bar-track {
     flex: 1;
     height: 14px;
-    background: rgba(0,0,0,0.4);
+    background: var(--track);
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid var(--card-border);
@@ -269,8 +388,8 @@
      БАЛАНС
      ============================================================ */
   .balance-card {
-    background: linear-gradient(135deg, #1f2647 0%, #131834 100%);
-    border: 1px solid #ffd70033;
+    background: var(--card-bg);
+    border: 1px solid var(--accent-glow);
     border-radius: 16px;
     padding: 14px 18px;
     text-align: center;
@@ -280,7 +399,7 @@
   .balance-value {
     font-size: 34px;
     font-weight: 800;
-    background: linear-gradient(90deg, #ffd700, #ffb300);
+    background: linear-gradient(90deg, var(--accent), var(--gold));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -320,6 +439,49 @@
     transition: transform 0.08s ease, box-shadow 0.3s, background 0.6s, filter 0.3s;
     position: relative;
     animation: coinFloat 3s ease-in-out infinite;
+    overflow: hidden;
+  }
+
+  /* Монета-картинка (image/coin.png) поверх цветного фона уровня */
+  .coin-img {
+    position: absolute;
+    inset: 4%;
+    width: 92%;
+    height: 92%;
+    object-fit: cover;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .coin-glyph {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.28;
+    filter: saturate(0.4);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Эффект «монеток» при клике */
+  .fly-coin {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border-radius: 50%;
+    object-fit: cover;
+    pointer-events: none;
+    z-index: 12;
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+    animation: flyCoin 0.85s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+  }
+  @keyframes flyCoin {
+    0%   { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    100% { opacity: 0; transform: translate(var(--fx), var(--fy)) rotate(var(--fr)) scale(0.5); }
   }
 
   @keyframes coinFloat {
@@ -342,7 +504,7 @@
     font-size: 22px;
     font-weight: 800;
     color: var(--gold);
-    text-shadow: 0 0 12px rgba(255,215,0,0.9);
+    text-shadow: 0 0 12px var(--accent-glow);
     pointer-events: none;
     animation: floatUp 0.9s ease-out forwards;
     z-index: 10;
@@ -397,8 +559,8 @@
   }
 
   .upgrade-main {
-    background: linear-gradient(135deg, #1f2647 0%, #131834 100%);
-    border: 1px solid #ffd70055;
+    background: var(--card-bg);
+    border: 1px solid var(--accent);
     border-radius: 16px;
     padding: 14px;
     cursor: pointer;
@@ -414,20 +576,20 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.15), transparent);
+    background: linear-gradient(90deg, transparent, var(--accent-soft), transparent);
     transition: left 0.6s;
   }
 
   .upgrade-main:hover:not(.disabled)::before { left: 100%; }
   .upgrade-main:hover:not(.disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(255,215,0,0.25);
-    border-color: var(--gold);
+    box-shadow: 0 10px 30px var(--accent-glow);
+    border-color: var(--accent);
   }
   .upgrade-main.disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--card-border); }
   .upgrade-main.maxed {
     border-color: var(--green);
-    background: linear-gradient(135deg, #0d3320 0%, #061a10 100%);
+    background: var(--card-bg);
     cursor: default;
   }
 
@@ -486,9 +648,9 @@
     text-align: left;
   }
   .upgrade:hover:not(.disabled) {
-    border-color: #ffd70066;
+    border-color: var(--accent);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255,215,0,0.15);
+    box-shadow: 0 6px 20px var(--accent-glow);
   }
   .upgrade.disabled { opacity: 0.45; cursor: not-allowed; }
   .upgrade-name { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 3px; }
@@ -525,7 +687,7 @@
 
   .btn-sell {
     background: linear-gradient(135deg, var(--green), #00994d);
-    color: #002200;
+    color: var(--btn-text);
     box-shadow: 0 6px 20px rgba(0,230,118,0.3);
   }
   .btn-sell:hover:not(:disabled) {
@@ -550,7 +712,7 @@
     left: 50%;
     transform: translateX(-50%) translateY(120px);
     background: linear-gradient(135deg, var(--green), #00994d);
-    color: #002200;
+    color: var(--btn-text);
     padding: 12px 24px;
     border-radius: 30px;
     font-weight: 700;
@@ -577,6 +739,182 @@
     margin-top: 16px;
     letter-spacing: 1px;
     padding-bottom: 12px;
+  }
+
+
+  /* ============================================================
+     МОДАЛЬНОЕ ОКНО НАСТРОЕК
+     ============================================================ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-overlay.visible { opacity: 1; }
+
+  .modal {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 480px;
+    max-height: min(85vh, 700px);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px var(--accent-soft);
+    transform: translateY(30px) scale(0.97);
+    transition: transform 0.25s;
+  }
+  .modal-overlay.visible .modal { transform: translateY(0) scale(1); }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--card-border);
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: 16px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+  .modal-close {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--text-dim);
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { color: var(--red); border-color: var(--red); }
+
+  .modal-body { overflow-y: auto; padding: 16px 20px 20px; overscroll-behavior: contain; }
+
+  .settings-section { margin-bottom: 20px; }
+  .settings-section:last-child { margin-bottom: 4px; }
+  .settings-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 8px;
+  }
+  .theme-card {
+    border: 2px solid var(--card-border);
+    border-radius: 12px;
+    padding: 8px 6px 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    background: var(--track);
+  }
+  .theme-card:hover { transform: translateY(-2px); }
+  .theme-card.active { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
+  .theme-preview {
+    height: 34px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    border: 1px solid rgba(255,255,255,0.12);
+    position: relative;
+    overflow: hidden;
+  }
+  .theme-preview::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 16px; height: 16px;
+    margin: -8px 0 0 -8px;
+    border-radius: 50%;
+    background: var(--tp-accent);
+    box-shadow: 0 0 8px var(--tp-accent);
+  }
+  .theme-name { font-size: 10px; font-weight: 700; color: var(--text); line-height: 1.2; }
+
+  .lang-select-wrap { position: relative; }
+  .lang-search {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: var(--track);
+    color: var(--text);
+    font-size: 13px;
+    margin-bottom: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .lang-search:focus { border-color: var(--accent); }
+  .lang-search::placeholder { color: var(--text-darker); }
+  select.lang-select {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: var(--track);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+  }
+  select.lang-select option { background: #1a1f33; color: #fff; }
+  .lang-count { font-size: 10px; color: var(--text-darker); margin-top: 6px; text-align: right; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--track);
+    margin-bottom: 8px;
+  }
+  .toggle-text { min-width: 0; }
+  .toggle-name { font-size: 13px; font-weight: 700; }
+  .toggle-desc { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+  .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; cursor: pointer; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0;
+    background: var(--text-darker);
+    border-radius: 20px;
+    transition: 0.25s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    left: 3px; top: 3px;
+    border-radius: 50%;
+    background: #fff;
+    transition: 0.25s;
+  }
+  .switch input:checked + .slider { background: var(--accent); }
+  .switch input:checked + .slider::before { transform: translateX(20px); }
+
+  @media (max-width: 380px) {
+    .theme-grid { grid-template-columns: repeat(3, 1fr); }
   }
 
   /* ============================================================
@@ -724,8 +1062,12 @@
 <body>
 
   <div class="header">
-    <h1>БАРКОИН</h1>
-    <div class="subtitle">Кликер • BARC</div>
+    <button class="settings-btn" id="settingsBtn" title="Настройки" aria-label="Настройки">⚙️</button>
+    <div class="logo-row">
+      <img class="logo-coin" src="image/coin.png" alt="BARC">
+      <h1 data-i18n="title">БАРКОИН</h1>
+    </div>
+    <div class="subtitle"><span data-i18n="subtitle">Кликер</span> • BARC</div>
   </div>
 
   <div class="container">
@@ -738,25 +1080,25 @@
         <div class="player-row">
           <div class="player-rank">
             <span class="rank-badge" id="rankBadge">1 УР.</span>
-            <span class="rank-title" id="rankTitle">Новичок</span>
+            <span class="rank-title" id="rankTitle" data-i18n="rank_novice">Новичок</span>
           </div>
-          <div style="font-size:11px;color:#8892b0;" id="critStat">Криты: 0%</div>
+          <div style="font-size:11px;color:var(--text-dim);" id="critStat">Криты: 0%</div>
         </div>
 
         <div class="bar-wrap">
           <div class="bar-icon">⚡</div>
           <div class="bar-track">
             <div class="bar-fill energy" id="energyBar" style="width:100%"></div>
-            <div class="bar-text" id="energyText">30 / 30</div>
+            <div class="bar-text" id="energyText"></div>
           </div>
         </div>
-        <div class="regen-info" id="regenInfo">+1 энергии за 5 сек</div>
+        <div class="regen-info" id="regenInfo" data-i18n="regen_info">+1 энергии за 5 сек</div>
 
         <div class="bar-wrap">
           <div class="bar-icon">⭐</div>
           <div class="bar-track">
             <div class="bar-fill xp" id="xpBar" style="width:0%"></div>
-            <div class="bar-text" id="xpText">0 / 100 XP</div>
+            <div class="bar-text" id="xpText"></div>
           </div>
         </div>
       </div>
@@ -765,7 +1107,7 @@
       <div class="rate-card">
         <div class="rate-top">
           <div>
-            <div class="label">Курс BARC</div>
+            <div class="label" data-i18n="rate_label">Курс BARC</div>
             <div class="rate-price-row">
               <div class="rate-price" id="ratePrice">1.0000</div>
               <div class="arrow" id="arrow">—</div>
@@ -774,11 +1116,11 @@
           </div>
           <div style="text-align:right;">
             <div class="rate-stats">
-              <div>Макс: <b id="chartHigh">—</b></div>
-              <div>Мин: <b id="chartLow">—</b></div>
+              <div><span data-i18n="chart_high">Макс:</span> <b id="chartHigh">—</b></div>
+              <div><span data-i18n="chart_low">Мин:</span> <b id="chartLow">—</b></div>
             </div>
             <div class="rate-stats" style="margin-top:4px;justify-content:flex-end;">
-              <div>Свечей: <b id="chartTicks">0</b></div>
+              <div><span data-i18n="chart_points">Свечей:</span> <b id="chartTicks">0</b></div>
             </div>
           </div>
         </div>
@@ -788,14 +1130,14 @@
         </div>
 
         <div class="chart-legend">
-          <span>← 80 последних точек</span>
-          <span>сейчас →</span>
+          <span data-i18n="chart_left">← 80 последних точек</span>
+          <span data-i18n="chart_right">сейчас →</span>
         </div>
 
         <div class="event-row">
-          <div class="event bull" id="eventTag">📈 Обычный рынок</div>
+          <div class="event bull" id="eventTag"></div>
           <div class="rate-stats">
-            <div>24ч изм.: <b id="dayChange">+0.00%</b></div>
+            <div><span data-i18n="day_change">24ч изм.:</span> <b id="dayChange">+0.00%</b></div>
           </div>
         </div>
       </div>
@@ -807,14 +1149,14 @@
 
       <!-- Баланс -->
       <div class="balance-card">
-        <div class="label">Твой баланс</div>
+        <div class="label" data-i18n="balance_label">Твой баланс</div>
         <div class="balance-value" id="balance">0</div>
         <div class="balance-usd" id="balanceUsd">≈ $0.00</div>
       </div>
 
       <!-- Монета -->
       <div class="coin-zone" id="coinZone">
-        <div class="coin" id="coin">₿</div>
+        <div class="coin" id="coin"><span class="coin-glyph" id="coinGlyph">₿</span><img class="coin-img" src="image/coin.png" alt="" draggable="false"></div>
       </div>
       <div class="coin-info">
         <div class="coin-name" id="coinName">Обычная монета</div>
@@ -822,42 +1164,87 @@
       </div>
 
       <!-- Прокачка монеты -->
-      <div class="shop-title">Прокачка монеты</div>
+      <div class="shop-title" data-i18n="shop_upgrade">Прокачка монеты</div>
       <div class="upgrade-main" id="upgradeMain">
         <div class="upgrade-header">
-          <div class="upgrade-title" id="upgTitle">Уровень 1 / 18</div>
+          <div class="upgrade-title" id="upgTitle"></div>
           <div class="upgrade-arrow" id="upgArrow">→</div>
         </div>
         <div class="upgrade-body">
           <div class="upgrade-icon" id="upgIcon">🪨</div>
           <div class="upgrade-info">
             <div class="upgrade-new-name" id="upgNewName">Каменная монета</div>
-            <div class="upgrade-desc" id="upgDesc">Следующий уровень</div>
+            <div class="upgrade-desc" id="upgDesc" data-i18n="next_level">Следующий уровень</div>
             <div class="upgrade-bonus" id="upgBonus">+5 за клик</div>
           </div>
           <div style="text-align:right;">
             <div class="upgrade-cost" id="upgCost">100 BARC</div>
-            <div style="font-size:9px;color:#8892b0;margin-top:2px;">стоимость</div>
+            <div style="font-size:9px;color:var(--text-dim);margin-top:2px;" data-i18n="cost_label">стоимость</div>
           </div>
         </div>
       </div>
 
       <!-- Улучшения -->
-      <div class="shop-title">Улучшения</div>
+      <div class="shop-title" data-i18n="shop_upgrades">Улучшения</div>
       <div class="upgrades-grid" id="upgrades"></div>
 
       <!-- Кнопки -->
       <div class="actions">
-        <button class="btn btn-sell" id="sellBtn" disabled>Продать всё</button>
-        <button class="btn btn-reset" id="resetBtn">Сброс</button>
+        <button class="btn btn-sell" id="sellBtn" disabled data-i18n="sell_all">Продать всё</button>
+        <button class="btn btn-reset" id="resetBtn" data-i18n="reset">Сброс</button>
       </div>
 
     </div>
   </div>
 
-  <div class="footer">Клик = доход • Курс меняется каждые 2 сек</div>
+  <div class="footer" data-i18n="footer">Клик = доход • Курс меняется каждые 2 сек</div>
 
   <div class="toast" id="toast"></div>
+
+  <!-- МОДАЛЬНОЕ ОКНО НАСТРОЕК -->
+  <div class="modal-overlay" id="settingsOverlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-title" data-i18n="settings_title">Настройки</div>
+        <button class="modal-close" id="settingsClose" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="settings-section">
+          <div class="settings-label">🎨 <span data-i18n="theme_label">Тема оформления</span></div>
+          <div class="theme-grid" id="themeGrid"></div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-label">🌍 <span data-i18n="language_label">Язык интерфейса</span></div>
+          <div class="lang-select-wrap">
+            <input type="text" class="lang-search" id="langSearch" placeholder="Поиск языка..." autocomplete="off">
+            <select class="lang-select" id="langSelect" size="7"></select>
+            <div class="lang-count" id="langCount"></div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-label">⚙️ <span data-i18n="other_label">Прочее</span></div>
+          <div class="toggle-row">
+            <div class="toggle-text">
+              <div class="toggle-name" data-i18n="sound_name">Звуки</div>
+              <div class="toggle-desc" data-i18n="sound_desc">Звуковые эффекты кликов и покупок</div>
+            </div>
+            <label class="switch"><input type="checkbox" id="soundToggle"><span class="slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-text">
+              <div class="toggle-name" data-i18n="fx_name">Эффект монеток</div>
+              <div class="toggle-desc" data-i18n="fx_desc">Разлетающиеся монеты при клике</div>
+            </div>
+            <label class="switch"><input type="checkbox" id="coinFxToggle" checked><span class="slider"></span></label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
 <script>
   // ================================================================
@@ -927,25 +1314,348 @@
   ];
 
   const RANKS = [
-    { minLvl: 1,  title: 'Новичок' },
-    { minLvl: 3,  title: 'Любитель' },
-    { minLvl: 5,  title: 'Трейдер' },
-    { minLvl: 8,  title: 'Инвестор' },
-    { minLvl: 11, title: 'Магнат' },
-    { minLvl: 14, title: 'Крипто-барон' },
-    { minLvl: 17, title: 'Барский лорд' },
-    { minLvl: 20, title: 'Легенда' }
+    { minLvl: 1,  key: 'rank_novice' },
+    { minLvl: 3,  key: 'rank_amateur' },
+    { minLvl: 5,  key: 'rank_trader' },
+    { minLvl: 8,  key: 'rank_investor' },
+    { minLvl: 11, key: 'rank_tycoon' },
+    { minLvl: 14, key: 'rank_baron' },
+    { minLvl: 17, key: 'rank_lord' },
+    { minLvl: 20, key: 'rank_legend' }
   ];
 
   const MARKET_EVENTS = [
-    { type: 'bull',  name: 'Бычий рынок',    emoji: '📈', ticks: 15, effect: { priceDrift: +0.03 },  weight: 30 },
-    { type: 'bear',  name: 'Медвежий рынок', emoji: '📉', ticks: 15, effect: { priceDrift: -0.03 },  weight: 30 },
-    { type: 'crash', name: 'КРАХ!',          emoji: '💥', ticks: 8,  effect: { priceDrift: -0.15 },  weight: 14 },
-    { type: 'moon',  name: 'ТО THE MOON!',   emoji: '🚀', ticks: 10, effect: { priceDrift: +0.15 },  weight: 12 },
-    { type: 'volatile', name: 'Волатильность', emoji: '⚡', ticks: 12, effect: { volatility: 3 },      weight: 14 }
+    { type: 'bull',     emoji: '📈', ticks: 15, effect: { priceDrift: +0.03 },  weight: 30 },
+    { type: 'bear',     emoji: '📉', ticks: 15, effect: { priceDrift: -0.03 },  weight: 30 },
+    { type: 'crash',    emoji: '💥', ticks: 8,  effect: { priceDrift: -0.15 },  weight: 14 },
+    { type: 'moon',     emoji: '🚀', ticks: 10, effect: { priceDrift: +0.15 },  weight: 12 },
+    { type: 'volatile', emoji: '⚡', ticks: 12, effect: { volatility: 3 },      weight: 14 }
   ];
 
   const $ = id => document.getElementById(id);
+  let currentLang = 'ru';
+
+  // ================================================================
+  // СПРАВОЧНИК ЯЗЫКОВ (ISO 639-1) — все основные языки мира
+  // ================================================================
+  const LANG_NAMES = {
+    ab:'Аҧсуа', ace:'Achinese', af:'Afrikaans', ak:'Akan', am:'አማርኛ', an:'Aragonés',
+    ar:'العربية', as:'অসমীয়া', av:'Авар', ay:'Aymarã', az:'Azərbaycan', ba:'Башҡортса',
+    be:'Беларуская', bg:'Български', bh:'भोजपुरी', bi:'Bislama', bm:'Bamanankan',
+    bn:'বাংলা', bo:'བོད་ཡིག', br:'Brezhoneg', bs:'Bosanski', ca:'Català',
+    ce:'Нохчийн', ch:'Chamoru', co:'Corsu', cr:'ᓀᐦᐃᔭᐍᐏᐣ', cs:'Čeština', cu:'Словѣньскъ',
+    cv:'Чӑвашла', cy:'Cymraeg', da:'Dansk', de:'Deutsch', dv:'ދިވެހި', dz:'རྫོང་ཁ',
+    ee:'Eʋegbe', el:'Ελληνικά', en:'English', eo:'Esperanto', es:'Español',
+    et:'Eesti', eu:'Euskara', fa:'فارسی', ff:'Fulfulde', fi:'Suomi', fj:'Na Vosa Vakaviti',
+    fo:'Føroyskt', fr:'Français', fy:'Frysk', ga:'Gaeilge', gd:'Gàidhlig', gl:'Galego',
+    gn:'Avañe\'ẽ', gu:'ગુજરાતી', gv:'Gaelg', ha:'Hausa', he:'עברית', hi:'हिन्दी',
+    ho:'Hiri Motu', hr:'Hrvatski', ht:'Kreyòl Ayisyen', hu:'Magyar', hy:'Հայերեն',
+    hz:'Otjiherero', ia:'Interlingua', id:'Bahasa Indonesia', ie:'Interlingue',
+    ig:'Asụsụ Igbo', ii:'ꆈꌠ꒿ Nuosuhxop', ik:'Iñupiaq', io:'Ido', is:'Íslenska',
+    it:'Italiano', iu:'ᐃᓄᒃᑎᑐᑦ', ja:'日本語', jv:'Basa Jawa', ka:'ქართული', kg:'KiKongo',
+    ki:'Gĩkũyũ', kj:'Kuanyama', kk:'Қазақша', kl:'Kalaallisut', km:'ភាសាខ្មែរ',
+    kn:'ಕನ್ನಡ', ko:'한국어', kr:'Kanuri', ks:'कश्मीरी', ku:'Kurdî', kv:'Коми', kw:'Kernewek',
+    ky:'Кыргызча', la:'Latina', lb:'Lëtzebuergesch', lg:'Luganda', li:'Limburgs',
+    ln:'Lingála', lo:'ລາວ', lt:'Lietuvių', lu:'Kiluba', lv:'Latviešu',
+    mg:'Malagasy', mh:'Kajin M̧ajeļ', mi:'Māori', mk:'Македонски', ml:'മലയാളം',
+    mn:'Монгол', mr:'मराठी', ms:'Bahasa Melayu', mt:'Malti', my:'မြန်မာ', na:'Dorerin Naoero',
+    nb:'Norsk Bokmål', nd:'IsiNdebele', ne:'नेपाली', ng:'Owambo', nl:'Nederlands',
+    nn:'Norsk Nynorsk', no:'Norsk', nr:'isiNdebele', nv:'Diné Bizaad', ny:'Chichewa',
+    oc:'Occitan', oj:'ᐊᓂᔑᓈᐯᒧᐎᓐ', om:'Afaan Oromoo', or:'ଓଡ଼ିଆ', os:'Ирон', pa:'ਪੰਜਾਬੀ',
+    pl:'Polski', ps:'پښتو', pt:'Português', qu:'Runa Simi', rm:'Rumantsch', rn:'Ikirundi',
+    ro:'Română', ru:'Русский', rw:'Ikinyarwanda', sa:'संस्कृतम्', sc:'Sardu', sd:'सिन्धी',
+    se:'Davvisámegiella', sg:'Yângâ Tî Na', si:'සිංහල', sk:'Slovenčina', sl:'Slovenščina',
+    sm:'Gagana Samoa', sn:'chiShona', so:'Af Soomaali', sq:'Shqip', sr:'Српски',
+    ss:'siSwati', st:'Sesotho', su:'Basa Sunda', sv:'Svenska', sw:'Kiswahili',
+    ta:'தமிழ்', te:'తెలుగు', tg:'Тоҷикӣ', th:'ไทย', ti:'ትግርኛ', tk:'Türkmençe',
+    tl:'Tagalog', tn:'Setswana', to:'Lea faka-Tonga', tr:'Türkçe', ts:'Xitsonga',
+    tt:'Татарча', tw:'Twi', ty:'Reo Tahiti', ug:'Uyƣurqə', uk:'Українська',
+    ur:'اردو', uz:'O\'zbekcha', ve:'Tshivenḓa', vi:'Tiếng Việt', vo:'Volapük',
+    wa:'Walon', wo:'Wollof', xh:'isiXhosa', yi:'ייִדיש', yo:'Yorùbá', za:'Sawcuengh',
+    zh:'中文', zu:'isiZulu'
+  };
+
+  // ================================================================
+  // ПЕРЕВОДЫ ИНТЕРФЕЙСА. Ключ 'xx' — fallback (в родном названии языка).
+  // ================================================================
+  const TRANSLATIONS = {
+    ru: {
+      title:'БАРКОИН', subtitle:'Кликер',
+      rank_novice:'Новичок', rank_amateur:'Любитель', rank_trader:'Трейдер', rank_investor:'Инвестор',
+      rank_tycoon:'Магнат', rank_baron:'Крипто-барон', rank_lord:'Барский лорд', rank_legend:'Легенда',
+      level_short:'УР.', crit_stat:'Криты:',
+      energy:'Энергия', xp:'Опыт', regen_info:'+1 энергии за {n} сек',
+      rate_label:'Курс BARC', chart_left:'← 80 последних точек', chart_right:'сейчас →',
+      chart_high:'Макс:', chart_low:'Мин:', chart_points:'Свечей:', day_change:'24ч изм.:',
+      balance_label:'Твой баланс', sold_label:'Продано:', coin_word:'монета',
+      per_click:'+{n} за клик', crit_suffix:'крит {n}%',
+      shop_upgrade:'Прокачка монеты', shop_upgrades:'Улучшения',
+      level_of:'Уровень {a} / {b}', next_level:'Следующий уровень', from_to:'С {a} → {b}',
+      maxed_title:'МАКСИМУМ ДОСТИГНУТ', maxed_desc:'Ты прокачал монету до конца',
+      cost_label:'стоимость', sell_all:'Продать всё', reset:'Сброс',
+      footer:'Клик = доход • Курс меняется каждые 2 сек',
+      no_energy:'⚡ Нет энергии! Подожди восстановления',
+      coin_unlocked:'🎉 {name} монета открыта!', level_up:'⬆️ Уровень {n}! +0.5% крит, +2 энергии',
+      upgrade_bought:'✅ {name} куплен!', sold_msg:'💰 ${net} (налог $${tax})',
+      confirm_reset:'Сбросить весь прогресс?', collecting:'Накапливаю данные...',
+      market_normal:'Обычный рынок', event_bull:'Бычий рынок', event_bear:'Медвежий рынок',
+      event_crash:'КРАХ!', event_moon:'ТО THE MOON!', event_volatile:'Волатильность',
+      upg_energyMax:'Запас энергии', upg_energyRegen:'Быстрая регенерация', upg_critChance:'Критический удар',
+      upg_critMult:'Мощь крита', upg_mult2:'Множитель x2', upg_auto1:'Автокликер', upg_mult5:'Множитель x5',
+      upg_auto2:'Робо-рука', upg_auto3:'Ферма',
+      eff_energyMax:'+15 макс. энергии', eff_energyRegen:'реген в 2x быстрее', eff_critChance:'+2% шанс крита',
+      eff_critMult:'+1x множитель крита', eff_mult2:'x2 за клик', eff_auto1:'+5/сек',
+      eff_mult5:'x5 за клик', eff_auto2:'+100/сек', eff_auto3:'+2000/сек',
+      settings_title:'Настройки', theme_label:'Тема оформления', language_label:'Язык интерфейса',
+      other_label:'Прочее', sound_name:'Звуки', sound_desc:'Звуковые эффекты кликов и покупок',
+      fx_name:'Эффект монеток', fx_desc:'Разлетающиеся монеты при клике', lang_search_ph:'Поиск языка...',
+      lang_count:'Всего языков: {n}', close:'Закрыть',
+      theme_default:'Классика', theme_emerald:'Изумруд', theme_ruby:'Рубин', theme_sunset:'Закат',
+      theme_ocean:'Океан', theme_purple:'Аметист', theme_neon:'Неон', theme_candy:'Конфетка', theme_light:'Светлая',
+      lvl_0:'Обычная', lvl_1:'Каменная', lvl_2:'Деревянная', lvl_3:'Металлическая', lvl_4:'Бронзовая',
+      lvl_5:'Железная', lvl_6:'Серебряная', lvl_7:'Золотая', lvl_8:'Платиновая', lvl_9:'Радиоактивная',
+      lvl_10:'Атомная', lvl_11:'Молекулярная', lvl_12:'Клеточная', lvl_13:'Разумная', lvl_14:'Планетарная',
+      lvl_15:'Звёздная', lvl_16:'Галактическая', lvl_17:'Вселенская'
+    },
+    en: {
+      title:'BARCOIN', subtitle:'Clicker',
+      rank_novice:'Novice', rank_amateur:'Amateur', rank_trader:'Trader', rank_investor:'Investor',
+      rank_tycoon:'Tycoon', rank_baron:'Crypto Baron', rank_lord:'Barc Lord', rank_legend:'Legend',
+      level_short:'LVL', crit_stat:'Crits:',
+      energy:'Energy', xp:'XP', regen_info:'+1 energy every {n}s',
+      rate_label:'BARC Rate', chart_left:'← last 80 points', chart_right:'now →',
+      chart_high:'High:', chart_low:'Low:', chart_points:'Points:', day_change:'24h chg:',
+      balance_label:'Your Balance', sold_label:'Sold:', coin_word:'coin',
+      per_click:'+{n} per click', crit_suffix:'crit {n}%',
+      shop_upgrade:'Coin Upgrade', shop_upgrades:'Upgrades',
+      level_of:'Level {a} / {b}', next_level:'Next level', from_to:'From {a} → {b}',
+      maxed_title:'MAX LEVEL', maxed_desc:'You fully upgraded the coin',
+      cost_label:'cost', sell_all:'Sell All', reset:'Reset',
+      footer:'Click = income • Rate changes every 2s',
+      no_energy:'⚡ No energy! Wait for it to regenerate',
+      coin_unlocked:'🎉 {name} coin unlocked!', level_up:'⬆️ Level {n}! +0.5% crit, +2 energy',
+      upgrade_bought:'✅ {name} purchased!', sold_msg:'💰 $${net} (tax $${tax})',
+      confirm_reset:'Reset all progress?', collecting:'Collecting data...',
+      market_normal:'Normal market', event_bull:'Bull Market', event_bear:'Bear Market',
+      event_crash:'CRASH!', event_moon:'TO THE MOON!', event_volatile:'Volatility',
+      upg_energyMax:'Energy Reserve', upg_energyRegen:'Fast Regen', upg_critChance:'Critical Strike',
+      upg_critMult:'Crit Power', upg_mult2:'x2 Multiplier', upg_auto1:'Autoclicker', upg_mult5:'x5 Multiplier',
+      upg_auto2:'Robo Arm', upg_auto3:'Farm',
+      eff_energyMax:'+15 max energy', eff_energyRegen:'regen 2x faster', eff_critChance:'+2% crit chance',
+      eff_critMult:'+1x crit multiplier', eff_mult2:'x2 per click', eff_auto1:'+5/sec',
+      eff_mult5:'x5 per click', eff_auto2:'+100/sec', eff_auto3:'+2000/sec',
+      settings_title:'Settings', theme_label:'Theme', language_label:'Interface language',
+      other_label:'Other', sound_name:'Sounds', sound_desc:'Sound effects for clicks and purchases',
+      fx_name:'Coin Effect', fx_desc:'Flying coins on click', lang_search_ph:'Search language...',
+      lang_count:'Total languages: {n}', close:'Close',
+      theme_default:'Classic', theme_emerald:'Emerald', theme_ruby:'Ruby', theme_sunset:'Sunset',
+      theme_ocean:'Ocean', theme_purple:'Amethyst', theme_neon:'Neon', theme_candy:'Candy', theme_light:'Light',
+      lvl_0:'Common', lvl_1:'Stone', lvl_2:'Wooden', lvl_3:'Metal', lvl_4:'Bronze',
+      lvl_5:'Iron', lvl_6:'Silver', lvl_7:'Golden', lvl_8:'Platinum', lvl_9:'Radioactive',
+      lvl_10:'Atomic', lvl_11:'Molecular', lvl_12:'Cellular', lvl_13:'Sentient', lvl_14:'Planetary',
+      lvl_15:'Stellar', lvl_16:'Galactic', lvl_17:'Universal'
+    },
+    uk: {
+      title:'БАРКОІН', subtitle:'Клікер',
+      rank_novice:'Новачок', rank_amateur:'Аматор', rank_trader:'Трейдér', rank_investor:'Інвестор',
+      rank_tycoon:'Магнат', rank_baron:'Крипто-барон', rank_lord:'Барський лорд', rank_legend:'Легенда',
+      level_short:'РІВ.', crit_stat:'Криди:',
+      energy:'Енергія', xp:'Досвід', regen_info:'+1 енергії кожні {n} с',
+      rate_label:'Курс BARC', chart_left:'← останні 80 точок', chart_right:'зараз →',
+      chart_high:'Макс:', chart_low:'Мін:', chart_points:'Свічок:', day_change:'24год зм.:',
+      balance_label:'Твій баланс', sold_label:'Продано:', coin_word:'монета',
+      per_click:'+{n} за клік', crit_suffix:'крид {n}%',
+      shop_upgrade:'Прокачка монети', shop_upgrades:'Покращення',
+      level_of:'Рівень {a} / {b}', next_level:'Наступний рівень', from_to:'З {a} → {b}',
+      maxed_title:'МАКСИМУМ ДОСЯГНУТО', maxed_desc:'Ти прокачав монету до кінця',
+      cost_label:'вартість', sell_all:'Продати все', reset:'Скинути',
+      footer:'Клік = дохід • Курс змінюється кожні 2 с',
+      no_energy:'⚡ Немає енергії! Зачекай відновлення',
+      coin_unlocked:'🎉 {name} монета відкрита!', level_up:'⬆️ Рівень {n}! +0.5% крид, +2 енергії',
+      upgrade_bought:'✅ {name} куплено!', sold_msg:'💰 $${net} (податок $${tax})',
+      confirm_reset:'Скинути весь прогрес?', collecting:'Збираю дані...',
+      market_normal:'Звичайний ринок', event_bull:'Бичачий ринок', event_bear:'Ведмежий ринок',
+      event_crash:'КРАХ!', event_moon:'ТО THE MOON!', event_volatile:'Волатильність',
+      upg_energyMax:'Запас енергії', upg_energyRegen:'Швидка регенерація', upg_critChance:'Критичний удар',
+      upg_critMult:'Мощь криду', upg_mult2:'Множник x2', upg_auto1:'Автоклікер', upg_mult5:'Множник x5',
+      upg_auto2:'Робо-рука', upg_auto3:'Ферма',
+      eff_energyMax:'+15 макс. енергії', eff_energyRegen:'регем у 2x швидше', eff_critChance:'+2% шанс криду',
+      eff_critMult:'+1x множник криду', eff_mult2:'x2 за клік', eff_auto1:'+5/сек',
+      eff_mult5:'x5 за клік', eff_auto2:'+100/сек', eff_auto3:'+2000/сек',
+      settings_title:'Налаштування', theme_label:'Тема оформлення', language_label:'Мова інтерфейсу',
+      other_label:'Інше', sound_name:'Звуки', sound_desc:'Звукові ефекти кліків і покупок',
+      fx_name:'Ефект монеток', fx_desc:'Монети, що розлітаються при кліку', lang_search_ph:'Пошук мови...',
+      lang_count:'Усього мов: {n}', close:'Закрити',
+      theme_default:'Класика', theme_emerald:'Смарагд', theme_ruby:'Рубін', theme_sunset:'Захід',
+      theme_ocean:'Океан', theme_purple:'Аметист', theme_neon:'Неон', theme_candy:'Цукерка', theme_light:'Світла',
+      lvl_0:'Звичайна', lvl_1:'Камʼяна', lvl_2:'Деревʼяна', lvl_3:'Металева', lvl_4:'Бронзова',
+      lvl_5:'Залізна', lvl_6:'Срібна', lvl_7:'Золота', lvl_8:'Платинова', lvl_9:'Радіоактивна',
+      lvl_10:'Атомна', lvl_11:'Молекулярна', lvl_12:'Клітинна', lvl_13:'Розумна', lvl_14:'Планетарна',
+      lvl_15:'Зоряна', lvl_16:'Галактична', lvl_17:'Всесвітня'
+    }
+  };
+
+  function t(key, params) {
+    const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
+    let s = dict[key] !== undefined ? dict[key] : (TRANSLATIONS.ru[key] !== undefined ? TRANSLATIONS.ru[key] : key);
+    if (params) for (const k in params) s = s.replace(new RegExp('\\{' + k + '\\}', 'g'), params[k]);
+    return s;
+  }
+
+  function coinName(i) { return t('lvl_' + i); }
+
+  function applyStaticTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    $('langSearch').placeholder = t('lang_search_ph');
+    $('settingsBtn').title = t('settings_title');
+    $('settingsClose').setAttribute('aria-label', t('close'));
+    $('langCount').textContent = t('lang_count', { n: Object.keys(LANG_NAMES).length });
+  }
+
+  // ================================================================
+  // ТЕМЫ
+  // ================================================================
+  const THEMES = [
+    { id:'default',  name:'Классика', bg:['#1a1f3a','#0a0d1a'], accent:'#ffd700' },
+    { id:'emerald',  name:'Изумруд',  bg:['#0c2b1e','#04120b'], accent:'#35e08a' },
+    { id:'ruby',     name:'Рубин',    bg:['#3a1020','#14040a'], accent:'#ff5c8a' },
+    { id:'sunset',   name:'Закат',    bg:['#3a1a0a','#160802'], accent:'#ffab40' },
+    { id:'ocean',    name:'Океан',    bg:['#06263a','#010d16'], accent:'#4fc3f7' },
+    { id:'purple',   name:'Аметист',  bg:['#241040','#0d0518'], accent:'#b388ff' },
+    { id:'neon',     name:'Неон',     bg:['#0a1420','#02060a'], accent:'#00fff0' },
+    { id:'candy',    name:'Конфетка', bg:['#ffe0ec','#ffc9dd'], accent:'#e040a0' },
+    { id:'light',    name:'Светлая',  bg:['#f4f6fb','#dde3f0'], accent:'#1565c0' }
+  ];
+
+  const settings = { theme: 'default', lang: 'ru', sounds: false, coinFx: true };
+
+  function loadSettings() {
+    try {
+      const d = JSON.parse(localStorage.getItem('barcoin_settings') || '{}');
+      if (d.theme && THEMES.some(th => th.id === d.theme)) settings.theme = d.theme;
+      if (d.lang && LANG_NAMES[d.lang]) settings.lang = d.lang;
+      settings.sounds = !!d.sounds;
+      settings.coinFx = d.coinFx !== false;
+    } catch(e) {}
+  }
+  function saveSettings() { localStorage.setItem('barcoin_settings', JSON.stringify(settings)); }
+
+  function applyTheme(themeId) {
+    settings.theme = themeId;
+    if (themeId === 'default') document.body.removeAttribute('data-theme');
+    else document.body.setAttribute('data-theme', themeId);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      const th = THEMES.find(x => x.id === themeId);
+      meta.setAttribute('content', th ? th.bg[1] : '#0a0d1a');
+    }
+    document.querySelectorAll('.theme-card').forEach(c => c.classList.toggle('active', c.dataset.theme === themeId));
+    saveSettings();
+    drawChart();
+  }
+
+  function buildThemeGrid() {
+    const grid = $('themeGrid');
+    grid.innerHTML = '';
+    THEMES.forEach(th => {
+      const card = document.createElement('div');
+      card.className = 'theme-card' + (th.id === settings.theme ? ' active' : '');
+      card.dataset.theme = th.id;
+      const prev = document.createElement('div');
+      prev.className = 'theme-preview';
+      prev.style.background = `linear-gradient(160deg, ${th.bg[0]}, ${th.bg[1]})`;
+      prev.style.setProperty('--tp-accent', th.accent);
+      const name = document.createElement('div');
+      name.className = 'theme-name';
+      name.textContent = th.id === 'default' ? '★ ' : '';
+      name.append(t('theme_' + th.id));
+      card.append(prev, name);
+      card.onclick = () => { applyTheme(th.id); playSound('buy'); };
+      grid.appendChild(card);
+    });
+  }
+
+  function buildLangSelect(filter) {
+    const sel = $('langSelect');
+    const cur = sel.value || settings.lang;
+    sel.innerHTML = '';
+    const f = (filter || '').trim().toLowerCase();
+    const entries = Object.entries(LANG_NAMES)
+      .filter(([code, name]) => !f || name.toLowerCase().includes(f) || code.includes(f) ||
+        (TRANSLATIONS[code] && TRANSLATIONS[code].language_label ? TRANSLATIONS[code].language_label.toLowerCase().includes(f) : false))
+      .sort((a, b) => a[1].localeCompare(b[1]));
+    entries.forEach(([code, name]) => {
+      const opt = document.createElement('option');
+      opt.value = code;
+      opt.textContent = name + '  (' + code.toUpperCase() + ')';
+      if (code === settings.lang) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    if (!entries.length) {
+      const opt = document.createElement('option');
+      opt.value = ''; opt.textContent = '—';
+      sel.appendChild(opt);
+    }
+  }
+
+  function setLanguage(lang) {
+    settings.lang = lang;
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    applyStaticTranslations();
+    buildThemeGrid();
+    renderUpgrades();
+    renderCoin();
+    renderPlayerBars();
+    updateRank();
+    renderEventTag();
+    updateBalanceDisplay();
+    drawChart();
+    saveSettings();
+  }
+
+  // ===== ЗВУКИ =====
+  let audioCtx = null;
+  function playSound(type) {
+    if (!settings.sounds) return;
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+      if (type === 'click') { o.frequency.value = 900 + Math.random()*200; g.gain.setValueAtTime(0.06, now); }
+      else if (type === 'crit') { o.frequency.value = 1400; g.gain.setValueAtTime(0.1, now); }
+      else { o.type = 'triangle'; o.frequency.value = 600; o.frequency.exponentialRampToValueAtTime(1200, now+0.12); g.gain.setValueAtTime(0.08, now); }
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+      o.start(now); o.stop(now + 0.16);
+    } catch(e) {}
+  }
+
+  // ===== ЭФФЕТ РАЗЛЕТАЮЩИХСЯ МОНЕТ (image/coin.png) =====
+  function spawnCoinBurst(x, y, count) {
+    if (!settings.coinFx) return;
+    for (let i = 0; i < count; i++) {
+      const img = document.createElement('img');
+      img.className = 'fly-coin';
+      img.src = 'image/coin.png';
+      img.alt = '';
+      img.draggable = false;
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 60 + Math.random() * 90;
+      img.style.left = x + 'px';
+      img.style.top = y + 'px';
+      img.style.setProperty('--fx', Math.cos(ang) * dist + 'px');
+      img.style.setProperty('--fy', (-Math.abs(Math.sin(ang)) - 0.4) * dist + 'px');
+      img.style.setProperty('--fr', (Math.random() * 720 - 360) + 'deg');
+      img.style.width = img.style.height = (20 + Math.random() * 16) + 'px';
+      coinZoneEl.appendChild(img);
+      setTimeout(() => img.remove(), 900);
+    }
+  }
+
   const ratePriceEl = $('ratePrice'), arrowEl = $('arrow'), rateChangeEl = $('rateChange');
   const balanceEl = $('balance'), balanceUsdEl = $('balanceUsd');
   const coinEl = $('coin'), coinZoneEl = $('coinZone');
@@ -990,18 +1700,27 @@
     drawChart();
   }
 
+  function cssVar(name, fallback) {
+    const v = getComputedStyle(document.body).getPropertyValue(name).trim();
+    return v || fallback;
+  }
+
   function drawChart() {
     const rect = canvas.getBoundingClientRect();
+    const COL_LABEL = cssVar('--chart-label', '#4a5474');
+    const COL_GRID  = cssVar('--grid-line', '#1e2540');
+    const COL_GREEN = cssVar('--green', '#00e676');
+    const COL_RED   = cssVar('--red', '#ff5252');
     const W = rect.width, H = rect.height;
     if (W < 10 || H < 10) return;
     ctx.clearRect(0, 0, W, H);
 
     const data = state.priceHistory;
     if (data.length < 2) {
-      ctx.fillStyle = '#4a5474';
+      ctx.fillStyle = COL_LABEL;
       ctx.font = '11px Segoe UI';
       ctx.textAlign = 'center';
-      ctx.fillText('Накапливаю данные...', W/2, H/2);
+      ctx.fillText(t('collecting'), W/2, H/2);
       return;
     }
 
@@ -1014,10 +1733,10 @@
     const pad = (max - min) * 0.15 || 0.1;
     max += pad; min -= pad;
 
-    ctx.strokeStyle = '#1e2540';
+    ctx.strokeStyle = COL_GRID;
     ctx.lineWidth = 1;
     ctx.font = '9px Segoe UI';
-    ctx.fillStyle = '#4a5474';
+    ctx.fillStyle = COL_LABEL;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
@@ -1042,7 +1761,7 @@
     const toY = v => padT + chartH - ((v - min) / (max - min)) * chartH;
 
     const isUp = data[data.length - 1].price >= data[0].price;
-    const lineColor = isUp ? '#00e676' : '#ff5252';
+    const lineColor = isUp ? COL_GREEN : COL_RED;
     const fillColor = isUp ? 'rgba(0,230,118,0.18)' : 'rgba(255,82,82,0.18)';
 
     ctx.beginPath();
@@ -1072,7 +1791,7 @@
       if (isMax || isMin) {
         ctx.beginPath();
         ctx.arc(toX(i), toY(d.price), 3, 0, Math.PI * 2);
-        ctx.fillStyle = isMax ? '#ff5252' : '#00e676';
+        ctx.fillStyle = isMax ? COL_RED : COL_GREEN;
         ctx.fill();
       }
     });
@@ -1109,10 +1828,10 @@
       inset 0 -10px 20px rgba(0,0,0,0.3),
       inset 0 10px 20px rgba(255,255,255,0.3)`;
     coinEl.style.color = lvl.textColor;
-    coinEl.textContent = lvl.icon;
-    coinNameEl.textContent = lvl.name + ' монета';
+    $('coinGlyph').textContent = lvl.icon;
+    coinNameEl.textContent = coinName(state.levelIndex) + ' ' + t('coin_word');
     coinNameEl.style.color = lvl.color[0];
-    coinBonusEl.textContent = '+' + formatNumber(getPerClick()) + ' за клик' + (state.critChance > BASE_CRIT_CHANCE ? ' • крит ' + Math.round(state.critChance*100) + '%' : '');
+    coinBonusEl.textContent = t('per_click', { n: formatNumber(getPerClick()) }) + (state.critChance > BASE_CRIT_CHANCE ? ' • ' + t('crit_suffix', { n: Math.round(state.critChance*100) }) : '');
     renderUpgradeMain();
     updateBalanceDisplay();
   }
@@ -1122,11 +1841,11 @@
     if (isMaxed) {
       upgradeMainEl.classList.add('maxed');
       upgradeMainEl.classList.remove('disabled');
-      upgTitleEl.textContent = 'Уровень ' + MAX_LEVEL + ' / ' + MAX_LEVEL;
+      upgTitleEl.textContent = t('level_of', { a: MAX_LEVEL, b: MAX_LEVEL });
       upgArrowEl.textContent = '★';
       upgIconEl.textContent = '🏆';
-      upgNewNameEl.textContent = 'МАКСИМУМ ДОСТИГНУТ';
-      upgDescEl.textContent = 'Ты прокачал монету до конца';
+      upgNewNameEl.textContent = t('maxed_title');
+      upgDescEl.textContent = t('maxed_desc');
       upgBonusEl.textContent = '';
       upgCostEl.textContent = '';
       upgradeMainEl.onclick = null;
@@ -1137,15 +1856,15 @@
     const canBuy = state.balance >= next.cost;
     upgradeMainEl.classList.remove('maxed');
     upgradeMainEl.classList.toggle('disabled', !canBuy);
-    upgTitleEl.textContent = 'Уровень ' + (state.levelIndex + 1) + ' / ' + MAX_LEVEL;
+    upgTitleEl.textContent = t('level_of', { a: state.levelIndex + 1, b: MAX_LEVEL });
     upgArrowEl.textContent = '→';
     upgIconEl.textContent = next.icon;
-    upgNewNameEl.textContent = next.name + ' монета';
+    upgNewNameEl.textContent = coinName(state.levelIndex + 1) + ' ' + t('coin_word');
     upgNewNameEl.style.color = next.color[0];
-    upgDescEl.textContent = `С ${current.name.toLowerCase()} → ${next.name.toLowerCase()}`;
-    upgBonusEl.textContent = '+' + formatNumber(next.bonus * clickMultiplier) + ' за клик';
+    upgDescEl.textContent = t('from_to', { a: coinName(state.levelIndex), b: coinName(state.levelIndex + 1) });
+    upgBonusEl.textContent = t('per_click', { n: formatNumber(next.bonus * clickMultiplier) });
     upgCostEl.textContent = formatNumber(next.cost) + ' BARC';
-    upgCostEl.style.color = canBuy ? '#ffd700' : '#8892b0';
+    upgCostEl.style.color = canBuy ? 'var(--accent)' : 'var(--text-dim)';
     upgradeMainEl.onclick = buyCoinUpgrade;
   }
 
@@ -1158,7 +1877,7 @@
     renderCoin();
     updateUpgradesDisplay();
     saveGame();
-    showToast('🎉 ' + next.name + ' монета открыта!');
+    showToast(t('coin_unlocked', { name: coinName(state.levelIndex) }));
   }
 
   function xpNeeded(lvl) { return Math.floor(XP_PER_LEVEL_BASE * Math.pow(XP_GROWTH, lvl - 1)); }
@@ -1176,7 +1895,7 @@
       state.maxEnergy += 2;
       state.energy = state.maxEnergy;
       updateRank();
-      showToast('⬆️ Уровень ' + state.playerLevel + '! +0.5% крит, +2 энергии');
+      showToast(t('level_up', { n: state.playerLevel }));
     }
     renderPlayerBars();
     saveGame();
@@ -1185,26 +1904,26 @@
   function updateRank() {
     let rank = RANKS[0];
     for (const r of RANKS) if (state.playerLevel >= r.minLvl) rank = r;
-    rankBadge.textContent = state.playerLevel + ' УР.';
-    rankTitle.textContent = rank.title;
+    rankBadge.textContent = state.playerLevel + ' ' + t('level_short');
+    rankTitle.textContent = t(rank.key);
   }
 
   function renderPlayerBars() {
     const ePercent = (state.energy / state.maxEnergy) * 100;
     energyBar.style.width = ePercent + '%';
-    energyText.textContent = Math.floor(state.energy) + ' / ' + state.maxEnergy;
+    energyText.textContent = Math.floor(state.energy) + ' / ' + state.maxEnergy + ' • ' + t('energy');
     if (ePercent < 20) energyBar.style.background = 'linear-gradient(90deg, #ff5252, #b71c1c)';
     else energyBar.style.background = 'linear-gradient(90deg, #ffca28, #ff8f00)';
 
     const need = xpNeeded(state.playerLevel);
     const xPercent = (state.xp / need) * 100;
     xpBar.style.width = xPercent + '%';
-    xpText.textContent = formatNumber(state.xp) + ' / ' + formatNumber(need) + ' XP';
+    xpText.textContent = formatNumber(state.xp) + ' / ' + formatNumber(need) + ' ' + t('xp');
 
-    critStat.textContent = 'Криты: ' + Math.round(state.critChance * 100) + '% • x' + state.critMult;
+    critStat.textContent = t('crit_stat') + ' ' + Math.round(state.critChance * 100) + '% • x' + state.critMult;
 
     const regenInterval = getRegenInterval();
-    regenInfo.textContent = '+1 энергии за ' + regenInterval + ' сек';
+    regenInfo.textContent = t('regen_info', { n: regenInterval });
 
     coinEl.classList.toggle('no-energy', state.energy < ENERGY_PER_CLICK);
   }
@@ -1235,7 +1954,7 @@
       if (state.marketEvent.ticksLeft <= 0) {
         state.marketEvent = null;
         eventTag.className = 'event bull';
-        eventTag.textContent = '📈 Обычный рынок';
+        renderEventTag();
       } else renderEventTag();
     } else if (Math.random() < 0.15) startRandomEvent();
   }
@@ -1249,22 +1968,22 @@
       if (r <= 0) { chosen = e; break; }
     }
     state.marketEvent = {
-      type: chosen.type, name: chosen.name, emoji: chosen.emoji,
+      type: chosen.type, emoji: chosen.emoji,
       ticksLeft: chosen.ticks, effect: chosen.effect
     };
     renderEventTag();
-    showToast(chosen.emoji + ' ' + chosen.name + '!');
+    showToast(chosen.emoji + ' ' + t('event_' + chosen.type) + '!');
   }
 
   function renderEventTag() {
     if (!state.marketEvent) {
       eventTag.className = 'event bull';
-      eventTag.textContent = '📈 Обычный рынок';
+      eventTag.textContent = '📈 ' + t('market_normal');
       return;
     }
     const ev = state.marketEvent;
     eventTag.className = 'event ' + ev.type;
-    eventTag.textContent = ev.emoji + ' ' + ev.name + ' (' + ev.ticksLeft + 'с)';
+    eventTag.textContent = ev.emoji + ' ' + t('event_' + ev.type) + ' (' + ev.ticksLeft + ')';
   }
 
   function updateRate() {
@@ -1298,7 +2017,7 @@
     const oldest = state.priceHistory[0].price;
     const dayPct = ((state.price - oldest) / oldest) * 100;
     dayChangeEl.textContent = (dayPct >= 0 ? '+' : '') + dayPct.toFixed(2) + '%';
-    dayChangeEl.style.color = dayPct >= 0 ? '#00e676' : '#ff5252';
+    dayChangeEl.style.color = dayPct >= 0 ? 'var(--green)' : 'var(--red)';
 
     drawChart();
     tickMarketEvent();
@@ -1308,13 +2027,13 @@
   function updateBalanceDisplay() {
     balanceEl.textContent = formatNumber(state.balance);
     const usd = state.balance * state.price;
-    balanceUsdEl.textContent = `≈ $${formatNumber(usd)} • Продано: $${state.usdBalance.toFixed(2)}`;
+    balanceUsdEl.textContent = `≈ $${formatNumber(usd)} • ${t('sold_label')} $${state.usdBalance.toFixed(2)}`;
     sellBtn.disabled = state.balance < 1;
   }
 
   function handleClick(e) {
     if (state.energy < ENERGY_PER_CLICK) {
-      showToast('⚡ Нет энергии! Подожди восстановления', true);
+      showToast(t('no_energy'), true); playSound('click');
       return;
     }
     state.energy -= ENERGY_PER_CLICK;
@@ -1347,13 +2066,16 @@
 
     const floatEl = document.createElement('div');
     floatEl.className = 'float-num' + (isCrit ? ' crit' : '');
-    floatEl.textContent = (isCrit ? '💥 КРИТ +' : '+') + formatNumber(gain);
+    floatEl.textContent = (isCrit ? '💥 ' + t('crit_stat').replace(':','') + ' +' : '+') + formatNumber(gain);
     floatEl.style.left = x + 'px';
     floatEl.style.top = y + 'px';
     floatEl.style.transform = 'translate(-50%, -50%)';
     if (!isCrit) floatEl.style.color = COIN_LEVELS[state.levelIndex].color[0];
     coinZoneEl.appendChild(floatEl);
     setTimeout(() => floatEl.remove(), 900);
+
+    spawnCoinBurst(x, y, isCrit ? 8 : 4);
+    playSound(isCrit ? 'crit' : 'click');
 
     renderPlayerBars();
     updateBalanceDisplay();
@@ -1369,8 +2091,8 @@
       const div = document.createElement('div');
       div.className = 'upgrade' + (canBuy ? '' : ' disabled');
       div.innerHTML = `
-        <div class="upgrade-name">${u.name}</div>
-        <div class="upgrade-effect">${u.effect}</div>
+        <div class="upgrade-name">${t('upg_' + u.id)}</div>
+        <div class="upgrade-effect">${t('eff_' + u.id)}</div>
         <div class="upgrade-cost-small">${formatNumber(u.cost)} BARC${u.bought > 0 ? ' • x' + u.bought : ''}</div>
       `;
       div.onclick = () => buyUpgrade(u);
@@ -1403,7 +2125,8 @@
     renderPlayerBars();
     updateUpgradesDisplay();
     saveGame();
-    showToast('✅ ' + u.name + ' куплен!');
+    playSound('buy');
+    showToast(t('upgrade_bought', { name: t('upg_' + u.id) }));
   }
 
   sellBtn.onclick = () => {
@@ -1417,11 +2140,12 @@
     updateUpgradesDisplay();
     renderUpgradeMain();
     saveGame();
-    showToast(`💰 $${net.toFixed(2)} (налог $${tax.toFixed(2)})`);
+    playSound('buy');
+    showToast(t('sold_msg', { net: net.toFixed(2), tax: tax.toFixed(2) }));
   };
 
   resetBtn.onclick = () => {
-    if (!confirm('Сбросить весь прогресс?')) return;
+    if (!confirm(t('confirm_reset'))) return;
     localStorage.removeItem('barcoin_clicker_v5');
     location.reload();
   };
@@ -1504,6 +2228,13 @@
     } catch(e) { console.log('Ошибка загрузки', e); }
   }
 
+  // ===== Загрузка настроек (тема, язык, переключатели) до первого рендера =====
+  loadSettings();
+  currentLang = TRANSLATIONS[settings.lang] ? settings.lang : 'ru';
+  applyTheme(settings.theme);
+  applyStaticTranslations();
+  buildLangSelect('');
+
   loadGame();
   updateRank();
   renderUpgrades();
@@ -1511,6 +2242,43 @@
   renderPlayerBars();
   updateUpgradesDisplay();
   coinEl.addEventListener('click', handleClick);
+
+  // ================================================================
+  // НАСТРОЙКИ: открытие/закрытие, выбор темы, языка, переключатели
+  // ================================================================
+  const overlay = $('settingsOverlay');
+
+  function openSettings() {
+    buildThemeGrid();
+    buildLangSelect($('langSearch').value);
+    overlay.classList.add('open');
+    requestAnimationFrame(() => overlay.classList.add('visible'));
+  }
+  function closeSettings() {
+    overlay.classList.remove('visible');
+    setTimeout(() => overlay.classList.remove('open'), 250);
+  }
+
+  $('settingsBtn').onclick = openSettings;
+  $('settingsClose').onclick = closeSettings;
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeSettings(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSettings(); });
+
+  $('langSearch').addEventListener('input', () => buildLangSelect($('langSearch').value));
+  $('langSelect').addEventListener('change', e => { if (e.target.value) setLanguage(e.target.value); });
+
+  $('soundToggle').checked = settings.sounds;
+  $('soundToggle').addEventListener('change', e => {
+    settings.sounds = e.target.checked;
+    saveSettings();
+    if (settings.sounds) playSound('buy');
+  });
+
+  $('coinFxToggle').checked = settings.coinFx;
+  $('coinFxToggle').addEventListener('change', e => {
+    settings.coinFx = e.target.checked;
+    saveSettings();
+  });
   window.addEventListener('resize', resizeCanvas);
   window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 200));
 
