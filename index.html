@@ -13,14 +13,26 @@
   :root {
     --bg-top: #1a1f3a;
     --bg-bottom: #0a0d1a;
-    --card-bg: linear-gradient(135deg, #161b33 0%, #0d1126 100%);
+    --card-from: #161b33;
+    --card-to: #0d1126;
+    --card-bg: linear-gradient(135deg, var(--card-from) 0%, var(--card-to) 100%);
     --card-border: #2a3154;
+    --accent: #ffd700;
+    --accent-soft: rgba(255,215,0,0.15);
+    --accent-glow: rgba(255,215,0,0.4);
+    --btn-text: #002200;
     --gold: #ffd700;
     --green: #00e676;
     --red: #ff5252;
+    --text: #ffffff;
     --text-dim: #8892b0;
     --text-darker: #4a5474;
+    --track: rgba(0,0,0,0.4);
+    --grid-line: #1e2540;
+    --chart-label: #4a5474;
   }
+
+  /* ============ ТЕМЫ (переключаются в настройках) ============ */
 
   html, body {
     overscroll-behavior: none;
@@ -32,7 +44,8 @@
   body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: radial-gradient(circle at 50% 0%, var(--bg-top) 0%, var(--bg-bottom) 70%);
-    color: #fff;
+    background-attachment: fixed;
+    color: var(--text);
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
@@ -44,17 +57,161 @@
   }
 
   /* ============================================================
-     ЗАГОЛОВОК
+     ЗАГОЛОВОК + КНОПКА НАСТРОЕК + ЛОГОТИП
      ============================================================ */
   .header {
     text-align: center;
     margin-bottom: 12px;
     padding-top: 12px;
+    position: relative;
+    width: 100%;
+    max-width: 540px;
   }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .logo-coin {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 18px var(--accent-glow), 0 4px 10px rgba(0,0,0,0.4);
+    animation: coinFloat 3s ease-in-out infinite;
+  }
+
+  .settings-btn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-dim);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    z-index: 30;
+  }
+  .settings-btn:hover, .settings-btn:active {
+    color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-50%) rotate(40deg);
+    box-shadow: 0 0 18px var(--accent-glow);
+  }
+
+  /* Кнопка аккаунта — вторая слева в углу шапки */
+  .auth-corner-btn { left: 54px; }
+  /* ===== Полноэкранный экран входа (авторизация/регистрация) ===== */
+  .auth-gate {
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(1200px 800px at 50% -10%, var(--accent-soft), transparent 60%),
+                linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+    overflow-y: auto; padding: 20px;
+    transition: opacity .35s ease, visibility .35s;
+  }
+  .auth-gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  .auth-gate-card {
+    width: 440px; max-width: 94vw;
+    background: linear-gradient(160deg, var(--card-from), var(--card-to));
+    border: 1px solid var(--card-border); border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45), 0 0 40px var(--accent-glow);
+    padding: 26px 26px 22px; margin: auto;
+  }
+  .gate-logo { text-align: center; margin-bottom: 18px; }
+  .gate-logo img {
+    width: 84px; height: 84px; object-fit: contain; border-radius: 50%;
+    box-shadow: 0 0 26px var(--accent-glow), 0 6px 18px rgba(0,0,0,.4);
+    animation: gateSpin 7s linear infinite;
+  }
+  @keyframes gateSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+  .gate-logo h1 {
+    font-size: 26px; letter-spacing: 3px; color: var(--gold); margin: 10px 0 2px;
+    text-shadow: 0 0 18px var(--accent-glow);
+  }
+  .gate-sub { font-size: 12px; color: var(--text-dim); letter-spacing: 2px; }
+  .auth-hint { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 12px; }
+  .guest-row { text-align: center; margin-top: 8px; }
+  .guest-row a { font-size: 12px; color: var(--text-dim); cursor: pointer; text-decoration: underline; }
+  .guest-row a:hover { color: var(--accent); }
+  body.locked { overflow: hidden; }
+  .user-chip {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--text);
+    z-index: 30; max-width: 220px;
+  }
+  .user-chip .chip-login { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-chip .chip-status { font-size: 10px; color: var(--green); }
+  .user-chip .chip-status.offline { color: var(--red); }
+  .user-chip button {
+    border: 1px solid var(--card-border); background: transparent; color: var(--text-dim);
+    border-radius: 8px; padding: 2px 8px; font-size: 11px; cursor: pointer;
+  }
+  .user-chip button:hover { color: var(--red); border-color: var(--red); }
+
+  /* ===== Модалка авторизации/регистрации ===== */
+  .auth-modal { width: 420px; max-width: 94vw; }
+  .auth-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .auth-tab {
+    flex: 1; padding: 10px; text-align: center; border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--card-border); background: transparent; color: var(--text-dim);
+    font-weight: 700; font-size: 13px; letter-spacing: 1px; transition: all .2s;
+  }
+  .auth-tab.active { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .auth-field { margin-bottom: 12px; }
+  .auth-field label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 5px; letter-spacing: 1px; }
+  .auth-field input {
+    width: 100%; padding: 11px 12px; border-radius: 10px; font-size: 14px;
+    border: 1px solid var(--card-border); background: rgba(0,0,0,0.25); color: var(--text);
+    outline: none; transition: border-color .2s; -webkit-user-select: text; user-select: text;
+  }
+  .auth-field input:focus { border-color: var(--accent); }
+  .auth-submit {
+    width: 100%; padding: 13px; border: none; border-radius: 12px; cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    color: #111; font-weight: 800; font-size: 15px; letter-spacing: 1px;
+    box-shadow: 0 6px 18px var(--accent-glow); transition: transform .15s;
+  }
+  .auth-submit:hover { transform: translateY(-2px); }
+  .auth-submit:disabled { opacity: .5; cursor: wait; transform: none; }
+  .auth-error { min-height: 18px; font-size: 12px; color: var(--red); margin: 4px 0 8px; text-align: center; }
+  .auth-ok { color: var(--green) !important; }
+  .auth-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0 10px; color: var(--text-dim); font-size: 11px; }
+  .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--card-border); }
+  .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .social-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 11px 8px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 700;
+    border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text); transition: all .2s;
+  }
+  .social-btn:hover { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+  .social-btn svg { width: 18px; height: 18px; flex: none; }
+  .social-btn.disabled { opacity: .45; cursor: not-allowed; }
+  .auth-lang-row { margin-top: 14px; }
+  .auth-lang-row select {
+    width: 100%; padding: 10px; border-radius: 10px; font-size: 13px;
+    border: 1px solid var(--card-border); background: rgba(0,0,0,0.25); color: var(--text);
+  }
+  .auth-switchlink { text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-dim); }
+  .auth-switchlink a { color: var(--accent); cursor: pointer; text-decoration: underline; }
 
   h1 {
     font-size: 28px;
-    background: linear-gradient(90deg, #ffd700, #ff9500, #ffd700);
+    background: linear-gradient(90deg, var(--accent), var(--gold));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -125,8 +282,8 @@
   }
 
   .rank-badge {
-    background: linear-gradient(135deg, #ffd700, #ff9500);
-    color: #2b1406;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    color: var(--btn-text);
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 11px;
@@ -140,7 +297,7 @@
   .bar-track {
     flex: 1;
     height: 14px;
-    background: rgba(0,0,0,0.4);
+    background: var(--track);
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid var(--card-border);
@@ -269,8 +426,8 @@
      БАЛАНС
      ============================================================ */
   .balance-card {
-    background: linear-gradient(135deg, #1f2647 0%, #131834 100%);
-    border: 1px solid #ffd70033;
+    background: var(--card-bg);
+    border: 1px solid var(--accent-glow);
     border-radius: 16px;
     padding: 14px 18px;
     text-align: center;
@@ -280,7 +437,7 @@
   .balance-value {
     font-size: 34px;
     font-weight: 800;
-    background: linear-gradient(90deg, #ffd700, #ffb300);
+    background: linear-gradient(90deg, var(--accent), var(--gold));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -320,6 +477,49 @@
     transition: transform 0.08s ease, box-shadow 0.3s, background 0.6s, filter 0.3s;
     position: relative;
     animation: coinFloat 3s ease-in-out infinite;
+    overflow: hidden;
+  }
+
+  /* Монета-картинка (image/coin.png) поверх цветного фона уровня */
+  .coin-img {
+    position: absolute;
+    inset: 4%;
+    width: 92%;
+    height: 92%;
+    object-fit: cover;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .coin-glyph {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.28;
+    filter: saturate(0.4);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Эффект «монеток» при клике */
+  .fly-coin {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border-radius: 50%;
+    object-fit: cover;
+    pointer-events: none;
+    z-index: 12;
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+    animation: flyCoin 0.85s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+  }
+  @keyframes flyCoin {
+    0%   { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    100% { opacity: 0; transform: translate(var(--fx), var(--fy)) rotate(var(--fr)) scale(0.5); }
   }
 
   @keyframes coinFloat {
@@ -342,7 +542,7 @@
     font-size: 22px;
     font-weight: 800;
     color: var(--gold);
-    text-shadow: 0 0 12px rgba(255,215,0,0.9);
+    text-shadow: 0 0 12px var(--accent-glow);
     pointer-events: none;
     animation: floatUp 0.9s ease-out forwards;
     z-index: 10;
@@ -397,8 +597,8 @@
   }
 
   .upgrade-main {
-    background: linear-gradient(135deg, #1f2647 0%, #131834 100%);
-    border: 1px solid #ffd70055;
+    background: var(--card-bg);
+    border: 1px solid var(--accent);
     border-radius: 16px;
     padding: 14px;
     cursor: pointer;
@@ -414,20 +614,20 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.15), transparent);
+    background: linear-gradient(90deg, transparent, var(--accent-soft), transparent);
     transition: left 0.6s;
   }
 
   .upgrade-main:hover:not(.disabled)::before { left: 100%; }
   .upgrade-main:hover:not(.disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(255,215,0,0.25);
-    border-color: var(--gold);
+    box-shadow: 0 10px 30px var(--accent-glow);
+    border-color: var(--accent);
   }
   .upgrade-main.disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--card-border); }
   .upgrade-main.maxed {
     border-color: var(--green);
-    background: linear-gradient(135deg, #0d3320 0%, #061a10 100%);
+    background: var(--card-bg);
     cursor: default;
   }
 
@@ -486,9 +686,9 @@
     text-align: left;
   }
   .upgrade:hover:not(.disabled) {
-    border-color: #ffd70066;
+    border-color: var(--accent);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255,215,0,0.15);
+    box-shadow: 0 6px 20px var(--accent-glow);
   }
   .upgrade.disabled { opacity: 0.45; cursor: not-allowed; }
   .upgrade-name { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 3px; }
@@ -525,7 +725,7 @@
 
   .btn-sell {
     background: linear-gradient(135deg, var(--green), #00994d);
-    color: #002200;
+    color: var(--btn-text);
     box-shadow: 0 6px 20px rgba(0,230,118,0.3);
   }
   .btn-sell:hover:not(:disabled) {
@@ -550,7 +750,7 @@
     left: 50%;
     transform: translateX(-50%) translateY(120px);
     background: linear-gradient(135deg, var(--green), #00994d);
-    color: #002200;
+    color: var(--btn-text);
     padding: 12px 24px;
     border-radius: 30px;
     font-weight: 700;
@@ -577,6 +777,182 @@
     margin-top: 16px;
     letter-spacing: 1px;
     padding-bottom: 12px;
+  }
+
+
+  /* ============================================================
+     МОДАЛЬНОЕ ОКНО НАСТРОЕК
+     ============================================================ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-overlay.visible { opacity: 1; }
+
+  .modal {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 480px;
+    max-height: min(85vh, 700px);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px var(--accent-soft);
+    transform: translateY(30px) scale(0.97);
+    transition: transform 0.25s;
+  }
+  .modal-overlay.visible .modal { transform: translateY(0) scale(1); }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--card-border);
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: 16px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+  .modal-close {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--text-dim);
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { color: var(--red); border-color: var(--red); }
+
+  .modal-body { overflow-y: auto; padding: 16px 20px 20px; overscroll-behavior: contain; }
+
+  .settings-section { margin-bottom: 20px; }
+  .settings-section:last-child { margin-bottom: 4px; }
+  .settings-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 8px;
+  }
+  .theme-card {
+    border: 2px solid var(--card-border);
+    border-radius: 12px;
+    padding: 8px 6px 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    background: var(--track);
+  }
+  .theme-card:hover { transform: translateY(-2px); }
+  .theme-card.active { border-color: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
+  .theme-preview {
+    height: 34px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    border: 1px solid rgba(255,255,255,0.12);
+    position: relative;
+    overflow: hidden;
+  }
+  .theme-preview::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 16px; height: 16px;
+    margin: -8px 0 0 -8px;
+    border-radius: 50%;
+    background: var(--tp-accent);
+    box-shadow: 0 0 8px var(--tp-accent);
+  }
+  .theme-name { font-size: 10px; font-weight: 700; color: var(--text); line-height: 1.2; }
+
+  .lang-select-wrap { position: relative; }
+  .lang-search {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: var(--track);
+    color: var(--text);
+    font-size: 13px;
+    margin-bottom: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .lang-search:focus { border-color: var(--accent); }
+  .lang-search::placeholder { color: var(--text-darker); }
+  select.lang-select {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: var(--track);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+  }
+  select.lang-select option { background: #1a1f33; color: #fff; }
+  .lang-count { font-size: 10px; color: var(--text-darker); margin-top: 6px; text-align: right; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--track);
+    margin-bottom: 8px;
+  }
+  .toggle-text { min-width: 0; }
+  .toggle-name { font-size: 13px; font-weight: 700; }
+  .toggle-desc { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+  .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; cursor: pointer; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0;
+    background: var(--text-darker);
+    border-radius: 20px;
+    transition: 0.25s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    left: 3px; top: 3px;
+    border-radius: 50%;
+    background: #fff;
+    transition: 0.25s;
+  }
+  .switch input:checked + .slider { background: var(--accent); }
+  .switch input:checked + .slider::before { transform: translateX(20px); }
+
+  @media (max-width: 380px) {
+    .theme-grid { grid-template-columns: repeat(3, 1fr); }
   }
 
   /* ============================================================
@@ -719,13 +1095,82 @@
       transition-duration: 0.01ms !important;
     }
   }
+
+  /* ============================================================
+     СЕТЕВОЙ РЕЙТИНГ: счётчик онлайна + таблица лидеров
+     ============================================================ */
+  .db-badge {
+    display: flex; align-items: center; gap: 8px; margin: 2px 0 10px;
+    padding: 7px 10px; border-radius: 10px; font-size: 12.5px; line-height: 1.3;
+    border: 1px solid var(--border, rgba(255,255,255,.14));
+    background: rgba(127,127,127,.08); color: var(--text-dim, #9aa);
+  }
+  .db-badge b { color: var(--text, #eee); }
+  .db-badge.ok   { border-color: rgba(46,204,113,.5); }
+  .db-badge.warn { border-color: rgba(241,196,15,.55); }
+  .db-badge.bad  { border-color: rgba(231,76,60,.6); }
+  .online-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 10px; padding: 7px 10px;
+    border: 1px solid var(--card-border); border-radius: 10px;
+    background: var(--accent-soft);
+    font-size: 12px; color: var(--text); flex-wrap: wrap;
+  }
+  .online-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: #666; box-shadow: 0 0 6px rgba(120,120,120,.6);
+    transition: background .3s, box-shadow .3s;
+  }
+  .online-dot.live { background: #35e08a; box-shadow: 0 0 8px rgba(53,224,138,.8); animation: pulseDot 2s infinite; }
+  .online-dot.dead { background: #ff5252; box-shadow: 0 0 8px rgba(255,82,82,.7); }
+  @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+  .online-sep { color: var(--text-dim); }
+  .lb-open-btn {
+    margin-inline-start: auto; cursor: pointer;
+    border: 1px solid var(--card-border); border-radius: 8px;
+    background: var(--card-from); color: var(--text);
+    font-size: 11px; padding: 4px 10px; font-family: inherit;
+    transition: filter .15s, transform .1s;
+  }
+  .lb-open-btn:hover { filter: brightness(1.2); }
+  .lb-open-btn:active { transform: scale(.96); }
+
+  .lb-list { display: flex; flex-direction: column; gap: 6px; max-height: 55vh; overflow-y: auto; }
+  .lb-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: linear-gradient(135deg, var(--card-from), var(--card-to));
+    font-size: 13px;
+  }
+  .lb-row.me { outline: 2px solid var(--accent); box-shadow: 0 0 12px var(--accent-soft); }
+  .lb-pos { min-width: 34px; font-weight: 800; color: var(--text-dim); text-align: center; }
+  .lb-row:nth-child(1) .lb-pos { color: #ffd700; font-size: 16px; }
+  .lb-row:nth-child(2) .lb-pos { color: #cfd8dc; font-size: 15px; }
+  .lb-row:nth-child(3) .lb-pos { color: #cd7f32; font-size: 14px; }
+  .lb-ava { width: 26px; height: 26px; border-radius: 50%; object-fit: contain; background: var(--accent-soft); flex: none; }
+  .lb-name { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-online-tag { width: 8px; height: 8px; border-radius: 50%; background: #35e08a; box-shadow: 0 0 6px rgba(53,224,138,.8); flex: none; }
+  .lb-offline-tag { width: 8px; height: 8px; border-radius: 50%; background: #555; flex: none; }
+  .lb-earned { font-weight: 800; color: var(--gold); white-space: nowrap; }
+  .lb-meta { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+  .lb-head {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--text-dim); margin-bottom: 8px; flex-wrap: wrap; gap: 6px;
+  }
+  .lb-empty { text-align: center; color: var(--text-dim); padding: 24px 8px; font-size: 13px; }
 </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>БАРКОИН</h1>
-    <div class="subtitle">Кликер • BARC</div>
+    <button class="settings-btn" id="settingsBtn" title="Настройки" aria-label="Настройки">⚙️</button>
+    <div class="logo-row">
+      <img class="logo-coin" src="image/coin.png" alt="BARC">
+      <h1 data-i18n="title">БАРКОИН</h1>
+    </div>
+    <div class="subtitle"><span data-i18n="subtitle">Кликер</span> • BARC</div>
+    <div class="user-chip" id="userChip" hidden></div>
   </div>
 
   <div class="container">
@@ -738,26 +1183,35 @@
         <div class="player-row">
           <div class="player-rank">
             <span class="rank-badge" id="rankBadge">1 УР.</span>
-            <span class="rank-title" id="rankTitle">Новичок</span>
+            <span class="rank-title" id="rankTitle" data-i18n="rank_novice">Новичок</span>
           </div>
-          <div style="font-size:11px;color:#8892b0;" id="critStat">Криты: 0%</div>
+          <div style="font-size:11px;color:var(--text-dim);" id="critStat">Криты: 0%</div>
         </div>
 
         <div class="bar-wrap">
           <div class="bar-icon">⚡</div>
           <div class="bar-track">
             <div class="bar-fill energy" id="energyBar" style="width:100%"></div>
-            <div class="bar-text" id="energyText">30 / 30</div>
+            <div class="bar-text" id="energyText"></div>
           </div>
         </div>
-        <div class="regen-info" id="regenInfo">+1 энергии за 5 сек</div>
+        <div class="regen-info" id="regenInfo" data-i18n="regen_info">+1 энергии за 5 сек</div>
 
         <div class="bar-wrap">
           <div class="bar-icon">⭐</div>
           <div class="bar-track">
             <div class="bar-fill xp" id="xpBar" style="width:0%"></div>
-            <div class="bar-text" id="xpText">0 / 100 XP</div>
+            <div class="bar-text" id="xpText"></div>
           </div>
+        </div>
+
+        <!-- Сетевой счётчик игроков: онлайн + место в рейтинге (данные с сервера) -->
+        <div class="online-row" id="onlineRow" title="">
+          <span class="online-dot" id="onlineDot"></span>
+          <span id="onlineCount" data-i18n="lb_loading">Онлайн: …</span>
+          <span class="online-sep">•</span>
+          <span id="myRank" data-i18n="lb_my_rank">Моё место: —</span>
+          <button class="lb-open-btn" id="lbOpenBtn" data-i18n="leaderboard_title">Рейтинг 🏆</button>
         </div>
       </div>
 
@@ -765,7 +1219,7 @@
       <div class="rate-card">
         <div class="rate-top">
           <div>
-            <div class="label">Курс BARC</div>
+            <div class="label" data-i18n="rate_label">Курс BARC</div>
             <div class="rate-price-row">
               <div class="rate-price" id="ratePrice">1.0000</div>
               <div class="arrow" id="arrow">—</div>
@@ -774,11 +1228,11 @@
           </div>
           <div style="text-align:right;">
             <div class="rate-stats">
-              <div>Макс: <b id="chartHigh">—</b></div>
-              <div>Мин: <b id="chartLow">—</b></div>
+              <div><span data-i18n="chart_high">Макс:</span> <b id="chartHigh">—</b></div>
+              <div><span data-i18n="chart_low">Мин:</span> <b id="chartLow">—</b></div>
             </div>
             <div class="rate-stats" style="margin-top:4px;justify-content:flex-end;">
-              <div>Свечей: <b id="chartTicks">0</b></div>
+              <div><span data-i18n="chart_points">Свечей:</span> <b id="chartTicks">0</b></div>
             </div>
           </div>
         </div>
@@ -788,14 +1242,14 @@
         </div>
 
         <div class="chart-legend">
-          <span>← 80 последних точек</span>
-          <span>сейчас →</span>
+          <span data-i18n="chart_left">← 80 последних точек</span>
+          <span data-i18n="chart_right">сейчас →</span>
         </div>
 
         <div class="event-row">
-          <div class="event bull" id="eventTag">📈 Обычный рынок</div>
+          <div class="event bull" id="eventTag"></div>
           <div class="rate-stats">
-            <div>24ч изм.: <b id="dayChange">+0.00%</b></div>
+            <div><span data-i18n="day_change">24ч изм.:</span> <b id="dayChange">+0.00%</b></div>
           </div>
         </div>
       </div>
@@ -807,14 +1261,14 @@
 
       <!-- Баланс -->
       <div class="balance-card">
-        <div class="label">Твой баланс</div>
+        <div class="label" data-i18n="balance_label">Твой баланс</div>
         <div class="balance-value" id="balance">0</div>
         <div class="balance-usd" id="balanceUsd">≈ $0.00</div>
       </div>
 
       <!-- Монета -->
       <div class="coin-zone" id="coinZone">
-        <div class="coin" id="coin">₿</div>
+        <div class="coin" id="coin"><span class="coin-glyph" id="coinGlyph">₿</span><img class="coin-img" src="image/coin.png" alt="" draggable="false"></div>
       </div>
       <div class="coin-info">
         <div class="coin-name" id="coinName">Обычная монета</div>
@@ -822,59 +1276,198 @@
       </div>
 
       <!-- Прокачка монеты -->
-      <div class="shop-title">Прокачка монеты</div>
+      <div class="shop-title" data-i18n="shop_upgrade">Прокачка монеты</div>
       <div class="upgrade-main" id="upgradeMain">
         <div class="upgrade-header">
-          <div class="upgrade-title" id="upgTitle">Уровень 1 / 18</div>
+          <div class="upgrade-title" id="upgTitle"></div>
           <div class="upgrade-arrow" id="upgArrow">→</div>
         </div>
         <div class="upgrade-body">
           <div class="upgrade-icon" id="upgIcon">🪨</div>
           <div class="upgrade-info">
             <div class="upgrade-new-name" id="upgNewName">Каменная монета</div>
-            <div class="upgrade-desc" id="upgDesc">Следующий уровень</div>
+            <div class="upgrade-desc" id="upgDesc" data-i18n="next_level">Следующий уровень</div>
             <div class="upgrade-bonus" id="upgBonus">+5 за клик</div>
           </div>
           <div style="text-align:right;">
             <div class="upgrade-cost" id="upgCost">100 BARC</div>
-            <div style="font-size:9px;color:#8892b0;margin-top:2px;">стоимость</div>
+            <div style="font-size:9px;color:var(--text-dim);margin-top:2px;" data-i18n="cost_label">стоимость</div>
           </div>
         </div>
       </div>
 
       <!-- Улучшения -->
-      <div class="shop-title">Улучшения</div>
+      <div class="shop-title" data-i18n="shop_upgrades">Улучшения</div>
       <div class="upgrades-grid" id="upgrades"></div>
 
       <!-- Кнопки -->
       <div class="actions">
-        <button class="btn btn-sell" id="sellBtn" disabled>Продать всё</button>
-        <button class="btn btn-reset" id="resetBtn">Сброс</button>
+        <button class="btn btn-sell" id="sellBtn" disabled data-i18n="sell_all">Продать всё</button>
+        <button class="btn btn-reset" id="resetBtn" data-i18n="reset">Сброс</button>
       </div>
 
     </div>
   </div>
 
-  <div class="footer">Клик = доход • Курс меняется каждые 2 сек</div>
+  <div class="footer" data-i18n="footer">Клик = доход • Курс меняется каждые 2 сек</div>
 
   <div class="toast" id="toast"></div>
+
+  <!-- МОДАЛЬНОЕ ОКНО СЕТЕВОГО РЕЙТИНГА -->
+  <div class="modal-overlay" id="lbOverlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-title">🏆 <span data-i18n="leaderboard_title">Рейтинг игроков</span></div>
+        <button class="modal-close" id="lbClose" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="lb-head">
+          <span id="lbInfo"></span>
+          <span id="lbRefreshHint"></span>
+        </div>
+        <div class="lb-list" id="lbList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО НАСТРОЕК -->
+  <div class="modal-overlay" id="settingsOverlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-title" data-i18n="settings_title">Настройки</div>
+        <button class="modal-close" id="settingsClose" aria-label="Закрыть">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="settings-section">
+          <div class="settings-label">🎨 <span data-i18n="theme_label">Тема оформления</span></div>
+          <div class="theme-grid" id="themeGrid"></div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-label">🌍 <span data-i18n="language_label">Язык интерфейса</span></div>
+          <div class="lang-select-wrap">
+            <input type="text" class="lang-search" id="langSearch" placeholder="Поиск языка..." autocomplete="off">
+            <select class="lang-select" id="langSelect" size="7"></select>
+            <div class="lang-count" id="langCount"></div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-label">⚙️ <span data-i18n="other_label">Прочее</span></div>
+          <div class="toggle-row">
+            <div class="toggle-text">
+              <div class="toggle-name" data-i18n="sound_name">Звуки</div>
+              <div class="toggle-desc" data-i18n="sound_desc">Звуковые эффекты кликов и покупок</div>
+            </div>
+            <label class="switch"><input type="checkbox" id="soundToggle"><span class="slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-text">
+              <div class="toggle-name" data-i18n="fx_name">Эффект монеток</div>
+              <div class="toggle-desc" data-i18n="fx_desc">Разлетающиеся монеты при клике</div>
+            </div>
+            <label class="switch"><input type="checkbox" id="coinFxToggle" checked><span class="slider"></span></label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ЭКРАН АВТОРИЗАЦИИ / РЕГИСТРАЦИИ (вход в игру) ===== -->
+  <div class="auth-gate" id="authGate">
+    <div class="auth-gate-card">
+      <div class="gate-logo">
+        <img src="image/coin.png" alt="BARC" draggable="false">
+        <h1 data-i18n="title">БАРКОИН</h1>
+        <div class="gate-sub"><span data-i18n="subtitle">Кликер</span> • BARC</div>
+      </div>
+      <div class="db-badge" id="dbBadge"><span data-i18n="db_checking">Проверяю подключение к серверу…</span></div>
+      <div class="modal-body">
+        <div class="auth-tabs">
+          <div class="auth-tab active" id="tabLogin" data-i18n="auth_title">Вход</div>
+          <div class="auth-tab" id="tabRegister" data-i18n="register_title">Регистрация</div>
+        </div>
+
+        <form id="loginForm" autocomplete="on">
+          <div class="auth-field">
+            <label data-i18n="login_ph">Логин</label>
+            <input type="text" id="liLogin" autocomplete="username" required>
+          </div>
+          <div class="auth-field">
+            <label data-i18n="password_ph">Пароль</label>
+            <input type="password" id="liPass" autocomplete="current-password" required>
+          </div>
+          <div class="auth-error" id="loginError"></div>
+          <button type="submit" class="auth-submit" id="liSubmit" data-i18n="btn_enter">Войти</button>
+          <div class="auth-switchlink"><a id="goRegister" data-i18n="to_register">Нет аккаунта? Создать аккаунт</a></div>
+        </form>
+
+        <form id="registerForm" style="display:none" autocomplete="on">
+          <div class="auth-field">
+            <label data-i18n="login_ph">Логин</label>
+            <input type="text" id="rgLogin" autocomplete="username" required>
+          </div>
+          <div class="auth-field">
+            <label data-i18n="email_ph">Электронная почта</label>
+            <input type="email" id="rgEmail" autocomplete="email" required>
+          </div>
+          <div class="auth-field">
+            <label data-i18n="password_ph">Пароль</label>
+            <input type="password" id="rgPass" autocomplete="new-password" required>
+          </div>
+          <div class="auth-field">
+            <label data-i18n="confirm_ph">Подтвердите пароль</label>
+            <input type="password" id="rgPass2" autocomplete="new-password" required>
+          </div>
+          <div class="auth-error" id="regError"></div>
+          <button type="submit" class="auth-submit" id="rgSubmit" data-i18n="btn_create">Создать аккаунт</button>
+          <div class="auth-switchlink"><a id="goLogin" data-i18n="to_login">Уже есть аккаунт? Войти</a></div>
+        </form>
+
+        <div class="auth-divider"><span data-i18n="or_social">или войдите через соцсети</span></div>
+        <div class="social-grid">
+          <button type="button" class="social-btn" data-provider="vk">
+            <svg viewBox="0 0 24 24" fill="#4680c2"><path d="M12.9 18.9c-7.7 0-12.2-5.3-12.4-14.1h3.9c.1 6.5 3 9.2 5.3 9.8V4.8h3.7v5.6c2.2-.2 4.6-2.7 5.4-5.6h3.6c-.6 3.4-3 5.9-4.7 7 1.7.8 4.4 3.1 5.5 7.1h-4c-.8-2.6-2.9-4.6-5.3-4.9v4.9h-.5z"/></svg>
+            VK</button>
+          <button type="button" class="social-btn" data-provider="google">
+            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.5-.3-2.3H12v4.5h6.5c-.1 1-.8 2.6-2.4 3.6l3.6 2.8c2.2-2 3.2-5 3.2-8.6z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.6-2.8c-1 .7-2.4 1.2-4.3 1.2-3.3 0-6-2.2-7-5.1L2 17.2C4 21.2 7.7 24 12 24z"/><path fill="#FBBC05" d="M5 14.4c-.3-.8-.4-1.6-.4-2.4s.2-1.6.4-2.4L2 6.8C1.3 8.2.9 10 .9 12s.4 3.8 1.1 5.2L5 14.4z"/><path fill="#EA4335" d="M12 4.6c1.8 0 3 .8 3.7 1.4l3.1-3C18 1.2 15.2 0 12 0 7.7 0 4 2.8 2 6.8l4.6 3.6c1-2.9 3.7-5.8 5.4-5.8z"/></svg>
+            Google</button>
+          <button type="button" class="social-btn" data-provider="yandex">
+            <svg viewBox="0 0 24 24" fill="#fc3f1d"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm.4 4c2.5 0 4.1 1.4 4.1 3.5 0 1.9-1.1 3-3.3 4.3l-2.6 1.6V17h6.2v2H8.6v-2.7l3.4-2.2c1.4-.9 2-1.6 2-2.7 0-1.1-.8-1.8-2-1.8-1.3 0-2.3.8-2.4 2.2H6.1c.1-2.9 2.2-4.9 6.3-4.9z"/></svg>
+            Яндекс</button>
+          <button type="button" class="social-btn" data-provider="discord">
+            <svg viewBox="0 0 24 24" fill="#5865F2"><path d="M20.3 4.9A19.8 19.8 0 0 0 15.9 3.4l-.4.8a18.3 18.3 0 0 1 4 1.9 16.6 16.6 0 0 0-14.9 0 18.3 18.3 0 0 1 4-1.9l-.4-.8a19.8 19.8 0 0 0-4.4 1.5C.4 9 -.3 13 .1 16.9a20 20 0 0 0 6 3l1.3-2a13 13 0 0 1-2-1l.5-.4a14.3 14.3 0 0 0 12.2 0l.5.4a13 13 0 0 1-2 1l1.3 2a20 20 0 0 0 6-3c.5-4.5-.8-8.5-3.5-12zM8.6 14.1c-1.2 0-2.1-1-2.1-2.3s.9-2.3 2.1-2.3 2.2 1 2.1 2.3c0 1.2-.9 2.3-2.1 2.3zm6.8 0c-1.2 0-2.1-1-2.1-2.3s.9-2.3 2.1-2.3 2.2 1 2.1 2.3c0 1.2-.9 2.3-2.1 2.3z"/></svg>
+            Discord</button>
+        </div>
+
+        <div class="auth-lang-row">
+          <div class="settings-label">🌍 <span data-i18n="language_label">Язык интерфейса</span></div>
+          <select id="authLangSelect"></select>
+        </div>
+        <div class="auth-hint" data-i18n="auth_hint">Прогресс сохраняется в аккаунт и не потеряется</div>
+        <div class="guest-row"><a id="guestSkip" data-i18n="to_register">Нет аккаунта? Создать аккаунт</a></div>
+      </div>
+    </div>
+  </div>
 
 <script>
   // ================================================================
   // КОНФИГ
   // ================================================================
-  const MAX_ENERGY = 30;
-  const ENERGY_REGEN_TICKS = 5;
+  const MAX_ENERGY = 40;               // было 30 — чуть больше энергии
+  const ENERGY_REGEN_TICKS = 4;        // было 5 — реген чууть быстрее
   const ENERGY_PER_CLICK = 1;
   const BASE_CRIT_CHANCE = 0.03;
   const BASE_CRIT_MULT = 3;
   const XP_PER_CLICK = 1;
-  const XP_PER_LEVEL_BASE = 200;
-  const XP_GROWTH = 1.6;
-  const TAX_RATE = 0.10;
+  const XP_PER_LEVEL_BASE = 150;       // было 200 — уровни достигаются легче
+  const XP_GROWTH = 1.5;               // было 1.6 — рост требований мягче
+  const TAX_RATE = 0.08;               // было 0.10 — комиссия при продаже меньше
   const MAX_LEVEL = 18;
   const CHART_POINTS = 80;
-  const COST_MULTIPLIER = 4.5;
+  const COST_MULTIPLIER = 4.5;         // множитель цены прокачки монеты (см. также scaleCosts ниже)
 
   const COIN_LEVELS = [
     { name: 'Обычная',       icon: '🪙', bonus: 1,           cost: 0,                color: ['#9e9e9e', '#616161'], glow: 'rgba(158,158,158,0.4)', textColor: '#333' },
@@ -897,9 +1490,17 @@
     { name: 'Вселенская',    icon: '🌠', bonus: 5000000000,  cost: 20000000000000000,color:['#ffffff', '#000000'], glow: 'rgba(255,255,255,1)', textColor: '#fff' }
   ];
 
+  // --- Балансировка «средняя сложность»: цены прокачки монеты чуть ниже прежних ---
+  (function scaleCoinCosts() {
+    const factors = [1, 1, 1, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.6, 0.55, 0.55, 0.5, 0.5, 0.5, 0.45, 0.45];
+    for (let i = 1; i < COIN_LEVELS.length; i++) {
+      COIN_LEVELS[i].cost = Math.round(COIN_LEVELS[i].cost * (factors[i] || 0.5) / 1000) * 1000;
+    }
+  })();
+
   const state = {
     price: 1.0, prevPrice: 1.0,
-    balance: 0, levelIndex: 0, usdBalance: 0,
+    balance: 0, levelIndex: 0, usdBalance: 0, totalEarned: 0,
     totalClicks: 0,
     energy: MAX_ENERGY, maxEnergy: MAX_ENERGY,
     energyProgress: 0,
@@ -915,37 +1516,2317 @@
   let clickMultiplier = 1;
 
   const upgrades = [
-    { id: 'energyMax',   name: 'Запас энергии',       effect: '+15 макс. энергии',    cost: 5000,       type: 'maxEnergy',  value: 15,   bought: 0 },
-    { id: 'energyRegen', name: 'Быстрая регенерация', effect: 'реген в 2x быстрее',   cost: 50000,      type: 'regenSpeed', value: 1,    bought: 0 },
-    { id: 'critChance',  name: 'Критический удар',    effect: '+2% шанс крита',       cost: 25000,      type: 'crit',       value: 0.02, bought: 0 },
-    { id: 'critMult',    name: 'Мощь крита',          effect: '+1x множитель крита',  cost: 200000,     type: 'critMult',   value: 1,    bought: 0 },
-    { id: 'mult2',       name: 'Множитель x2',        effect: 'x2 за клик',           cost: 100000,     type: 'mult',       value: 2,    bought: 0 },
-    { id: 'auto1',       name: 'Автокликер',          effect: '+5/сек',               cost: 500000,     type: 'auto',       value: 5,    bought: 0 },
-    { id: 'mult5',       name: 'Множитель x5',        effect: 'x5 за клик',           cost: 20000000,   type: 'mult',       value: 5,    bought: 0 },
-    { id: 'auto2',       name: 'Робо-рука',           effect: '+100/сек',             cost: 150000000,  type: 'auto',       value: 100,  bought: 0 },
-    { id: 'auto3',       name: 'Ферма',               effect: '+2000/сек',            cost: 5000000000, type: 'auto',       value: 2000, bought: 0 }
+    { id: 'energyMax',   name: 'Запас энергии',       effect: '+15 макс. энергии',    cost: 3000,       type: 'maxEnergy',  value: 15,   bought: 0 },
+    { id: 'energyRegen', name: 'Быстрая регенерация', effect: 'реген в 2x быстрее',   cost: 40000,      type: 'regenSpeed', value: 1,    bought: 0 },
+    { id: 'critChance',  name: 'Критический удар',    effect: '+2% шанс крита',       cost: 20000,      type: 'crit',       value: 0.02, bought: 0 },
+    { id: 'critMult',    name: 'Мощь крита',          effect: '+1x множитель крита',  cost: 150000,     type: 'critMult',   value: 1,    bought: 0 },
+    { id: 'mult2',       name: 'Множитель x2',        effect: 'x2 за клик',           cost: 80000,      type: 'mult',       value: 2,    bought: 0 },
+    { id: 'auto1',       name: 'Автокликер',          effect: '+5/сек',               cost: 400000,     type: 'auto',       value: 5,    bought: 0 },
+    { id: 'mult5',       name: 'Множитель x5',        effect: 'x5 за клик',           cost: 15000000,   type: 'mult',       value: 5,    bought: 0 },
+    { id: 'auto2',       name: 'Робо-рука',           effect: '+100/сек',             cost: 120000000,  type: 'auto',       value: 100,  bought: 0 },
+    { id: 'auto3',       name: 'Ферма',               effect: '+2000/сек',            cost: 4000000000, type: 'auto',       value: 2000, bought: 0 }
   ];
 
+  // Стоимость повторной покупки того же улучшения — чуть мягче прежней (средняя сложность)
+  const UPGRADE_COST_MULT = 3.5;
+
   const RANKS = [
-    { minLvl: 1,  title: 'Новичок' },
-    { minLvl: 3,  title: 'Любитель' },
-    { minLvl: 5,  title: 'Трейдер' },
-    { minLvl: 8,  title: 'Инвестор' },
-    { minLvl: 11, title: 'Магнат' },
-    { minLvl: 14, title: 'Крипто-барон' },
-    { minLvl: 17, title: 'Барский лорд' },
-    { minLvl: 20, title: 'Легенда' }
+    { minLvl: 1,  key: 'rank_novice' },
+    { minLvl: 3,  key: 'rank_amateur' },
+    { minLvl: 5,  key: 'rank_trader' },
+    { minLvl: 8,  key: 'rank_investor' },
+    { minLvl: 11, key: 'rank_tycoon' },
+    { minLvl: 14, key: 'rank_baron' },
+    { minLvl: 17, key: 'rank_lord' },
+    { minLvl: 20, key: 'rank_legend' }
   ];
 
   const MARKET_EVENTS = [
-    { type: 'bull',  name: 'Бычий рынок',    emoji: '📈', ticks: 15, effect: { priceDrift: +0.03 },  weight: 30 },
-    { type: 'bear',  name: 'Медвежий рынок', emoji: '📉', ticks: 15, effect: { priceDrift: -0.03 },  weight: 30 },
-    { type: 'crash', name: 'КРАХ!',          emoji: '💥', ticks: 8,  effect: { priceDrift: -0.15 },  weight: 14 },
-    { type: 'moon',  name: 'ТО THE MOON!',   emoji: '🚀', ticks: 10, effect: { priceDrift: +0.15 },  weight: 12 },
-    { type: 'volatile', name: 'Волатильность', emoji: '⚡', ticks: 12, effect: { volatility: 3 },      weight: 14 }
+    { type: 'bull',     emoji: '📈', ticks: 15, effect: { priceDrift: +0.03 },  weight: 30 },
+    { type: 'bear',     emoji: '📉', ticks: 15, effect: { priceDrift: -0.03 },  weight: 30 },
+    { type: 'crash',    emoji: '💥', ticks: 8,  effect: { priceDrift: -0.15 },  weight: 14 },
+    { type: 'moon',     emoji: '🚀', ticks: 10, effect: { priceDrift: +0.15 },  weight: 12 },
+    { type: 'volatile', emoji: '⚡', ticks: 12, effect: { volatility: 3 },      weight: 14 }
   ];
 
   const $ = id => document.getElementById(id);
+  let currentLang = 'ru';
+
+  // ================================================================
+  // СПРАВОЧНИК ЯЗЫКОВ — поддерживаемые языки интерфейса
+  // ================================================================
+  const LANG_NAMES = {
+    ru:'Русский', en:'English', de:'Deutsch', fr:'Français', es:'Español',
+    pt:'Português', el:'Ελληνικά', tr:'Türkçe', zh:'中文', th:'ไทย',
+    ja:'日本語', ko:'한국어', pl:'Polski', uk:'Українська', hi:'हिन्दी',
+    fi:'Suomi', no:'Norsk', he:'עברית', ar:'العربية'
+  };
+
+  // ================================================================
+  // ПЕРЕВОДЫ ИНТЕРФЕЙСА. Ключ 'xx' — fallback (в родном названии языка).
+  // ================================================================
+  const TRANSLATIONS = {
+    ru: {
+
+    "db_checking": "Проверяю подключение к серверу…",
+    "db_ok_mysql": "сервер и база данных в сети — играйте на здоровье!",
+    "db_ok_sqlite": "резервная SQL-база активна — данные сохраняются",
+    "db_down": "Сервер недоступен. Проверьте, запущен ли server.py (http://localhost:8000)",
+      _AUTH:{"auth_title":"Вход","register_title":"Регистрация","login_ph":"Логин","password_ph":"Пароль","email_ph":"Электронная почта","confirm_ph":"Подтвердите пароль","to_register":"Нет аккаунта? Создать аккаунт","to_login":"Уже есть аккаунт? Войти","btn_enter":"Войти","btn_create":"Создать аккаунт","or_social":"или войдите через","logout":"Выйти","welcome":"Добро пожаловать, {name}!","account":"Аккаунт","cloud_saved":"☁ Сохранено в облако","err_bad_login":"Логин: 3–32 символа (буквы, цифры, _ . -)","err_bad_email":"Некорректная электронная почта","err_weak":"Пароль минимум 6 символов","err_mismatch":"Пароли не совпадают","err_login_taken":"Такой логин уже занят","err_email_taken":"Эта почта уже зарегистрирована","err_bad_credentials":"Неверный логин или пароль","err_not_configured":"Вход через эту соцсеть пока не настроен на сервере (нужен client_id). Войдите по логину или настройте OAuth.","err_denied":"Вы отменили вход через соцсеть","err_state_mismatch":"Проверка безопасности не пройдена, попробуйте ещё раз","err_exchange_failed":"Сервер соцсети недоступен, попробуйте позже","err_no_identity":"Соцсеть не вернула профиль","err_offline":"Сервер недоступен — играйте локально, прогресс сохраняется в браузере","guest_skip":"Играть без аккаунта","sync_done":"☁ Прогресс загружен из облака","oauth_popup":"Разрешите всплывающее окно для входа через соцсеть","auth_hint":"Прогресс сохраняется в аккаунт и не потеряется","server_off":"Локальный режим: база данных недоступна","lang_label_auth":"Язык интерфейса","pw_show":"Показать пароль","local_guest":"Гость (локальная игра)",leaderboard_title:"Рейтинг игроков",lb_online:"Онлайн: {n}",lb_loading:"Онлайн: …",lb_my_rank:"Моё место: {n}",lb_me:"Моё место: —",lb_total:"Всего игроков: {n}",lb_earned:"заработано",lb_level:"Ур. {n}",lb_clicks:"кликов",lb_empty:"Пока нет данных — станьте первым в рейтинге!",lb_offline:"Сервер недоступен",need_account:"Игра сетевая — войдите или создайте аккаунт",lb_top:"Топ заработавших 🏆",lb_you:"Вы"},
+      title:'БАРКОИН', subtitle:'Кликер',
+      rank_novice:'Новичок', rank_amateur:'Любитель', rank_trader:'Трейдер', rank_investor:'Инвестор',
+      rank_tycoon:'Магнат', rank_baron:'Крипто-барон', rank_lord:'Барский лорд', rank_legend:'Легенда',
+      level_short:'УР.', crit_stat:'Криты:',
+      energy:'Энергия', xp:'Опыт', regen_info:'+1 энергии за {n} сек',
+      rate_label:'Курс BARC', chart_left:'← 80 последних точек', chart_right:'сейчас →',
+      chart_high:'Макс:', chart_low:'Мин:', chart_points:'Свечей:', day_change:'24ч изм.:',
+      balance_label:'Твой баланс', sold_label:'Продано:', coin_word:'монета',
+      per_click:'+{n} за клик', crit_suffix:'крит {n}%',
+      shop_upgrade:'Прокачка монеты', shop_upgrades:'Улучшения',
+      level_of:'Уровень {a} / {b}', next_level:'Следующий уровень', from_to:'С {a} → {b}',
+      maxed_title:'МАКСИМУМ ДОСТИГНУТ', maxed_desc:'Ты прокачал монету до конца',
+      cost_label:'стоимость', sell_all:'Продать всё', reset:'Сброс',
+      footer:'Клик = доход • Курс меняется каждые 2 сек',
+      no_energy:'⚡ Нет энергии! Подожди восстановления',
+      coin_unlocked:'🎉 {name} монета открыта!', level_up:'⬆️ Уровень {n}! +0.5% крит, +2 энергии',
+      upgrade_bought:'✅ {name} куплен!', sold_msg:'💰 ${net} (налог $${tax})',
+      confirm_reset:'Сбросить весь прогресс?', collecting:'Накапливаю данные...',
+      market_normal:'Обычный рынок', event_bull:'Бычий рынок', event_bear:'Медвежий рынок',
+      event_crash:'КРАХ!', event_moon:'ТО THE MOON!', event_volatile:'Волатильность',
+      upg_energyMax:'Запас энергии', upg_energyRegen:'Быстрая регенерация', upg_critChance:'Критический удар',
+      upg_critMult:'Мощь крита', upg_mult2:'Множитель x2', upg_auto1:'Автокликер', upg_mult5:'Множитель x5',
+      upg_auto2:'Робо-рука', upg_auto3:'Ферма',
+      eff_energyMax:'+15 макс. энергии', eff_energyRegen:'реген в 2x быстрее', eff_critChance:'+2% шанс крита',
+      eff_critMult:'+1x множитель крита', eff_mult2:'x2 за клик', eff_auto1:'+5/сек',
+      eff_mult5:'x5 за клик', eff_auto2:'+100/сек', eff_auto3:'+2000/сек',
+      settings_title:'Настройки', theme_label:'Тема оформления', language_label:'Язык интерфейса',
+      other_label:'Прочее', sound_name:'Звуки', sound_desc:'Звуковые эффекты кликов и покупок',
+      fx_name:'Эффект монеток', fx_desc:'Разлетающиеся монеты при клике', lang_search_ph:'Поиск языка...',
+      lang_count:'Всего языков: {n}', close:'Закрыть',
+      theme_default:'Классика', theme_emerald:'Изумруд', theme_ruby:'Рубин', theme_sunset:'Закат',
+      theme_ocean:'Океан', theme_purple:'Аметист', theme_neon:'Неон', theme_candy:'Конфетка', theme_light:'Светлая',
+      lvl_0:'Обычная', lvl_1:'Каменная', lvl_2:'Деревянная', lvl_3:'Металлическая', lvl_4:'Бронзовая',
+      lvl_5:'Железная', lvl_6:'Серебряная', lvl_7:'Золотая', lvl_8:'Платиновая', lvl_9:'Радиоактивная',
+      lvl_10:'Атомная', lvl_11:'Молекулярная', lvl_12:'Клеточная', lvl_13:'Разумная', lvl_14:'Планетарная',
+      lvl_15:'Звёздная', lvl_16:'Галактическая', lvl_17:'Вселенская'
+    },
+    en: {
+
+    "db_checking": "Checking server connection…",
+    "db_ok_mysql": "server & database online — happy playing!",
+    "db_ok_sqlite": "backup SQL database active — your data is saved",
+    "db_down": "Server unavailable. Make sure server.py is running (http://localhost:8000)",
+      _AUTH:{"auth_title":"Sign in","register_title":"Sign up","login_ph":"Login","password_ph":"Password","email_ph":"Email","confirm_ph":"Confirm password","to_register":"No account? Create one","to_login":"Already have an account? Sign in","btn_enter":"Sign in","btn_create":"Create account","or_social":"or sign in with","logout":"Log out","welcome":"Welcome, {name}!","account":"Account","cloud_saved":"☁ Saved to cloud","err_bad_login":"Login: 3–32 characters (letters, digits, _ . -)","err_bad_email":"Invalid email address","err_weak":"Password must be at least 6 characters","err_mismatch":"Passwords do not match","err_login_taken":"This login is already taken","err_email_taken":"This email is already registered","err_bad_credentials":"Wrong login or password","err_not_configured":"Sign-in with this social network is not configured on the server yet (client_id required). Use login/password or set up OAuth.","err_denied":"You cancelled the social sign-in","err_state_mismatch":"Security check failed, please try again","err_exchange_failed":"Social provider server unavailable, try later","err_no_identity":"The provider returned no profile","err_offline":"Server unavailable — playing locally, progress saved in browser","guest_skip":"Play without an account","sync_done":"☁ Progress loaded from cloud","oauth_popup":"Allow the popup window to sign in with a social network","auth_hint":"Your progress is stored in the account and won't be lost","server_off":"Local mode: database unavailable","lang_label_auth":"Language","pw_show":"Show password","local_guest":"Guest (local game)",leaderboard_title:"Player Leaderboard",lb_online:"Online: {n}",lb_loading:"Online: …",lb_my_rank:"My rank: {n}",lb_me:"My rank: —",lb_total:"Total players: {n}",lb_earned:"earned",lb_level:"Lv. {n}",lb_clicks:"clicks",lb_empty:"No data yet — be the first on the leaderboard!",lb_offline:"Server unavailable",need_account:"This is an online game — sign in or create an account",lb_top:"Top earners 🏆",lb_you:"You"},
+      title:'BARCOIN', subtitle:'Clicker',
+      rank_novice:'Novice', rank_amateur:'Amateur', rank_trader:'Trader', rank_investor:'Investor',
+      rank_tycoon:'Tycoon', rank_baron:'Crypto Baron', rank_lord:'Barc Lord', rank_legend:'Legend',
+      level_short:'LVL', crit_stat:'Crits:',
+      energy:'Energy', xp:'XP', regen_info:'+1 energy every {n}s',
+      rate_label:'BARC Rate', chart_left:'← last 80 points', chart_right:'now →',
+      chart_high:'High:', chart_low:'Low:', chart_points:'Points:', day_change:'24h chg:',
+      balance_label:'Your Balance', sold_label:'Sold:', coin_word:'coin',
+      per_click:'+{n} per click', crit_suffix:'crit {n}%',
+      shop_upgrade:'Coin Upgrade', shop_upgrades:'Upgrades',
+      level_of:'Level {a} / {b}', next_level:'Next level', from_to:'From {a} → {b}',
+      maxed_title:'MAX LEVEL', maxed_desc:'You fully upgraded the coin',
+      cost_label:'cost', sell_all:'Sell All', reset:'Reset',
+      footer:'Click = income • Rate changes every 2s',
+      no_energy:'⚡ No energy! Wait for it to regenerate',
+      coin_unlocked:'🎉 {name} coin unlocked!', level_up:'⬆️ Level {n}! +0.5% crit, +2 energy',
+      upgrade_bought:'✅ {name} purchased!', sold_msg:'💰 $${net} (tax $${tax})',
+      confirm_reset:'Reset all progress?', collecting:'Collecting data...',
+      market_normal:'Normal market', event_bull:'Bull Market', event_bear:'Bear Market',
+      event_crash:'CRASH!', event_moon:'TO THE MOON!', event_volatile:'Volatility',
+      upg_energyMax:'Energy Reserve', upg_energyRegen:'Fast Regen', upg_critChance:'Critical Strike',
+      upg_critMult:'Crit Power', upg_mult2:'x2 Multiplier', upg_auto1:'Autoclicker', upg_mult5:'x5 Multiplier',
+      upg_auto2:'Robo Arm', upg_auto3:'Farm',
+      eff_energyMax:'+15 max energy', eff_energyRegen:'regen 2x faster', eff_critChance:'+2% crit chance',
+      eff_critMult:'+1x crit multiplier', eff_mult2:'x2 per click', eff_auto1:'+5/sec',
+      eff_mult5:'x5 per click', eff_auto2:'+100/sec', eff_auto3:'+2000/sec',
+      settings_title:'Settings', theme_label:'Theme', language_label:'Interface language',
+      other_label:'Other', sound_name:'Sounds', sound_desc:'Sound effects for clicks and purchases',
+      fx_name:'Coin Effect', fx_desc:'Flying coins on click', lang_search_ph:'Search language...',
+      lang_count:'Total languages: {n}', close:'Close',
+      theme_default:'Classic', theme_emerald:'Emerald', theme_ruby:'Ruby', theme_sunset:'Sunset',
+      theme_ocean:'Ocean', theme_purple:'Amethyst', theme_neon:'Neon', theme_candy:'Candy', theme_light:'Light',
+      lvl_0:'Common', lvl_1:'Stone', lvl_2:'Wooden', lvl_3:'Metal', lvl_4:'Bronze',
+      lvl_5:'Iron', lvl_6:'Silver', lvl_7:'Golden', lvl_8:'Platinum', lvl_9:'Radioactive',
+      lvl_10:'Atomic', lvl_11:'Molecular', lvl_12:'Cellular', lvl_13:'Sentient', lvl_14:'Planetary',
+      lvl_15:'Stellar', lvl_16:'Galactic', lvl_17:'Universal'
+    },
+    de: {
+
+    "db_checking": "Verbinde zum Server…",
+    "db_ok_mysql": "Server & Datenbank online — viel Spaß!",
+    "db_ok_sqlite": "Backup-SQL-Datenbank aktiv — Daten werden gespeichert",
+    "db_down": "Server nicht erreichbar. Prüfen Sie, ob server.py läuft (http://localhost:8000)",
+      _AUTH:{"auth_title":"Anmelden","register_title":"Registrieren","login_ph":"Benutzername","password_ph":"Passwort","email_ph":"E-Mail","confirm_ph":"Passwort bestätigen","to_register":"Noch kein Konto? Konto erstellen","to_login":"Schon ein Konto? Anmelden","btn_enter":"Anmelden","btn_create":"Konto erstellen","or_social":"oder anmelden mit","logout":"Abmelden","welcome":"Willkommen, {name}!","account":"Konto","cloud_saved":"☁ In der Cloud gespeichert","err_bad_login":"Benutzername: 3–32 Zeichen (Buchstaben, Ziffern, _ . -)","err_bad_email":"Ungültige E-Mail-Adresse","err_weak":"Passwort mindestens 6 Zeichen","err_mismatch":"Passwörter stimmen nicht überein","err_login_taken":"Dieser Name ist bereits vergeben","err_email_taken":"Diese E-Mail ist bereits registriert","err_bad_credentials":"Falscher Name oder Passwort","err_not_configured":"Anmeldung über dieses Netzwerk ist auf dem Server noch nicht eingerichtet (client_id nötig). Melde dich per Benutzername an oder richte OAuth ein.","err_denied":"Du hast die Anmeldung abgebrochen","err_state_mismatch":"Sicherheitsprüfung fehlgeschlagen, bitte erneut versuchen","err_exchange_failed":"Server des Netzwerks nicht erreichbar, versuche es später","err_no_identity":"Netzwerk lieferte kein Profil","err_offline":"Server nicht erreichbar — lokales Spiel, Fortschritt im Browser gespeichert","guest_skip":"Ohne Konto spielen","sync_done":"☁ Fortschritt aus der Cloud geladen","oauth_popup":"Popup-Fenster für die Anmeldung erlauben","auth_hint":"Dein Fortschritt wird im Konto gespeichert und geht nicht verloren","server_off":"Lokaler Modus: Datenbank nicht verfügbar","lang_label_auth":"Sprache","pw_show":"Passwort anzeigen","local_guest":"Gast (lokales Spiel)",leaderboard_title:"Spieler-Rangliste",lb_online:"Online: {n}",lb_loading:"Online: …",lb_my_rank:"Mein Platz: {n}",lb_me:"Mein Platz: —",lb_total:"Spieler gesamt: {n}",lb_earned:"verdient",lb_level:"St. {n}",lb_clicks:"Klicks",lb_empty:"Noch keine Daten — sei der Erste in der Rangliste!",lb_offline:"Server nicht erreichbar",need_account:"Dies ist ein Onlinespiel — melde dich an oder erstelle ein Konto",lb_top:"Top-Verdiener 🏆",lb_you:"Du"},
+      title:"BARCOIN",
+      subtitle:"Klicker",
+      rank_novice:"Anfänger",
+      rank_amateur:"Amateur",
+      rank_trader:"Trader",
+      rank_investor:"Investor",
+      rank_tycoon:"Tycoon",
+      rank_baron:"Krypto-Baron",
+      rank_lord:"Barc-Lord",
+      rank_legend:"Legende",
+      level_short:"ST.",
+      crit_stat:"Krits:",
+      energy:"Energie",
+      xp:"EP",
+      regen_info:"+1 Energie alle {n} s",
+      rate_label:"BARC-Kurs",
+      chart_left:"← letzte 80 Punkte",
+      chart_right:"jetzt →",
+      chart_high:"Hoch:",
+      chart_low:"Tief:",
+      chart_points:"Kerzen:",
+      day_change:"24 Std Δ:",
+      balance_label:"Dein Guthaben",
+      sold_label:"Verkauft:",
+      coin_word:"Münze",
+      per_click:"+{n} pro Klick",
+      crit_suffix:"Krit {n}%",
+      shop_upgrade:"Münz-Upgrade",
+      shop_upgrades:"Upgrades",
+      level_of:"Stufe {a} / {b}",
+      next_level:"Nächste Stufe",
+      from_to:"Von {a} → {b}",
+      maxed_title:"MAXIMUM ERREICHT",
+      maxed_desc:"Du hast die Münze vollständig aufgewertet",
+      cost_label:"Kosten",
+      sell_all:"Alle verkaufen",
+      reset:"Zurücksetzen",
+      footer:"Klick = Einkommen • Kurs ändert sich alle 2 s",
+      no_energy:"⚡ Keine Energie! Warte auf Regeneration",
+      coin_unlocked:"🎉 {name} Münze freigeschaltet!",
+      level_up:"⬆️ Stufe {n}! +0,5 % Krit, +2 Energie",
+      upgrade_bought:"✅ {name} gekauft!",
+      sold_msg:"💰 ${net} (Steuer ${tax})",
+      confirm_reset:"Gesamten Fortschritt zurücksetzen?",
+      collecting:"Sammle Daten...",
+      market_normal:"Normaler Markt",
+      event_bull:"Bullenmarkt",
+      event_bear:"Bärenmarkt",
+      event_crash:"CRASH!",
+      event_moon:"TO THE MOON!",
+      event_volatile:"Volatilität",
+      upg_energyMax:"Energiereserve",
+      upg_energyRegen:"Schnelle Regeneration",
+      upg_critChance:"Kritischer Schlag",
+      upg_critMult:"Krit-Stärke",
+      upg_mult2:"x2-Multiplikator",
+      upg_auto1:"Autoklicker",
+      upg_mult5:"x5-Multiplikator",
+      upg_auto2:"Roboterarm",
+      upg_auto3:"Farm",
+      eff_energyMax:"+15 max. Energie",
+      eff_energyRegen:"Regeneration 2x schneller",
+      eff_critChance:"+2 % Krit-Chance",
+      eff_critMult:"+1x Krit-Multiplikator",
+      eff_mult2:"x2 pro Klick",
+      eff_auto1:"+5/s",
+      eff_mult5:"x5 pro Klick",
+      eff_auto2:"+100/s",
+      eff_auto3:"+2000/s",
+      settings_title:"Einstellungen",
+      theme_label:"Design",
+      language_label:"Sprache",
+      other_label:"Sonstiges",
+      sound_name:"Töne",
+      sound_desc:"Soundeffekte für Klicks und Käufe",
+      fx_name:"Münz-Effekt",
+      fx_desc:"Fliegende Münzen beim Klick",
+      lang_search_ph:"Sprache suchen...",
+      lang_count:"Sprachen gesamt: {n}",
+      close:"Schließen",
+      theme_default:"Klassik",
+      theme_emerald:"Smaragd",
+      theme_ruby:"Rubin",
+      theme_sunset:"Sonnenuntergang",
+      theme_ocean:"Ozean",
+      theme_purple:"Amethyst",
+      theme_neon:"Neon",
+      theme_candy:"Bonbon",
+      theme_light:"Hell",
+      lvl_0:"Gewöhnlich",
+      lvl_1:"Stein",
+      lvl_2:"Holz",
+      lvl_3:"Metall",
+      lvl_4:"Bronze",
+      lvl_5:"Eisen",
+      lvl_6:"Silber",
+      lvl_7:"Gold",
+      lvl_8:"Platin",
+      lvl_9:"Radioaktiv",
+      lvl_10:"Atomar",
+      lvl_11:"Molekular",
+      lvl_12:"Zellulär",
+      lvl_13:"Bewusst",
+      lvl_14:"Planetarisch",
+      lvl_15:"Stellar",
+      lvl_16:"Galaktisch",
+      lvl_17:"Universal"
+    },
+    fr: {
+
+    "db_checking": "Connexion au serveur…",
+    "db_ok_mysql": "serveur et base de données en ligne — bon jeu !",
+    "db_ok_sqlite": "base SQL de secours active — vos données sont sauvegardées",
+    "db_down": "Serveur indisponible. Vérifiez que server.py est lancé (http://localhost:8000)",
+      _AUTH:{"auth_title":"Connexion","register_title":"Inscription","login_ph":"Identifiant","password_ph":"Mot de passe","email_ph":"E-mail","confirm_ph":"Confirmer le mot de passe","to_register":"Pas de compte ? Créer un compte","to_login":"Déjà un compte ? Se connecter","btn_enter":"Se connecter","btn_create":"Créer le compte","or_social":"ou se connecter avec","logout":"Déconnexion","welcome":"Bienvenue, {name} !","account":"Compte","cloud_saved":"☁ Enregistré dans le cloud","err_bad_login":"Identifiant : 3 à 32 caractères (lettres, chiffres, _ . -)","err_bad_email":"Adresse e-mail invalide","err_weak":"Mot de passe : 6 caractères minimum","err_mismatch":"Les mots de passe ne correspondent pas","err_login_taken":"Cet identifiant est déjà pris","err_email_taken":"Cet e-mail est déjà enregistré","err_bad_credentials":"Identifiant ou mot de passe incorrect","err_not_configured":"La connexion via ce réseau n'est pas encore configurée sur le serveur (client_id requis). Connectez-vous par identifiant ou configurez OAuth.","err_denied":"Vous avez annulé la connexion sociale","err_state_mismatch":"Contrôle de sécurité échoué, réessayez","err_exchange_failed":"Serveur du réseau indisponible, réessayez plus tard","err_no_identity":"Le réseau n'a pas renvoyé de profil","err_offline":"Serveur indisponible — jeu local, progression enregistrée dans le navigateur","guest_skip":"Jouer sans compte","sync_done":"☁ Progression chargée depuis le cloud","oauth_popup":"Autorisez la fenêtre pop-up pour la connexion sociale","auth_hint":"Votre progression est sauvegardée dans le compte","server_off":"Mode local : base de données indisponible","lang_label_auth":"Langue","pw_show":"Afficher le mot de passe","local_guest":"Invité (jeu local)",leaderboard_title:"Classement des joueurs",lb_online:"En ligne : {n}",lb_loading:"En ligne : …",lb_my_rank:"Ma place : {n}",lb_me:"Ma place : —",lb_total:"Joueurs au total : {n}",lb_earned:"gagnés",lb_level:"Niv. {n}",lb_clicks:"clics",lb_empty:"Aucune donnée pour l’instant — soyez le premier du classement !",lb_offline:"Serveur indisponible",need_account:"Le jeu est en ligne — connectez-vous ou créez un compte",lb_top:"Meilleurs gains 🏆",lb_you:"Vous"},
+      title:"BARCOIN",
+      subtitle:"Clicker",
+      rank_novice:"Débutant",
+      rank_amateur:"Amateur",
+      rank_trader:"Trader",
+      rank_investor:"Investisseur",
+      rank_tycoon:"Magnat",
+      rank_baron:"Baron crypto",
+      rank_lord:"Seigneur Barc",
+      rank_legend:"Légende",
+      level_short:"NV.",
+      crit_stat:"Crits :",
+      energy:"Énergie",
+      xp:"XP",
+      regen_info:"+1 énergie toutes les {n} s",
+      rate_label:"Cours BARC",
+      chart_left:"← 80 derniers points",
+      chart_right:"maintenant →",
+      chart_high:"Max :",
+      chart_low:"Min :",
+      chart_points:"Bougies :",
+      day_change:"Var. 24 h :",
+      balance_label:"Ton solde",
+      sold_label:"Vendu :",
+      coin_word:"pièce",
+      per_click:"+{n} par clic",
+      crit_suffix:"crit {n}%",
+      shop_upgrade:"Amélioration de la pièce",
+      shop_upgrades:"Améliorations",
+      level_of:"Niveau {a} / {b}",
+      next_level:"Niveau suivant",
+      from_to:"De {a} → {b}",
+      maxed_title:"MAXIMUM ATTEINT",
+      maxed_desc:"Tu as entièrement amélioré la pièce",
+      cost_label:"coût",
+      sell_all:"Tout vendre",
+      reset:"Réinitialiser",
+      footer:"Clic = revenu • Le cours change toutes les 2 s",
+      no_energy:"⚡ Plus d'énergie ! Attends la régénération",
+      coin_unlocked:"🎉 Pièce {name} débloquée !",
+      level_up:"⬆️ Niveau {n} ! +0,5% crit, +2 énergie",
+      upgrade_bought:"✅ {name} acheté !",
+      sold_msg:"💰 ${net} (taxe ${tax})",
+      confirm_reset:"Réinitialiser toute la progression ?",
+      collecting:"Collecte des données...",
+      market_normal:"Marché normal",
+      event_bull:"Marché haussier",
+      event_bear:"Marché baissier",
+      event_crash:"KRACH !",
+      event_moon:"TO THE MOON !",
+      event_volatile:"Volatilité",
+      upg_energyMax:"Réserve d'énergie",
+      upg_energyRegen:"Régénération rapide",
+      upg_critChance:"Frappe critique",
+      upg_critMult:"Puissance de crit",
+      upg_mult2:"Multiplicateur x2",
+      upg_auto1:"Autocliqueur",
+      upg_mult5:"Multiplicateur x5",
+      upg_auto2:"Bras robotique",
+      upg_auto3:"Ferme",
+      eff_energyMax:"+15 énergie max",
+      eff_energyRegen:"régén. 2x plus rapide",
+      eff_critChance:"+2% de chance de crit",
+      eff_critMult:"+1x multiplicateur de crit",
+      eff_mult2:"x2 par clic",
+      eff_auto1:"+5/s",
+      eff_mult5:"x5 par clic",
+      eff_auto2:"+100/s",
+      eff_auto3:"+2000/s",
+      settings_title:"Paramètres",
+      theme_label:"Thème",
+      language_label:"Langue de l'interface",
+      other_label:"Divers",
+      sound_name:"Sons",
+      sound_desc:"Effets sonores des clics et achats",
+      fx_name:"Effet de pièces",
+      fx_desc:"Pièces volantes au clic",
+      lang_search_ph:"Rechercher une langue...",
+      lang_count:"Langues au total : {n}",
+      close:"Fermer",
+      theme_default:"Classique",
+      theme_emerald:"Émeraude",
+      theme_ruby:"Rubis",
+      theme_sunset:"Coucher de soleil",
+      theme_ocean:"Océan",
+      theme_purple:"Améthyste",
+      theme_neon:"Néon",
+      theme_candy:"Bonbon",
+      theme_light:"Clair",
+      lvl_0:"Commune",
+      lvl_1:"Pierre",
+      lvl_2:"Bois",
+      lvl_3:"Métal",
+      lvl_4:"Bronze",
+      lvl_5:"Fer",
+      lvl_6:"Argent",
+      lvl_7:"Or",
+      lvl_8:"Platine",
+      lvl_9:"Radioactive",
+      lvl_10:"Atomique",
+      lvl_11:"Moléculaire",
+      lvl_12:"Cellulaire",
+      lvl_13:"Sensible",
+      lvl_14:"Planétaire",
+      lvl_15:"Stellaire",
+      lvl_16:"Galactique",
+      lvl_17:"Universelle"
+    },
+    es: {
+
+    "db_checking": "Conectando con el servidor…",
+    "db_ok_mysql": "servidor y base de datos en línea — ¡a jugar!",
+    "db_ok_sqlite": "base SQL de respaldo activa — tus datos se guardan",
+    "db_down": "Servidor no disponible. Comprueba que server.py está en marcha (http://localhost:8000)",
+      _AUTH:{"auth_title":"Iniciar sesión","register_title":"Registrarse","login_ph":"Usuario","password_ph":"Contraseña","email_ph":"Correo electrónico","confirm_ph":"Confirmar contraseña","to_register":"¿Sin cuenta? Crea una","to_login":"¿Ya tienes cuenta? Inicia sesión","btn_enter":"Entrar","btn_create":"Crear cuenta","or_social":"o entra con","logout":"Salir","welcome":"¡Bienvenido, {name}!","account":"Cuenta","cloud_saved":"☁ Guardado en la nube","err_bad_login":"Usuario: 3–32 caracteres (letras, números, _ . -)","err_bad_email":"Correo electrónico no válido","err_weak":"La contraseña debe tener al menos 6 caracteres","err_mismatch":"Las contraseñas no coinciden","err_login_taken":"Ese usuario ya existe","err_email_taken":"Ese correo ya está registrado","err_bad_credentials":"Usuario o contraseña incorrectos","err_not_configured":"El acceso con esta red social aún no está configurado en el servidor (se necesita client_id). Entra con usuario o configura OAuth.","err_denied":"Has cancelado el acceso social","err_state_mismatch":"Comprobación de seguridad fallida, inténtalo de nuevo","err_exchange_failed":"Servidor de la red no disponible, inténtalo más tarde","err_no_identity":"La red no devolvió perfil","err_offline":"Servidor no disponible — juego local, progreso guardado en el navegador","guest_skip":"Jugar sin cuenta","sync_done":"☁ Progreso cargado desde la nube","oauth_popup":"Permite la ventana emergente para entrar con la red social","auth_hint":"Tu progreso se guarda en la cuenta y no se perderá","server_off":"Modo local: base de datos no disponible","lang_label_auth":"Idioma","pw_show":"Mostrar contraseña","local_guest":"Invitado (juego local)",leaderboard_title:"Clasificación de jugadores",lb_online:"En línea: {n}",lb_loading:"En línea: …",lb_my_rank:"Mi puesto: {n}",lb_me:"Mi puesto: —",lb_total:"Jugadores totales: {n}",lb_earned:"ganado",lb_level:"Nv. {n}",lb_clicks:"clics",lb_empty:"¡Aún no hay datos — sé el primero en la clasificación!",lb_offline:"Servidor no disponible",need_account:"El juego es en línea: inicia sesión o crea una cuenta",lb_top:"Más ganadores 🏆",lb_you:"Tú"},
+      title:"BARCOIN",
+      subtitle:"Clicador",
+      rank_novice:"Novato",
+      rank_amateur:"Aficionado",
+      rank_trader:"Trader",
+      rank_investor:"Inversor",
+      rank_tycoon:"Magnate",
+      rank_baron:"Barón cripto",
+      rank_lord:"Señor Barc",
+      rank_legend:"Leyenda",
+      level_short:"NIV.",
+      crit_stat:"Críticos:",
+      energy:"Energía",
+      xp:"XP",
+      regen_info:"+1 energía cada {n} s",
+      rate_label:"Cotización BARC",
+      chart_left:"← últimos 80 puntos",
+      chart_right:"ahora →",
+      chart_high:"Máx:",
+      chart_low:"Mín:",
+      chart_points:"Velas:",
+      day_change:"Cambio 24h:",
+      balance_label:"Tu saldo",
+      sold_label:"Vendido:",
+      coin_word:"moneda",
+      per_click:"+{n} por clic",
+      crit_suffix:"crítico {n}%",
+      shop_upgrade:"Mejora de la moneda",
+      shop_upgrades:"Mejoras",
+      level_of:"Nivel {a} / {b}",
+      next_level:"Siguiente nivel",
+      from_to:"De {a} → {b}",
+      maxed_title:"MÁXIMO ALCANZADO",
+      maxed_desc:"Has mejorado la moneda al máximo",
+      cost_label:"coste",
+      sell_all:"Vender todo",
+      reset:"Reiniciar",
+      footer:"Clic = ingreso • La cotización cambia cada 2 s",
+      no_energy:"⚡ ¡Sin energía! Espera la regeneración",
+      coin_unlocked:"🎉 ¡Moneda {name} desbloqueada!",
+      level_up:"⬆️ ¡Nivel {n}! +0.5% crítico, +2 energía",
+      upgrade_bought:"✅ ¡{name} comprado!",
+      sold_msg:"💰 ${net} (impuesto ${tax})",
+      confirm_reset:"¿Reiniciar todo el progreso?",
+      collecting:"Recopilando datos...",
+      market_normal:"Mercado normal",
+      event_bull:"Mercado alcista",
+      event_bear:"Mercado bajista",
+      event_crash:"¡CRACK!",
+      event_moon:"¡TO THE MOON!",
+      event_volatile:"Volatilidad",
+      upg_energyMax:"Reserva de energía",
+      upg_energyRegen:"Regeneración rápida",
+      upg_critChance:"Golpe crítico",
+      upg_critMult:"Poder crítico",
+      upg_mult2:"Multiplicador x2",
+      upg_auto1:"Autoclicador",
+      upg_mult5:"Multiplicador x5",
+      upg_auto2:"Brazo robótico",
+      upg_auto3:"Granja",
+      eff_energyMax:"+15 energía máx.",
+      eff_energyRegen:"regeneración 2x más rápida",
+      eff_critChance:"+2% prob. crítica",
+      eff_critMult:"+1x multiplicador crítico",
+      eff_mult2:"x2 por clic",
+      eff_auto1:"+5/s",
+      eff_mult5:"x5 por clic",
+      eff_auto2:"+100/s",
+      eff_auto3:"+2000/s",
+      settings_title:"Ajustes",
+      theme_label:"Tema",
+      language_label:"Idioma de la interfaz",
+      other_label:"Otros",
+      sound_name:"Sonidos",
+      sound_desc:"Efectos de sonido de clics y compras",
+      fx_name:"Efecto de monedas",
+      fx_desc:"Monedas voladoras al hacer clic",
+      lang_search_ph:"Buscar idioma...",
+      lang_count:"Idiomas en total: {n}",
+      close:"Cerrar",
+      theme_default:"Clásico",
+      theme_emerald:"Esmeralda",
+      theme_ruby:"Rubí",
+      theme_sunset:"Atardecer",
+      theme_ocean:"Océano",
+      theme_purple:"Amatista",
+      theme_neon:"Neón",
+      theme_candy:"Caramelo",
+      theme_light:"Claro",
+      lvl_0:"Común",
+      lvl_1:"Piedra",
+      lvl_2:"Madera",
+      lvl_3:"Metal",
+      lvl_4:"Bronce",
+      lvl_5:"Hierro",
+      lvl_6:"Plata",
+      lvl_7:"Oro",
+      lvl_8:"Platino",
+      lvl_9:"Radiactiva",
+      lvl_10:"Atómica",
+      lvl_11:"Molecular",
+      lvl_12:"Celular",
+      lvl_13:"Sintiente",
+      lvl_14:"Planetaria",
+      lvl_15:"Estelar",
+      lvl_16:"Galáctica",
+      lvl_17:"Universal"
+    },
+    pt: {
+
+    "db_checking": "Conectando ao servidor…",
+    "db_ok_mysql": "servidor e banco de dados online — bom jogo!",
+    "db_ok_sqlite": "banco SQL reserva ativo — seus dados são salvos",
+    "db_down": "Servidor indisponível. Verifique se o server.py está rodando (http://localhost:8000)",
+      _AUTH:{"auth_title":"Entrar","register_title":"Cadastrar-se","login_ph":"Usuário","password_ph":"Senha","email_ph":"E-mail","confirm_ph":"Confirmar senha","to_register":"Sem conta? Crie uma","to_login":"Já tem conta? Entrar","btn_enter":"Entrar","btn_create":"Criar conta","or_social":"ou entre com","logout":"Sair","welcome":"Bem-vindo, {name}!","account":"Conta","cloud_saved":"☁ Salvo na nuvem","err_bad_login":"Usuário: 3–32 caracteres (letras, números, _ . -)","err_bad_email":"E-mail inválido","err_weak":"A senha deve ter pelo menos 6 caracteres","err_mismatch":"As senhas não coincidem","err_login_taken":"Esse usuário já existe","err_email_taken":"Esse e-mail já está cadastrado","err_bad_credentials":"Usuário ou senha incorretos","err_not_configured":"O acesso por esta rede ainda não está configurado no servidor (client_id necessário). Entre com usuário ou configure o OAuth.","err_denied":"Você cancelou o acesso pela rede","err_state_mismatch":"Verificação de segurança falhou, tente novamente","err_exchange_failed":"Servidor da rede indisponível, tente mais tarde","err_no_identity":"A rede não retornou perfil","err_offline":"Servidor indisponível — jogo local, progresso salvo no navegador","guest_skip":"Jogar sem conta","sync_done":"☁ Progresso carregado da nuvem","oauth_popup":"Permita a janela pop-up para entrar pela rede","auth_hint":"Seu progresso é salvo na conta e não será perdido","server_off":"Modo local: banco de dados indisponível","lang_label_auth":"Idioma","pw_show":"Mostrar senha","local_guest":"Convidado (jogo local)",leaderboard_title:"Classificação de jogadores",lb_online:"Online: {n}",lb_loading:"Online: …",lb_my_rank:"Meu lugar: {n}",lb_me:"Meu lugar: —",lb_total:"Total de jogadores: {n}",lb_earned:"ganho",lb_level:"Nv. {n}",lb_clicks:"cliques",lb_empty:"Sem dados ainda — seja o primeiro na classificação!",lb_offline:"Servidor indisponível",need_account:"O jogo é online — entre ou crie uma conta",lb_top:"Maiores ganhos 🏆",lb_you:"Você"},
+      title:"BARCOIN",
+      subtitle:"Clicador",
+      rank_novice:"Novato",
+      rank_amateur:"Amador",
+      rank_trader:"Trader",
+      rank_investor:"Investidor",
+      rank_tycoon:"Magnata",
+      rank_baron:"Barão cripto",
+      rank_lord:"Senhor Barc",
+      rank_legend:"Lenda",
+      level_short:"NV.",
+      crit_stat:"Críticos:",
+      energy:"Energia",
+      xp:"XP",
+      regen_info:"+1 energia a cada {n} s",
+      rate_label:"Cotação BARC",
+      chart_left:"← últimos 80 pontos",
+      chart_right:"agora →",
+      chart_high:"Máx:",
+      chart_low:"Mín:",
+      chart_points:"Velas:",
+      day_change:"Var. 24h:",
+      balance_label:"Seu saldo",
+      sold_label:"Vendido:",
+      coin_word:"moeda",
+      per_click:"+{n} por clique",
+      crit_suffix:"crítico {n}%",
+      shop_upgrade:"Melhoria da moeda",
+      shop_upgrades:"Melhorias",
+      level_of:"Nível {a} / {b}",
+      next_level:"Próximo nível",
+      from_to:"De {a} → {b}",
+      maxed_title:"MÁXIMO ALCANÇADO",
+      maxed_desc:"Você melhorou a moeda ao máximo",
+      cost_label:"custo",
+      sell_all:"Vender tudo",
+      reset:"Redefinir",
+      footer:"Clique = renda • Cotação muda a cada 2 s",
+      no_energy:"⚡ Sem energia! Aguarde a regeneração",
+      coin_unlocked:"🎉 Moeda {name} desbloqueada!",
+      level_up:"⬆️ Nível {n}! +0,5% crítico, +2 energia",
+      upgrade_bought:"✅ {name} comprado!",
+      sold_msg:"💰 ${net} (imposto ${tax})",
+      confirm_reset:"Redefinir todo o progresso?",
+      collecting:"Coletando dados...",
+      market_normal:"Mercado normal",
+      event_bull:"Mercado de alta",
+      event_bear:"Mercado de baixa",
+      event_crash:"COLAPSO!",
+      event_moon:"À LUA!",
+      event_volatile:"Volatilidade",
+      upg_energyMax:"Reserva de energia",
+      upg_energyRegen:"Regeneração rápida",
+      upg_critChance:"Golpe crítico",
+      upg_critMult:"Poder crítico",
+      upg_mult2:"Multiplicador x2",
+      upg_auto1:"Clique automático",
+      upg_mult5:"Multiplicador x5",
+      upg_auto2:"Braço robótico",
+      upg_auto3:"Fazenda",
+      eff_energyMax:"+15 energia máx.",
+      eff_energyRegen:"regeneração 2x mais rápida",
+      eff_critChance:"+2% chance de crítico",
+      eff_critMult:"+1x multiplicador crítico",
+      eff_mult2:"x2 por clique",
+      eff_auto1:"+5/s",
+      eff_mult5:"x5 por clique",
+      eff_auto2:"+100/s",
+      eff_auto3:"+2000/s",
+      settings_title:"Configurações",
+      theme_label:"Tema",
+      language_label:"Idioma da interface",
+      other_label:"Outros",
+      sound_name:"Sons",
+      sound_desc:"Efeitos sonoros de cliques e compras",
+      fx_name:"Efeito de moedas",
+      fx_desc:"Moedas voadoras ao clicar",
+      lang_search_ph:"Pesquisar idioma...",
+      lang_count:"Total de idiomas: {n}",
+      close:"Fechar",
+      theme_default:"Clássico",
+      theme_emerald:"Esmeralda",
+      theme_ruby:"Rubi",
+      theme_sunset:"Pôr do sol",
+      theme_ocean:"Oceano",
+      theme_purple:"Ametista",
+      theme_neon:"Neon",
+      theme_candy:"Doce",
+      theme_light:"Claro",
+      lvl_0:"Comum",
+      lvl_1:"Pedra",
+      lvl_2:"Madeira",
+      lvl_3:"Metal",
+      lvl_4:"Bronze",
+      lvl_5:"Ferro",
+      lvl_6:"Prata",
+      lvl_7:"Ouro",
+      lvl_8:"Platina",
+      lvl_9:"Radioativa",
+      lvl_10:"Atômica",
+      lvl_11:"Molecular",
+      lvl_12:"Celular",
+      lvl_13:"Senciente",
+      lvl_14:"Planetária",
+      lvl_15:"Estelar",
+      lvl_16:"Galáctica",
+      lvl_17:"Universal"
+    },
+    tr: {
+
+    "db_checking": "Sunucuya bağlanılıyor…",
+    "db_ok_mysql": "sunucu ve veritabanı çevrimiçi — iyi oyunlar!",
+    "db_ok_sqlite": "yedek SQL veritabanı etkin — verileriniz kaydediliyor",
+    "db_down": "Sunucuya ulaşılamıyor. server.py çalıştığından emin olun (http://localhost:8000)",
+      _AUTH:{"auth_title":"Giriş","register_title":"Kayıt ol","login_ph":"Kullanıcı adı","password_ph":"Şifre","email_ph":"E-posta","confirm_ph":"Şifreyi onayla","to_register":"Hesabın yok mu? Hesap oluştur","to_login":"Zaten hesabın var mı? Giriş yap","btn_enter":"Giriş yap","btn_create":"Hesap oluştur","or_social":"veya şununla giriş yap","logout":"Çıkış","welcome":"Hoş geldin, {name}!","account":"Hesap","cloud_saved":"☁ Buluta kaydedildi","err_bad_login":"Kullanıcı adı: 3–32 karakter (harf, rakam, _ . -)","err_bad_email":"Geçersiz e-posta","err_weak":"Şifre en az 6 karakter olmalı","err_mismatch":"Şifreler eşleşmiyor","err_login_taken":"Bu kullanıcı adı alınmış","err_email_taken":"Bu e-posta zaten kayıtlı","err_bad_credentials":"Yanlış kullanıcı adı veya şifre","err_not_configured":"Bu ağ ile giriş sunucuda henüz yapılandırılmadı (client_id gerekli). Kullanıcı adı ile gir veya OAuth kur.","err_denied":"Sosyal girişi iptal ettiniz","err_state_mismatch":"Güvenlik doğrulaması başarısız, tekrar deneyin","err_exchange_failed":"Sağlayıcı sunucusu mevcut değil, sonra deneyin","err_no_identity":"Sağlayıcı profil döndürmedi","err_offline":"Sunucu erişilemez — yerel oyun, ilerleme tarayıcıda saklanır","guest_skip":"Hesapsız oyna","sync_done":"☁ İlerleme buluttan yüklendi","oauth_popup":"Sosyal giriş için açılır pencereye izin ver","auth_hint":"İlerlemen hesapta saklanır ve kaybolmaz","server_off":"Yerel mod: veritabanı erişilemez","lang_label_auth":"Dil","pw_show":"Şifreyi göster","local_guest":"Misafir (yerel oyun)",leaderboard_title:"Oyuncu sıralaması",lb_online:"Çevrimiçi: {n}",lb_loading:"Çevrimiçi: …",lb_my_rank:"Benim sıram: {n}",lb_me:"Benim sıram: —",lb_total:"Toplam oyuncu: {n}",lb_earned:"kazanılan",lb_level:"Sv. {n}",lb_clicks:"tıklama",lb_empty:"Henüz veri yok — ilk siz olun!",lb_offline:"Sunucu kullanılamıyor",need_account:"Oyun çevrimiçidir — giriş yapın veya hesap oluşturun",lb_top:"En çok kazananlar 🏆",lb_you:"Siz"},
+      title:"BARCOIN",
+      subtitle:"Tıklayıcı",
+      rank_novice:"Acemi",
+      rank_amateur:"Amatör",
+      rank_trader:"Trader",
+      rank_investor:"Yatırımcı",
+      rank_tycoon:"Patron",
+      rank_baron:"Kripto Baronu",
+      rank_lord:"Barc Lordu",
+      rank_legend:"Efsane",
+      level_short:"SV",
+      crit_stat:"Krit:",
+      energy:"Enerji",
+      xp:"TP",
+      regen_info:"+1 enerji her {n} sn'de",
+      rate_label:"BARC Kuru",
+      chart_left:"← son 80 nokta",
+      chart_right:"şimdi →",
+      chart_high:"Yüksek:",
+      chart_low:"Düşük:",
+      chart_points:"Mum:",
+      day_change:"24s değişim:",
+      balance_label:"Bakiyen",
+      sold_label:"Satılan:",
+      coin_word:"coin",
+      per_click:"tık başına +{n}",
+      crit_suffix:"krit %{n}",
+      shop_upgrade:"Coin Yükseltmesi",
+      shop_upgrades:"Yükseltmeler",
+      level_of:"Seviye {a} / {b}",
+      next_level:"Sonraki seviye",
+      from_to:"{a} → {b}",
+      maxed_title:"MAKSİMUM ULAŞILDI",
+      maxed_desc:"Coin'i tamamen yükselttin",
+      cost_label:"maliyet",
+      sell_all:"Hepsini Sat",
+      reset:"Sıfırla",
+      footer:"Tık = gelir • Kur her 2 sn'de değişir",
+      no_energy:"⚡ Enerji yok! Yenilenmeyi bekle",
+      coin_unlocked:"🎉 {name} coin açıldı!",
+      level_up:"⬆️ Seviye {n}! +%0,5 krit, +2 enerji",
+      upgrade_bought:"✅ {name} satın alındı!",
+      sold_msg:"💰 ${net} (vergi ${tax})",
+      confirm_reset:"Tüm ilerleme sıfırlansın mı?",
+      collecting:"Veri toplanıyor...",
+      market_normal:"Normal piyasa",
+      event_bull:"Boğa Piyasası",
+      event_bear:"Ayı Piyasası",
+      event_crash:"ÇÖKÜŞ!",
+      event_moon:"AY'A DOĞRU!",
+      event_volatile:"Oynaklık",
+      upg_energyMax:"Enerji Rezervi",
+      upg_energyRegen:"Hızlı Yenilenme",
+      upg_critChance:"Kritik Vuruş",
+      upg_critMult:"Krit Gücü",
+      upg_mult2:"x2 Çarpan",
+      upg_auto1:"Otomatik Tıklayıcı",
+      upg_mult5:"x5 Çarpan",
+      upg_auto2:"Robot Kol",
+      upg_auto3:"Çiftlik",
+      eff_energyMax:"+15 maks. enerji",
+      eff_energyRegen:"yenilenme 2x hızlı",
+      eff_critChance:"+%2 krit şansı",
+      eff_critMult:"+1x krit çarpanı",
+      eff_mult2:"tık başına x2",
+      eff_auto1:"+5/sn",
+      eff_mult5:"tık başına x5",
+      eff_auto2:"+100/sn",
+      eff_auto3:"+2000/sn",
+      settings_title:"Ayarlar",
+      theme_label:"Tema",
+      language_label:"Arayüz dili",
+      other_label:"Diğer",
+      sound_name:"Sesler",
+      sound_desc:"Tıklama ve satın alma ses efektleri",
+      fx_name:"Coin Efekti",
+      fx_desc:"Tıklamada uçan coinler",
+      lang_search_ph:"Dil ara...",
+      lang_count:"Toplam dil: {n}",
+      close:"Kapat",
+      theme_default:"Klasik",
+      theme_emerald:"Zümrüt",
+      theme_ruby:"Yakut",
+      theme_sunset:"Gün Batımı",
+      theme_ocean:"Okyanus",
+      theme_purple:"Ametist",
+      theme_neon:"Neon",
+      theme_candy:"Şeker",
+      theme_light:"Açık",
+      lvl_0:"Sıradan",
+      lvl_1:"Taş",
+      lvl_2:"Ahşap",
+      lvl_3:"Metal",
+      lvl_4:"Tunç",
+      lvl_5:"Demir",
+      lvl_6:"Gümüş",
+      lvl_7:"Altın",
+      lvl_8:"Platin",
+      lvl_9:"Radyoaktif",
+      lvl_10:"Atomik",
+      lvl_11:"Moleküler",
+      lvl_12:"Hücresel",
+      lvl_13:"Duyarlı",
+      lvl_14:"Gezegenimsi",
+      lvl_15:"Yıldızsal",
+      lvl_16:"Galaktik",
+      lvl_17:"Evrensel"
+    },
+    el: {
+
+    "db_checking": "Σύνδεση με τον διακομιστή…",
+    "db_ok_mysql": "διακομιστής και βάση δεδομένων σε λειτουργία — καλό παιχνίδι!",
+    "db_ok_sqlite": "ενεργή αντιγραφική SQL βάση — τα δεδομένα αποθηκεύονται",
+    "db_down": "Ο διακομιστής δεν είναι διαθέσιμος. Βεβαιωθείτε ότι τρέχει το server.py (http://localhost:8000)",
+      _AUTH:{"auth_title":"Σύνδεση","register_title":"Εγγραφή","login_ph":"Όνομα χρήστη","password_ph":"Κωδικός","email_ph":"E-mail","confirm_ph":"Επιβεβαίωση κωδικού","to_register":"Δεν έχεις λογαριασμό; Δημιουργία","to_login":"Έχεις ήδη λογαριασμό; Σύνδεση","btn_enter":"Σύνδεση","btn_create":"Δημιουργία λογαριασμού","or_social":"ή σύνδεση με","logout":"Αποσύνδεση","welcome":"Καλωσόρισμα, {name}!","account":"Λογαριασμός","cloud_saved":"☁ Αποθηκεύτηκε στο cloud","err_bad_login":"Όνομα χρήστη: 3–32 χαρακτήρες (γράμματα, ψηφία, _ . -)","err_bad_email":"Μη έγκυρο e-mail","err_weak":"Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες","err_mismatch":"Οι κωδικοί δεν ταιριάζουν","err_login_taken":"Αυτό το όνομα υπάρχει ήδη","err_email_taken":"Αυτό το e-mail είναι ήδη εγγεγραμμένο","err_bad_credentials":"Λάθος όνομα ή κωδικός","err_not_configured":"Η σύνδεση με αυτό το δίκτυο δεν έχει ρυθμιστεί ακόμα στον διακομιστή (χρειάζεται client_id). Συνδέσου με όνομα ή ρύθμισε το OAuth.","err_denied":"Ακυρώσατε τη σύνδεση","err_state_mismatch":"Ο έλεγχος ασφαλείας απέτυχε, δοκιμάστε ξανά","err_exchange_failed":"Ο διακομιστής δικτύου δεν είναι διαθέσιμος","err_no_identity":"Το δίκτυο δεν επέστρεψε προφίλ","err_offline":"Διακομιστής μη διαθέσιμος — τοπικό παιχνίδι, η πρόοδος αποθηκεύεται στον browser","guest_skip":"Παίξε χωρίς λογαριασμό","sync_done":"☁ Η πρόοδος φορτώθηκε από το cloud","oauth_popup":"Επιτρέψτε το pop-up για σύνδεση","auth_hint":"Η πρόοδός σας αποθηκεύεται στον λογαριασμό","server_off":"Τοπική λειτουργία: βάση δεδομένων μη διαθέσιμη","lang_label_auth":"Γλώσσα","pw_show":"Εμφάνιση κωδικού","local_guest":"Επισκέπτης (τοπικά)",leaderboard_title:"Κατάταξη παικτών",lb_online:"Σε σύνδεση: {n}",lb_loading:"Σε σύνδεση: …",lb_my_rank:"Η θέση μου: {n}",lb_me:"Η θέση μου: —",lb_total:"Σύνολο παικτών: {n}",lb_earned:"κερδημένα",lb_level:"Επ. {n}",lb_clicks:"κλικ",lb_empty:"Δεν υπάρχουν δεδομένα — γίνετε ο πρώτος!",lb_offline:"Ο διακομιστής δεν είναι διαθέσιμος",need_account:"Το παιχνίδι είναι διαδικτυακό — συνδεθείτε ή δημιουργήστε λογαριασμό",lb_top:"Κορυφαίοι 🏆",lb_you:"Εσείς"},
+      title:"BARCOIN",
+      subtitle:"Κλικέρ",
+      rank_novice:"Αρχάριος",
+      rank_amateur:"Ερασιτέχνης",
+      rank_trader:"Έμπορος",
+      rank_investor:"Επενδυτής",
+      rank_tycoon:"Μέγας",
+      rank_baron:"Κρυπτο-Βαρόνος",
+      rank_lord:"Άρχοντας Barc",
+      rank_legend:"Θρύλος",
+      level_short:"ΕΠΙΠ.",
+      crit_stat:"Κριτ:",
+      energy:"Ενέργεια",
+      xp:"Εμπειρία",
+      regen_info:"+1 ενέργεια κάθε {n} δευτ.",
+      rate_label:"Ισοτιμία BARC",
+      chart_left:"← τελευταία 80 σημεία",
+      chart_right:"τώρα →",
+      chart_high:"Μέγιστο:",
+      chart_low:"Ελάχιστο:",
+      chart_points:"Κεράκια:",
+      day_change:"Μετ. 24ω:",
+      balance_label:"Το Υπόλοιπό σου",
+      sold_label:"Πουλήθηκαν:",
+      coin_word:"νόμισμα",
+      per_click:"+{n} ανά κλικ",
+      crit_suffix:"κριτ {n}%",
+      shop_upgrade:"Αναβάθμιση Νομίσματος",
+      shop_upgrades:"Αναβαθμίσεις",
+      level_of:"Επίπεδο {a} / {b}",
+      next_level:"Επόμενο Επίπεδο",
+      from_to:"Από {a} → {b}",
+      maxed_title:"ΜΕΓΙΣΤΟ ΕΠΙΠΕΔΟ",
+      maxed_desc:"Αναβάθμισες πλήρως το νόμισμα",
+      cost_label:"κόστος",
+      sell_all:"Πώληση Όλων",
+      reset:"Επαναφορά",
+      footer:"Κλικ = εισόδημα • Η ισοτιμία αλλάζει κάθε 2 δευτ.",
+      no_energy:"⚡ Δεν έχεις ενέργεια! Περίμενε αναγέννηση",
+      coin_unlocked:"🎉 Το νόμισμα {name} ξεκλείδωσε!",
+      level_up:"⬆️ Επίπεδο {n}! +0,5% κριτ, +2 ενέργεια",
+      upgrade_bought:"✅ Αγόρασες {name}!",
+      sold_msg:"💰 ${net} (φόρος ${tax})",
+      confirm_reset:"Επαναφορά όλης της προόδου;",
+      collecting:"Συλλέγονται δεδομένα...",
+      market_normal:"Κανονική αγορά",
+      event_bull:"Ανοδική αγορά",
+      event_bear:"Καθοδική αγορά",
+      event_crash:"ΚΡΑΣΧ!",
+      event_moon:"ΣΤΟ ΦΕΓΓΑΡΙ!",
+      event_volatile:"Μεταβλητότητα",
+      upg_energyMax:"Απόθεμα Ενέργειας",
+      upg_energyRegen:"Γρήγορη Αναγέννηση",
+      upg_critChance:"Κρίσιμο Χτύπημα",
+      upg_critMult:"Δύναμη Κριτ",
+      upg_mult2:"Πολλαπλασιαστής x2",
+      upg_auto1:"Αυτόματος Κλικέρ",
+      upg_mult5:"Πολλαπλασιαστής x5",
+      upg_auto2:"Ρομποτικό Χέρι",
+      upg_auto3:"Φάρμα",
+      eff_energyMax:"+15 μέγιστη ενέργεια",
+      eff_energyRegen:"αναγέννηση 2x γρηγορότερα",
+      eff_critChance:"+2% πιθανότητα κριτ",
+      eff_critMult:"+1x πολλαπλασιαστής κριτ",
+      eff_mult2:"x2 ανά κλικ",
+      eff_auto1:"+5/δευτ.",
+      eff_mult5:"x5 ανά κλικ",
+      eff_auto2:"+100/δευτ.",
+      eff_auto3:"+2000/δευτ.",
+      settings_title:"Ρυθμίσεις",
+      theme_label:"Θέμα",
+      language_label:"Γλώσσα διεπαφής",
+      other_label:"Λοιπά",
+      sound_name:"Ήχοι",
+      sound_desc:"Ηχητικά εφέ κλικ και αγορών",
+      fx_name:"Εφέ Νομισμάτων",
+      fx_desc:"Πεταμένα νομίσματα στο κλικ",
+      lang_search_ph:"Αναζήτηση γλώσσας...",
+      lang_count:"Σύνολο γλωσσών: {n}",
+      close:"Κλείσιμο",
+      theme_default:"Κλασικό",
+      theme_emerald:"Σμαραγδί",
+      theme_ruby:"Ρουμπί",
+      theme_sunset:"Ηλιοβασίλεμα",
+      theme_ocean:"Ωκεανός",
+      theme_purple:"Αμέθυστος",
+      theme_neon:"Νέον",
+      theme_candy:"Καρμελίτσα",
+      theme_light:"Φωτεινό",
+      lvl_0:"Κοινό",
+      lvl_1:"Πέτρινο",
+      lvl_2:"Ξύλινο",
+      lvl_3:"Μεταλλικό",
+      lvl_4:"Χάλκινο",
+      lvl_5:"Σιδηρό",
+      lvl_6:"Ασημένιο",
+      lvl_7:"Χρυσό",
+      lvl_8:"Πλατινένιο",
+      lvl_9:"Ραδιενεργό",
+      lvl_10:"Ατομικό",
+      lvl_11:"Μοριακό",
+      lvl_12:"Κυτταρικό",
+      lvl_13:"Έννομο",
+      lvl_14:"Πλανητικό",
+      lvl_15:"Αστρικό",
+      lvl_16:"Γαλαξιακό",
+      lvl_17:"Καθολικό"
+    },
+    zh: {
+
+    "db_checking": "正在连接服务器…",
+    "db_ok_mysql": "服务器和数据库在线——祝您游戏愉快！",
+    "db_ok_sqlite": "备用SQL数据库已启用——数据正在保存",
+    "db_down": "服务器不可用。请确认 server.py 已启动（http://localhost:8000）",
+      _AUTH:{"auth_title":"登录","register_title":"注册","login_ph":"用户名","password_ph":"密码","email_ph":"电子邮箱","confirm_ph":"确认密码","to_register":"没有账号？创建账号","to_login":"已有账号？去登录","btn_enter":"登录","btn_create":"创建账号","or_social":"或使用以下方式登录","logout":"退出","welcome":"欢迎，{name}！","account":"账号","cloud_saved":"☁ 已保存到云端","err_bad_login":"用户名：3–32个字符（字母、数字、_ . -）","err_bad_email":"邮箱地址无效","err_weak":"密码至少6位","err_mismatch":"两次密码不一致","err_login_taken":"该用户名已被占用","err_email_taken":"该邮箱已注册","err_bad_credentials":"用户名或密码错误","err_not_configured":"服务器尚未配置该社交网络登录（需要 client_id）。请用用户名登录或配置 OAuth。","err_denied":"您取消了社交登录","err_state_mismatch":"安全校验失败，请重试","err_exchange_failed":"社交服务器不可用，请稍后再试","err_no_identity":"社交网络未返回资料","err_offline":"服务器不可用——本地游戏，进度保存在浏览器","guest_skip":"不登录直接玩","sync_done":"☁ 已从云端加载进度","oauth_popup":"允许弹出窗口以进行社交登录","auth_hint":"进度将保存在账号中，不会丢失","server_off":"本地模式：数据库不可用","lang_label_auth":"界面语言","pw_show":"显示密码","local_guest":"游客（本地游戏）",leaderboard_title:"玩家排行榜",lb_online:"在线：{n}",lb_loading:"在线：…",lb_my_rank:"我的排名：{n}",lb_me:"我的排名：—",lb_total:"玩家总数：{n}",lb_earned:"已赚取",lb_level:"等级 {n}",lb_clicks:"点击",lb_empty:"暂无数据——快来成为第一名！",lb_offline:"服务器不可用",need_account:"这是网络游戏——请登录或创建账号",lb_top:"收入榜 🏆",lb_you:"你"},
+      title:"BARCOIN",
+      subtitle:"点击器",
+      rank_novice:"新手",
+      rank_amateur:"业余玩家",
+      rank_trader:"交易员",
+      rank_investor:"投资者",
+      rank_tycoon:"大亨",
+      rank_baron:"加密男爵",
+      rank_lord:"巴克领主",
+      rank_legend:"传奇",
+      level_short:"级",
+      crit_stat:"暴击：",
+      energy:"能量",
+      xp:"经验",
+      regen_info:"每 {n} 秒 +1 能量",
+      rate_label:"BARC 汇率",
+      chart_left:"← 最近 80 个点",
+      chart_right:"现在 →",
+      chart_high:"最高：",
+      chart_low:"最低：",
+      chart_points:"K线：",
+      day_change:"24小时涨跌：",
+      balance_label:"你的余额",
+      sold_label:"已出售：",
+      coin_word:"硬币",
+      per_click:"每次点击 +{n}",
+      crit_suffix:"暴击 {n}%",
+      shop_upgrade:"硬币升级",
+      shop_upgrades:"升级项",
+      level_of:"等级 {a} / {b}",
+      next_level:"下一等级",
+      from_to:"从 {a} → {b}",
+      maxed_title:"已达上限",
+      maxed_desc:"你已把硬币升到最高",
+      cost_label:"成本",
+      sell_all:"全部出售",
+      reset:"重置",
+      footer:"点击 = 收入 • 汇率每 2 秒变化",
+      no_energy:"⚡ 没有能量！等待恢复",
+      coin_unlocked:"🎉 已解锁「{name}」硬币！",
+      level_up:"⬆️ 等级 {n}！暴击 +0.5%，能量 +2",
+      upgrade_bought:"✅ 已购买 {name}！",
+      sold_msg:"💰 ${net}（税 ${tax}）",
+      confirm_reset:"重置全部进度？",
+      collecting:"正在收集数据...",
+      market_normal:"正常市场",
+      event_bull:"牛市",
+      event_bear:"熊市",
+      event_crash:"崩盘！",
+      event_moon:"一飞冲天！",
+      event_volatile:"高波动",
+      upg_energyMax:"能量储备",
+      upg_energyRegen:"快速再生",
+      upg_critChance:"暴击打击",
+      upg_critMult:"暴击威力",
+      upg_mult2:"x2 倍率",
+      upg_auto1:"自动点击器",
+      upg_mult5:"x5 倍率",
+      upg_auto2:"机械臂",
+      upg_auto3:"农场",
+      eff_energyMax:"能量上限 +15",
+      eff_energyRegen:"再生速度 x2",
+      eff_critChance:"暴击率 +2%",
+      eff_critMult:"暴击倍率 +1x",
+      eff_mult2:"每次点击 x2",
+      eff_auto1:"每秒 +5",
+      eff_mult5:"每次点击 x5",
+      eff_auto2:"每秒 +100",
+      eff_auto3:"每秒 +2000",
+      settings_title:"设置",
+      theme_label:"主题",
+      language_label:"界面语言",
+      other_label:"其他",
+      sound_name:"声音",
+      sound_desc:"点击与购买的音效",
+      fx_name:"金币特效",
+      fx_desc:"点击时飞散的金币",
+      lang_search_ph:"搜索语言...",
+      lang_count:"语言总数：{n}",
+      close:"关闭",
+      theme_default:"经典",
+      theme_emerald:"翡翠",
+      theme_ruby:"红宝石",
+      theme_sunset:"日落",
+      theme_ocean:"海洋",
+      theme_purple:"紫水晶",
+      theme_neon:"霓虹",
+      theme_candy:"糖果",
+      theme_light:"明亮",
+      lvl_0:"普通",
+      lvl_1:"石头",
+      lvl_2:"木质",
+      lvl_3:"金属",
+      lvl_4:"青铜",
+      lvl_5:"铁制",
+      lvl_6:"白银",
+      lvl_7:"黄金",
+      lvl_8:"铂金",
+      lvl_9:"放射性",
+      lvl_10:"原子",
+      lvl_11:"分子",
+      lvl_12:"细胞",
+      lvl_13:"智慧",
+      lvl_14:"行星",
+      lvl_15:"恒星",
+      lvl_16:"银河",
+      lvl_17:"宇宙"
+    },
+    th: {
+
+    "db_checking": "กำลังเชื่อมต่อเซิร์ฟเวอร์…",
+    "db_ok_mysql": "เซิร์ฟเวอร์และฐานข้อมูลออนไลน์ — เล่นให้สนุก!",
+    "db_ok_sqlite": "ฐานข้อมูล SQL สำรองทำงานอยู่ — ข้อมูลของคุณถูกบันทึก",
+    "db_down": "เซิร์ฟเวอร์ไม่พร้อมใช้งาน ตรวจสอบว่ารัน server.py อยู่ (http://localhost:8000)",
+      _AUTH:{"auth_title":"เข้าสู่ระบบ","register_title":"สมัครสมาชิก","login_ph":"ชื่อผู้ใช้","password_ph":"รหัสผ่าน","email_ph":"อีเมล","confirm_ph":"ยืนยันรหัสผ่าน","to_register":"ยังไม่มีบัญชี? สร้างบัญชี","to_login":"มีบัญชีแล้ว? เข้าสู่ระบบ","btn_enter":"เข้าสู่ระบบ","btn_create":"สร้างบัญชี","or_social":"หรือเข้าสู่ระบบด้วย","logout":"ออกจากระบบ","welcome":"ยินดีต้อนรับ {name}!","account":"บัญชี","cloud_saved":"☁ บันทึกลงคลาวด์แล้ว","err_bad_login":"ชื่อผู้ใช้: 3–32 ตัวอักษร (ตัวอักษร ตัวเลข _ . -)","err_bad_email":"ที่อยู่อีเมลไม่ถูกต้อง","err_weak":"รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร","err_mismatch":"รหัสผ่านไม่ตรงกัน","err_login_taken":"ชื่อผู้ใช้นี้ถูกใช้แล้ว","err_email_taken":"อีเมลนี้ลงทะเบียนแล้ว","err_bad_credentials":"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง","err_not_configured":"การเข้าสู่ระบบด้วยเครือข่ายนี้ยังไม่ได้รับการตั้งค่าบนเซิร์ฟเวอร์ (ต้องมี client_id) กรุณาเข้าสู่ระบบด้วยชื่อผู้ใช้หรือตั้งค่า OAuth","err_denied":"คุณยกเลิกการเข้าสู่ระบบ","err_state_mismatch":"การตรวจสอบความปลอดภัยไม่สำเร็จ ลองอีกครั้ง","err_exchange_failed":"เซิร์ฟเวอร์ของผู้ให้บริการไม่พร้อมใช้งาน ลองภายหลัง","err_no_identity":"ผู้ให้บริการไม่ส่งโปรไฟล์กลับมา","err_offline":"เซิร์ฟเวอร์ไม่พร้อมใช้งาน — เล่นในเครื่อง ความคืบหน้าบันทึกในเบราว์เซอร์","guest_skip":"เล่นโดยไม่ใช้บัญชี","sync_done":"☁ โหลดความคืบหน้าจากคลาวด์แล้ว","oauth_popup":"อนุญาตป๊อปอัพเพื่อเข้าสู่ระบบ","auth_hint":"ความคืบหน้าจะถูกบันทึกในบัญชีและไม่หาย","server_off":"โหมดโลคัล: ฐานข้อมูลไม่พร้อมใช้งาน","lang_label_auth":"ภาษา","pw_show":"แสดงรหัสผ่าน","local_guest":"แขก (เล่นในเครื่อง)",leaderboard_title:"ตารางผู้เล่น",lb_online:"ออนไลน์: {n}",lb_loading:"ออนไลน์: …",lb_my_rank:"อันดับของฉัน: {n}",lb_me:"อันดับของฉัน: —",lb_total:"ผู้เล่นทั้งหมด: {n}",lb_earned:"หามาได้",lb_level:"เลเวล {n}",lb_clicks:"คลิก",lb_empty:"ยังไม่มีข้อมูล — เป็นคนแรกของคุณ!",lb_offline:"เซิร์ฟเวอร์ไม่พร้อมใช้งาน",need_account:"เกมนี้เป็นเกมออนไลน์ — เข้าสู่ระบบหรือสร้างบัญชี",lb_top:"ผู้หาได้มากที่สุด 🏆",lb_you:"คุณ"},
+      title:"BARCOIN",
+      subtitle:"คลิกเกอร์",
+      rank_novice:"มือใหม่",
+      rank_amateur:"สมัครเล่น",
+      rank_trader:"เทรดเดอร์",
+      rank_investor:"นักลงทุน",
+      rank_tycoon:"มหาเศรษฐี",
+      rank_baron:"บารอนคริปโต",
+      rank_lord:"ลอร์ดบาร์ก",
+      rank_legend:"ตำนาน",
+      level_short:"Lv.",
+      crit_stat:"คริติคอล:",
+      energy:"พลังงาน",
+      xp:"ค่าประสบการณ์",
+      regen_info:"+1 พลังงานทุก {n} วินาที",
+      rate_label:"อัตรา BARC",
+      chart_left:"← 80 จุดล่าสุด",
+      chart_right:"ตอนนี้ →",
+      chart_high:"สูงสุด:",
+      chart_low:"ต่ำสุด:",
+      chart_points:"แท่งเทียน:",
+      day_change:"เปลี่ยน 24 ชม.:",
+      balance_label:"ยอดของคุณ",
+      sold_label:"ขายแล้ว:",
+      coin_word:"เหรียญ",
+      per_click:"+{n} ต่อคลิก",
+      crit_suffix:"คริท {n}%",
+      shop_upgrade:"อัปเกรดเหรียญ",
+      shop_upgrades:"การอัปเกรด",
+      level_of:"เลเวล {a} / {b}",
+      next_level:"เลเวลถัดไป",
+      from_to:"จาก {a} → {b}",
+      maxed_title:"สูงสุดแล้ว",
+      maxed_desc:"คุณอัปเกรดเหรียญจนเต็มแล้ว",
+      cost_label:"ต้นทุน",
+      sell_all:"ขายทั้งหมด",
+      reset:"รีเซ็ต",
+      footer:"คลิก = รายได้ • อัตราเปลี่ยนทุก 2 วินาที",
+      no_energy:"⚡ ไม่มีพลังงาน! รอฟื้นฟู",
+      coin_unlocked:"🎉 ปลดล็อกเหรียญ {name} แล้ว!",
+      level_up:"⬆️ เลเวล {n}! คริท +0.5%, พลังงาน +2",
+      upgrade_bought:"✅ ซื้อ {name} แล้ว!",
+      sold_msg:"💰 ${net} (ภาษี ${tax})",
+      confirm_reset:"รีเซ็ตความคืบหน้าทั้งหมด?",
+      collecting:"กำลังรวบรวมข้อมูล...",
+      market_normal:"ตลาดปกติ",
+      event_bull:"ตลาดขาขึ้น",
+      event_bear:"ตลาดขาลง",
+      event_crash:"crash!",
+      event_moon:"บินสู่ดวงจันทร์!",
+      event_volatile:"ความผันผวน",
+      upg_energyMax:"คลังพลังงาน",
+      upg_energyRegen:"ฟื้นฟูเร็ว",
+      upg_critChance:"โจมตีคริติคอล",
+      upg_critMult:"พลังคริท",
+      upg_mult2:"ตัวคูณ x2",
+      upg_auto1:"อโต้คลิกเกอร์",
+      upg_mult5:"ตัวคูณ x5",
+      upg_auto2:"แขนหุ่นยนต์",
+      upg_auto3:"ฟาร์ม",
+      eff_energyMax:"พลังงานสูงสุด +15",
+      eff_energyRegen:"ฟื้นฟูเร็ว 2 เท่า",
+      eff_critChance:"โอกาสคริท +2%",
+      eff_critMult:"ตัวคูณคริท +1x",
+      eff_mult2:"x2 ต่อคลิก",
+      eff_auto1:"+5/วิ",
+      eff_mult5:"x5 ต่อคลิก",
+      eff_auto2:"+100/วิ",
+      eff_auto3:"+2000/วิ",
+      settings_title:"การตั้งค่า",
+      theme_label:"ธีม",
+      language_label:"ภาษาอินเทอร์เฟซ",
+      other_label:"อื่นๆ",
+      sound_name:"เสียง",
+      sound_desc:"เสียงเอฟเฟกต์เมื่อคลิกและซื้อ",
+      fx_name:"เอฟเฟกต์เหรียญ",
+      fx_desc:"เหรียญปลิวเมื่อคลิก",
+      lang_search_ph:"ค้นหาภาษา...",
+      lang_count:"จำนวนภาษาทั้งหมด: {n}",
+      close:"ปิด",
+      theme_default:"คลาสสิก",
+      theme_emerald:"มรกต",
+      theme_ruby:"ทับทิม",
+      theme_sunset:"พระอาทิตย์ตก",
+      theme_ocean:"มหาสมุทร",
+      theme_purple:"อเมทิสต์",
+      theme_neon:"นีออน",
+      theme_candy:"ลูกอม",
+      theme_light:"สว่าง",
+      lvl_0:"ธรรมดา",
+      lvl_1:"หิน",
+      lvl_2:"ไม้",
+      lvl_3:"โลหะ",
+      lvl_4:"ทองสำริด",
+      lvl_5:"เหล็ก",
+      lvl_6:"เงิน",
+      lvl_7:"ทอง",
+      lvl_8:"แพลทินัม",
+      lvl_9:"กัมมันตรังสี",
+      lvl_10:"อะตอม",
+      lvl_11:"โมเลกุล",
+      lvl_12:"เซลล์",
+      lvl_13:"มีจิตใจ",
+      lvl_14:"ดาวเคราะห์",
+      lvl_15:"ดาวฤกษ์",
+      lvl_16:"กาแล็กซี",
+      lvl_17:"จักรวาล"
+    },
+    ja: {
+
+    "db_checking": "サーバーに接続中…",
+    "db_ok_mysql": "サーバーとデータベースはオンラインです — 楽しんで！",
+    "db_ok_sqlite": "バックアップSQLデータベース稼働中 — データは保存されます",
+    "db_down": "サーバーに接続できません。server.py が起動しているか確認してください（http://localhost:8000）",
+      _AUTH:{"auth_title":"ログイン","register_title":"新規登録","login_ph":"ユーザー名","password_ph":"パスワード","email_ph":"メールアドレス","confirm_ph":"パスワード確認","to_register":"アカウントをお持ちでない方はこちら","to_login":"すでにアカウントをお持ちの方","btn_enter":"ログイン","btn_create":"アカウント作成","or_social":"または次でログイン","logout":"ログアウト","welcome":"ようこそ、{name}さん！","account":"アカウント","cloud_saved":"☁ クラウドに保存しました","err_bad_login":"ユーザー名: 3〜32文字（英数字、_ . -）","err_bad_email":"メールアドレスが正しくありません","err_weak":"パスワードは6文字以上","err_mismatch":"パスワードが一致しません","err_login_taken":"このユーザー名は使われています","err_email_taken":"このメールは登録済みです","err_bad_credentials":"ユーザー名またはパスワードが違います","err_not_configured":"このSNSログインはサーバー側で未設定です（client_idが必要）。ユーザー名でログインするかOAuthを設定してください。","err_denied":"SNSログインがキャンセルされました","err_state_mismatch":"セキュリティ確認に失敗しました。もう一度お試しください","err_exchange_failed":"プロバイダーのサーバーを利用できません。後でお試しください","err_no_identity":"プロバイダーからプロフィールが返されませんでした","err_offline":"サーバーに接続できません—ローカルでプレイ中、進捗はブラウザに保存","guest_skip":"アカウントなしでプレイ","sync_done":"☁ クラウドから進捗を読み込みました","oauth_popup":"SNSログインのためのポップアップを許可してください","auth_hint":"進捗はアカウントに保存され失われません","server_off":"ローカルモード: データベース利用不可","lang_label_auth":"言語","pw_show":"パスワードを表示","local_guest":"ゲスト（ローカル）",leaderboard_title:"プレイヤーランキング",lb_online:"オンライン: {n}",lb_loading:"オンライン: …",lb_my_rank:"私の順位: {n}",lb_me:"私の順位: —",lb_total:"総プレイヤー数: {n}",lb_earned:"獲得",lb_level:"レベル{n}",lb_clicks:"クリック",lb_empty:"データがありません — 最初の1人になろう！",lb_offline:"サーバーに接続できません",need_account:"このゲームはオンラインです — ログインまたはアカウント作成",lb_top:"獲得額トップ 🏆",lb_you:"あなた"},
+      title:"BARCOIN",
+      subtitle:"クリッカー",
+      rank_novice:"初心者",
+      rank_amateur:"アマチュア",
+      rank_trader:"トレーダー",
+      rank_investor:"投資家",
+      rank_tycoon:"実業家",
+      rank_baron:"クリプトバロン",
+      rank_lord:"バルク卿",
+      rank_legend:"レジェンド",
+      level_short:"Lv.",
+      crit_stat:"クリティカル:",
+      energy:"エネルギー",
+      xp:"経験値",
+      regen_info:"{n}秒ごとにエネルギー+1",
+      rate_label:"BARCレート",
+      chart_left:"← 直近80ポイント",
+      chart_right:"現在 →",
+      chart_high:"高値:",
+      chart_low:"安値:",
+      chart_points:"ローソク足:",
+      day_change:"24h変動:",
+      balance_label:"残高",
+      sold_label:"売却済:",
+      coin_word:"コイン",
+      per_click:"クリック毎に+{n}",
+      crit_suffix:"クリティカル{n}%",
+      shop_upgrade:"コイン強化",
+      shop_upgrades:"アップグレード",
+      level_of:"レベル {a} / {b}",
+      next_level:"次のレベル",
+      from_to:"{a} → {b}",
+      maxed_title:"最大レベル到達",
+      maxed_desc:"コインを完全に強化しました",
+      cost_label:"コスト",
+      sell_all:"すべて売却",
+      reset:"リセット",
+      footer:"クリック＝収入 • レートは2秒ごとに変動",
+      no_energy:"⚡ エネルギー切れ！回復を待とう",
+      coin_unlocked:"🎉 「{name}」コインを解放！",
+      level_up:"⬆️ レベル{n}！クリティカル+0.5%、エネルギー+2",
+      upgrade_bought:"✅ {name}を購入！",
+      sold_msg:"💰 ${net}（税金 ${tax}）",
+      confirm_reset:"すべての進捗をリセットしますか？",
+      collecting:"データ収集中...",
+      market_normal:"通常の市場",
+      event_bull:"強気相場",
+      event_bear:"弱気相場",
+      event_crash:"クラッシュ！",
+      event_moon:"月へ一直線！",
+      event_volatile:"ボラティリティ",
+      upg_energyMax:"エネルギー補充",
+      upg_energyRegen:"高速リジェネ",
+      upg_critChance:"クリティカルストライク",
+      upg_critMult:"クリティカル威力",
+      upg_mult2:"x2マルチ",
+      upg_auto1:"オートクリック",
+      upg_mult5:"x5マルチ",
+      upg_auto2:"ロボアーム",
+      upg_auto3:"ファーム",
+      eff_energyMax:"最大エネルギー+15",
+      eff_energyRegen:"リジェネ2倍速",
+      eff_critChance:"クリティカル確率+2%",
+      eff_critMult:"クリティカル倍率+1x",
+      eff_mult2:"クリック毎にx2",
+      eff_auto1:"秒速+5",
+      eff_mult5:"クリック毎にx5",
+      eff_auto2:"秒速+100",
+      eff_auto3:"秒速+2000",
+      settings_title:"設定",
+      theme_label:"テーマ",
+      language_label:"表示言語",
+      other_label:"その他",
+      sound_name:"サウンド",
+      sound_desc:"クリックと購入の効果音",
+      fx_name:"コインエフェクト",
+      fx_desc:"クリックでコインが舞う",
+      lang_search_ph:"言語を検索...",
+      lang_count:"対応言語数: {n}",
+      close:"閉じる",
+      theme_default:"クラシック",
+      theme_emerald:"エメラルド",
+      theme_ruby:"ルビー",
+      theme_sunset:"サンセット",
+      theme_ocean:"オーシャン",
+      theme_purple:"アメジスト",
+      theme_neon:"ネオン",
+      theme_candy:"キャンディ",
+      theme_light:"ライト",
+      lvl_0:"ふつう",
+      lvl_1:"石",
+      lvl_2:"木",
+      lvl_3:"金属",
+      lvl_4:"青銅",
+      lvl_5:"鉄",
+      lvl_6:"銀",
+      lvl_7:"金",
+      lvl_8:"プラチナ",
+      lvl_9:"放射性",
+      lvl_10:"原子",
+      lvl_11:"分子",
+      lvl_12:"細胞",
+      lvl_13:"知性",
+      lvl_14:"惑星",
+      lvl_15:"恒星",
+      lvl_16:"銀河",
+      lvl_17:"宇宙"
+    },
+    ko: {
+
+    "db_checking": "서버에 연결 중…",
+    "db_ok_mysql": "서버와 데이터베이스가 온라인입니다 — 즐거운 게임 되세요!",
+    "db_ok_sqlite": "백업 SQL 데이터베이스 작동 중 — 데이터가 저장됩니다",
+    "db_down": "서버에 접속할 수 없습니다. server.py 실행 여부를 확인하세요 (http://localhost:8000)",
+      _AUTH:{"auth_title":"로그인","register_title":"회원가입","login_ph":"아이디","password_ph":"비밀번호","email_ph":"이메일","confirm_ph":"비밀번호 확인","to_register":"계정이 없으신가요? 가입하기","to_login":"이미 계정이 있으신가요? 로그인","btn_enter":"로그인","btn_create":"계정 만들기","or_social":"또는 다음으로 로그인","logout":"로그아웃","welcome":"환영합니다, {name}님!","account":"계정","cloud_saved":"☁ 클라우드에 저장됨","err_bad_login":"아이디: 3–32자 (문자, 숫자, _ . -)","err_bad_email":"올바른 이메일이 아닙니다","err_weak":"비밀번호는 최소 6자","err_mismatch":"비밀번호가 일치하지 않습니다","err_login_taken":"이미 사용 중인 아이디입니다","err_email_taken":"이미 등록된 이메일입니다","err_bad_credentials":"아이디 또는 비밀번호가 잘못되었습니다","err_not_configured":"이 소셜 로그인은 서버에 아직 설정되지 않았습니다(client_id 필요). 아이디로 로그인하거나 OAuth를 설정하세요.","err_denied":"소셜 로그인이 취소되었습니다","err_state_mismatch":"보안 확인에 실패했습니다. 다시 시도하세요","err_exchange_failed":"제공자 서버를 사용할 수 없습니다. 나중에 시도하세요","err_no_identity":"제공자가 프로필을 반환하지 않았습니다","err_offline":"서버에 연결할 수 없습니다 — 로컬 플레이, 진행 상황은 브라우저에 저장","guest_skip":"계정 없이 플레이","sync_done":"☁ 클라우드에서 진행 상황을 불러왔습니다","oauth_popup":"소셜 로그인을 위해 팝업을 허용하세요","auth_hint":"진행 상황은 계정에 저장되어 사라지지 않습니다","server_off":"로컬 모드: 데이터베이스 사용 불가","lang_label_auth":"언어","pw_show":"비밀번호 표시","local_guest":"게스트 (로컬 게임)",leaderboard_title:"플레이어 랭킹",lb_online:"온라인: {n}",lb_loading:"온라인: …",lb_my_rank:"내 순위: {n}",lb_me:"내 순위: —",lb_total:"전체 플레이어: {n}",lb_earned:"획득",lb_level:"레벨 {n}",lb_clicks:"클릭",lb_empty:"데이터 없음 — 첫 번째가 되어보세요!",lb_offline:"서버에 연결할 수 없음",need_account:"이 게임은 온라인입니다 — 로그인하거나 계정을 만드세요",lb_top:"최고 수입자 🏆",lb_you:"나"},
+      title:"BARCOIN",
+      subtitle:"클릭커",
+      rank_novice:"초보",
+      rank_amateur:"아마추어",
+      rank_trader:"트레이더",
+      rank_investor:"투자자",
+      rank_tycoon:"재벌",
+      rank_baron:"크립토 남작",
+      rank_lord:"바크 영주",
+      rank_legend:"전설",
+      level_short:"Lv.",
+      crit_stat:"치명타:",
+      energy:"에너지",
+      xp:"경험치",
+      regen_info:"{n}초마다 에너지 +1",
+      rate_label:"BARC 환율",
+      chart_left:"← 최근 80 포인트",
+      chart_right:"현재 →",
+      chart_high:"고점:",
+      chart_low:"저점:",
+      chart_points:"캔들:",
+      day_change:"24h 변동:",
+      balance_label:"잔액",
+      sold_label:"판매량:",
+      coin_word:"코인",
+      per_click:"클릭당 +{n}",
+      crit_suffix:"치명타 {n}%",
+      shop_upgrade:"코인 강화",
+      shop_upgrades:"업그레이드",
+      level_of:"레벨 {a} / {b}",
+      next_level:"다음 레벨",
+      from_to:"{a} → {b}",
+      maxed_title:"최대 레벨 도달",
+      maxed_desc:"코인을 모두 강화했습니다",
+      cost_label:"비용",
+      sell_all:"모두 판매",
+      reset:"초기화",
+      footer:"클릭 = 수입 • 환율은 2초마다 변동",
+      no_energy:"⚡ 에너지 부족! 회복을 기다리세요",
+      coin_unlocked:"🎉 {name} 코인 해제!",
+      level_up:"⬆️ 레벨 {n}! 치명타 +0.5%, 에너지 +2",
+      upgrade_bought:"✅ {name} 구매 완료!",
+      sold_msg:"💰 ${net} (세금 ${tax})",
+      confirm_reset:"모든 진행 상황을 초기화할까요?",
+      collecting:"데이터 수집 중...",
+      market_normal:"일반 시장",
+      event_bull:"강세장",
+      event_bear:"약세장",
+      event_crash:"크래시!",
+      event_moon:"달로 발사!",
+      event_volatile:"변동성",
+      upg_energyMax:"에너지 저장고",
+      upg_energyRegen:"빠른 재생",
+      upg_critChance:"치명타 일격",
+      upg_critMult:"치명타 위력",
+      upg_mult2:"x2 배율",
+      upg_auto1:"자동 클릭커",
+      upg_mult5:"x5 배율",
+      upg_auto2:"로봇 팔",
+      upg_auto3:"팜",
+      eff_energyMax:"최대 에너지 +15",
+      eff_energyRegen:"재생 속도 2배",
+      eff_critChance:"치명타 확률 +2%",
+      eff_critMult:"치명타 배율 +1x",
+      eff_mult2:"클릭당 x2",
+      eff_auto1:"초당 +5",
+      eff_mult5:"클릭당 x5",
+      eff_auto2:"초당 +100",
+      eff_auto3:"초당 +2000",
+      settings_title:"설정",
+      theme_label:"테마",
+      language_label:"인터페이스 언어",
+      other_label:"기타",
+      sound_name:"소리",
+      sound_desc:"클릭 및 구매 효과음",
+      fx_name:"코인 효과",
+      fx_desc:"클릭 시 날아가는 코인",
+      lang_search_ph:"언어 검색...",
+      lang_count:"전체 언어: {n}",
+      close:"닫기",
+      theme_default:"클래식",
+      theme_emerald:"에메랄드",
+      theme_ruby:"루비",
+      theme_sunset:"선셋",
+      theme_ocean:"오션",
+      theme_purple:"자수정",
+      theme_neon:"네온",
+      theme_candy:"캔디",
+      theme_light:"라이트",
+      lvl_0:"일반",
+      lvl_1:"돌",
+      lvl_2:"나무",
+      lvl_3:"금속",
+      lvl_4:"청동",
+      lvl_5:"철",
+      lvl_6:"은",
+      lvl_7:"금",
+      lvl_8:"플래티넘",
+      lvl_9:"방사성",
+      lvl_10:"원자",
+      lvl_11:"분자",
+      lvl_12:"세포",
+      lvl_13:"지성",
+      lvl_14:"행성",
+      lvl_15:"항성",
+      lvl_16:"은하",
+      lvl_17:"우주"
+    },
+    pl: {
+
+    "db_checking": "Łączenie z serwerem…",
+    "db_ok_mysql": "serwer i baza danych online — miłej gry!",
+    "db_ok_sqlite": "zapasowa baza SQL aktywna — dane są zapisywane",
+    "db_down": "Serwer niedostępny. Sprawdź, czy działa server.py (http://localhost:8000)",
+      _AUTH:{"auth_title":"Logowanie","register_title":"Rejestracja","login_ph":"Login","password_ph":"Hasło","email_ph":"E-mail","confirm_ph":"Potwierdź hasło","to_register":"Nie masz konta? Załóż konto","to_login":"Masz już konto? Zaloguj się","btn_enter":"Zaloguj się","btn_create":"Utwórz konto","or_social":"lub zaloguj przez","logout":"Wyloguj","welcome":"Witaj, {name}!","account":"Konto","cloud_saved":"☁ Zapisano w chmurze","err_bad_login":"Login: 3–32 znaki (litery, cyfry, _ . -)","err_bad_email":"Nieprawidłowy adres e-mail","err_weak":"Hasło musi mieć co najmniej 6 znaków","err_mismatch":"Hasła nie są takie same","err_login_taken":"Ten login jest zajęty","err_email_taken":"Ten e-mail jest już zarejestrowany","err_bad_credentials":"Zły login lub hasło","err_not_configured":"Logowanie przez tę sieć nie jest jeszcze skonfigurowane na serwerze (wymagany client_id). Zaloguj loginem lub skonfiguruj OAuth.","err_denied":"Anulowano logowanie społecznościowe","err_state_mismatch":"Kontrola bezpieczeństwa nie powiodła się, spróbuj ponownie","err_exchange_failed":"Serwer sieci niedostępny, spróbuj później","err_no_identity":"Sieć nie zwróciła profilu","err_offline":"Serwer niedostępny — gra lokalna, postęp zapisywany w przeglądarce","guest_skip":"Graj bez konta","sync_done":"☁ Wczytano postęp z chmury","oauth_popup":"Zezwól na okienko pop-up, aby zalogować się przez sieć","auth_hint":"Twój postęp jest zapisywany na koncie i nie zniknie","server_off":"Tryb lokalny: baza danych niedostępna","lang_label_auth":"Język","pw_show":"Pokaż hasło","local_guest":"Gość (gra lokalna)",leaderboard_title:"Ranking graczy",lb_online:"Online: {n}",lb_loading:"Online: …",lb_my_rank:"Moje miejsce: {n}",lb_me:"Moje miejsce: —",lb_total:"Wszyscy gracze: {n}",lb_earned:"zarobione",lb_level:"Poz. {n}",lb_clicks:"kliknięć",lb_empty:"Brak danych — zostań pierwszy w rankingu!",lb_offline:"Serwer niedostępny",need_account:"To gra online — zaloguj się lub załóż konto",lb_top:"Najlepsi zarabiający 🏆",lb_you:"Ty"},
+      title:"BARCOIN",
+      subtitle:"Klikacz",
+      rank_novice:"Nowicjusz",
+      rank_amateur:"Amator",
+      rank_trader:"Trader",
+      rank_investor:"Inwestor",
+      rank_tycoon:"Magnat",
+      rank_baron:"Baron krypto",
+      rank_lord:"Lord Barc",
+      rank_legend:"Legenda",
+      level_short:"POZ.",
+      crit_stat:"Krytyki:",
+      energy:"Energia",
+      xp:"PD",
+      regen_info:"+1 energia co {n} s",
+      rate_label:"Kurs BARC",
+      chart_left:"← ostatnie 80 punktów",
+      chart_right:"teraz →",
+      chart_high:"Maks:",
+      chart_low:"Min:",
+      chart_points:"Świece:",
+      day_change:"Zmiana 24h:",
+      balance_label:"Twój saldo",
+      sold_label:"Sprzedano:",
+      coin_word:"moneta",
+      per_click:"+{n} za kliknięcie",
+      crit_suffix:"krytyk {n}%",
+      shop_upgrade:"Ulepszenie monety",
+      shop_upgrades:"Ulepszenia",
+      level_of:"Poziom {a} / {b}",
+      next_level:"Następny poziom",
+      from_to:"Od {a} → {b}",
+      maxed_title:"MAKSIMUM OSIĄGNIĘTE",
+      maxed_desc:"Całkowicie ulepszono monetę",
+      cost_label:"koszt",
+      sell_all:"Sprzedaj wszystko",
+      reset:"Resetuj",
+      footer:"Kliknięcie = dochód • Kurs zmienia się co 2 s",
+      no_energy:"⚡ Brak energii! Czekaj na regenerację",
+      coin_unlocked:"🎉 Odblokowano monetę {name}!",
+      level_up:"⬆️ Poziom {n}! +0,5% krytyka, +2 energii",
+      upgrade_bought:"✅ Kupiono {name}!",
+      sold_msg:"💰 ${net} (podatek ${tax})",
+      confirm_reset:"Zresetować cały postęp?",
+      collecting:"Zbieranie danych...",
+      market_normal:"Normalny rynek",
+      event_bull:"Rynek byka",
+      event_bear:"Rynek niedźwiedzia",
+      event_crash:"KRACH!",
+      event_moon:"W KSIĘŻYC!",
+      event_volatile:"Zmienność",
+      upg_energyMax:"Zapas energii",
+      upg_energyRegen:"Szybka regeneracja",
+      upg_critChance:"Cios krytyczny",
+      upg_critMult:"Moc krytyka",
+      upg_mult2:"Mnożnik x2",
+      upg_auto1:"Autoklikacz",
+      upg_mult5:"Mnożnik x5",
+      upg_auto2:"Roboręka",
+      upg_auto3:"Farma",
+      eff_energyMax:"+15 maks. energii",
+      eff_energyRegen:"regeneracja 2x szybciej",
+      eff_critChance:"+2% szansy na krytyka",
+      eff_critMult:"+1x mnożnik krytyka",
+      eff_mult2:"x2 za kliknięcie",
+      eff_auto1:"+5/s",
+      eff_mult5:"x5 za kliknięcie",
+      eff_auto2:"+100/s",
+      eff_auto3:"+2000/s",
+      settings_title:"Ustawienia",
+      theme_label:"Motyw",
+      language_label:"Język interfejsu",
+      other_label:"Pozostałe",
+      sound_name:"Dźwięki",
+      sound_desc:"Efekty dźwiękowe kliknięć i zakupów",
+      fx_name:"Efekt monet",
+      fx_desc:"Latające monety przy kliknięciu",
+      lang_search_ph:"Szukaj języka...",
+      lang_count:"Wszystkich języków: {n}",
+      close:"Zamknij",
+      theme_default:"Klasyka",
+      theme_emerald:"Szmaragd",
+      theme_ruby:"Rubin",
+      theme_sunset:"Zachód słońca",
+      theme_ocean:"Ocean",
+      theme_purple:"Ametyst",
+      theme_neon:"Neon",
+      theme_candy:"Cukierek",
+      theme_light:"Jasny",
+      lvl_0:"Zwykła",
+      lvl_1:"Kamienna",
+      lvl_2:"Drewniana",
+      lvl_3:"Metalowa",
+      lvl_4:"Brązowa",
+      lvl_5:"Żelazna",
+      lvl_6:"Srebrna",
+      lvl_7:"Złota",
+      lvl_8:"Platynowa",
+      lvl_9:"Radioaktywna",
+      lvl_10:"Atomowa",
+      lvl_11:"Molekularna",
+      lvl_12:"Komórkowa",
+      lvl_13:"Rozumna",
+      lvl_14:"Planetarna",
+      lvl_15:"Gwiazdowa",
+      lvl_16:"Galaktyczna",
+      lvl_17:"Uniwersalna"
+    },
+    hi: {
+
+    "db_checking": "सर्वर से कनेक्ट हो रहे हैं…",
+    "db_ok_mysql": "सर्वर और डेटाबेस ऑनलाइन हैं — मज़े करें!",
+    "db_ok_sqlite": "बैकअप SQL डेटाबेस सक्रिय — आपका डेटा सुरक्षित है",
+    "db_down": "सर्वर उपलब्ध नहीं। सुनिश्चित करें कि server.py चल रहा है (http://localhost:8000)",
+      _AUTH:{"auth_title":"लॉगिन","register_title":"रजिस्टर","login_ph":"लॉगिन","password_ph":"पासवर्ड","email_ph":"ईमेल","confirm_ph":"पासवर्ड की पुष्टि करें","to_register":"खाता नहीं है? खाता बनाएँ","to_login":"पहले से खाता है? लॉगिन करें","btn_enter":"लॉगिन करें","btn_create":"खाता बनाएँ","or_social":"या इसके साथ लॉगिन करें","logout":"लॉग आउट","welcome":"स्वागत है, {name}!","account":"खाता","cloud_saved":"☁ क्लाउड में सहेजा गया","err_bad_login":"लॉगिन: 3–32 अक्षर (अक्षर, अंक, _ . -)","err_bad_email":"अमान्य ईमेल पता","err_weak":"पासवर्ड कम से कम 6 अक्षर का हो","err_mismatch":"पासवर्ड मेल नहीं खाते","err_login_taken":"यह लॉगिन पहले से लिया गया है","err_email_taken":"यह ईमेल पहले से पंजीकृत है","err_bad_credentials":"गलत लॉगिन या पासवर्ड","err_not_configured":"इस सोशल नेटवर्क से लॉगिन सर्वर पर अभी कॉन्फ़िगर नहीं है (client_id चाहिए)। लॉगिन से प्रवेश करें या OAuth सेट करें।","err_denied":"आपने सोशल लॉगिन रद्द किया","err_state_mismatch":"सुरक्षा जाँच विफल, फिर से कोशिश करें","err_exchange_failed":"प्रदाता सर्वर अनुपलब्ध, बाद में कोशिश करें","err_no_identity":"प्रदाता ने प्रोफ़ाइल नहीं लौटाई","err_offline":"सर्वर अनुपलब्ध — स्थानीय खेल, प्रगति ब्राउज़र में सहेजी जाती है","guest_skip":"खाते के बिना खेलें","sync_done":"☁ प्रगति क्लाउड से लोड हुई","oauth_popup":"सोशल लॉगिन के लिए पॉप-अप की अनुमति दें","auth_hint":"आपकी प्रगति खाते में सहेजी जाती है और नहीं खोएगी","server_off":"स्थानीय मोड: डेटाबेस अनुपलब्ध","lang_label_auth":"भाषा","pw_show":"पासवर्ड दिखाएँ","local_guest":"मेहमान (स्थानीय खेल)",leaderboard_title:" खिलाड़ी रैंकिंग",lb_online:"ऑनलाइन: {n}",lb_loading:"ऑनलाइन: …",lb_my_rank:"मेरा स्थान: {n}",lb_me:"मेरा स्थान: —",lb_total:"कुल खिलाड़ी: {n}",lb_earned:"कमाई",lb_level:"स्तर {n}",lb_clicks:"क्लिक",lb_empty:"अभी कोई डेटा नहीं — पहले बनें!",lb_offline:"सर्वर अनुपलब्ध",need_account:"यह ऑनलाइन गेम है — साइन इन करें या खाता बनाएँ",lb_top:"सर्वाधिक कमाने वाले 🏆",lb_you:"आप"},
+      title:"BARCOIN",
+      subtitle:"क्लिकर",
+      rank_novice:"नौसिखिया",
+      rank_amateur:"शौकिया",
+      rank_trader:"ट्रेडर",
+      rank_investor:"निवेशक",
+      rank_tycoon:"उद्योगपति",
+      rank_baron:"क्रिप्टो बैरन",
+      rank_lord:"बारक लॉर्ड",
+      rank_legend:"दिग्गज",
+      level_short:"स्तर",
+      crit_stat:"क्रिट:",
+      energy:"ऊर्जा",
+      xp:"अनुभव",
+      regen_info:"हर {n} सेकंड में +1 ऊर्जा",
+      rate_label:"BARC दर",
+      chart_left:"← पिछले 80 अंक",
+      chart_right:"अभी →",
+      chart_high:"उच्च:",
+      chart_low:"निम्न:",
+      chart_points:"कैंडल:",
+      day_change:"24घं बदलाव:",
+      balance_label:"आपकी शेष राशि",
+      sold_label:"बिका:",
+      coin_word:"सिक्का",
+      per_click:"प्रति क्लिक +{n}",
+      crit_suffix:"क्रिट {n}%",
+      shop_upgrade:"सिक्का अपग्रेड",
+      shop_upgrades:"अपग्रेड",
+      level_of:"स्तर {a} / {b}",
+      next_level:"अगला स्तर",
+      from_to:"{a} से {b}",
+      maxed_title:"अधिकतम स्तर",
+      maxed_desc:"आपने सिक्के का पूर्ण अपग्रेड कर दिया",
+      cost_label:"लागत",
+      sell_all:"सब बेचें",
+      reset:"रीसेट",
+      footer:"क्लिक = आय • दर हर 2 सेकंड बदलती है",
+      no_energy:"⚡ ऊर्जा नहीं! पुनर्जन की प्रतीक्षा करें",
+      coin_unlocked:"🎉 {name} सिक्का अनलॉक!",
+      level_up:"⬆️ स्तर {n}! क्रिट +0.5%, ऊर्जा +2",
+      upgrade_bought:"✅ {name} खरीदा गया!",
+      sold_msg:"💰 ${net} (कर ${tax})",
+      confirm_reset:"पूरी प्रगति रीसेट करें?",
+      collecting:"डेटा एकत्र हो रहा है...",
+      market_normal:"सामान्य बाज़ार",
+      event_bull:"तेज़ बाज़ार",
+      event_bear:"मंदी का बाज़ार",
+      event_crash:"क्रैश!",
+      event_moon:"चाँद की ओर!",
+      event_volatile:"अस्थिरता",
+      upg_energyMax:"ऊर्जा भंडार",
+      upg_energyRegen:"तेज़ पुनर्जन",
+      upg_critChance:"क्रिटिकल स्ट्राइक",
+      upg_critMult:"क्रिट शक्ति",
+      upg_mult2:"x2 गुणक",
+      upg_auto1:"ऑटोक्लिकर",
+      upg_mult5:"x5 गुणक",
+      upg_auto2:"रोबो-बाँह",
+      upg_auto3:"फ़ार्म",
+      eff_energyMax:"+15 अधिकतम ऊर्जा",
+      eff_energyRegen:"पुनर्जन 2x तेज़",
+      eff_critChance:"क्रिट संभावना +2%",
+      eff_critMult:"क्रिट गुणक +1x",
+      eff_mult2:"प्रति क्लिक x2",
+      eff_auto1:"+5/सेकंड",
+      eff_mult5:"प्रति क्लिक x5",
+      eff_auto2:"+100/सेकंड",
+      eff_auto3:"+2000/सेकंड",
+      settings_title:"सेटिंग्स",
+      theme_label:"थीम",
+      language_label:"इंटरफ़ेस भाषा",
+      other_label:"अन्य",
+      sound_name:"ध्वनियाँ",
+      sound_desc:"क्लिक और खरीद के ध्वनि प्रभाव",
+      fx_name:"सिक्का प्रभाव",
+      fx_desc:"क्लिक पर उड़ते सिक्के",
+      lang_search_ph:"भाषा खोजें...",
+      lang_count:"कुल भाषाएँ: {n}",
+      close:"बंद करें",
+      theme_default:"क्लासिक",
+      theme_emerald:"पन्ना",
+      theme_ruby:"माणिक",
+      theme_sunset:"सूर्यास्त",
+      theme_ocean:"सागर",
+      theme_purple:"एमेथिस्ट",
+      theme_neon:"नियॉन",
+      theme_candy:"कैंडी",
+      theme_light:"लाइट",
+      lvl_0:"सामान्य",
+      lvl_1:"पत्थर",
+      lvl_2:"लकड़ी",
+      lvl_3:"धातु",
+      lvl_4:"काँसा",
+      lvl_5:"लोहा",
+      lvl_6:"चाँदी",
+      lvl_7:"सोना",
+      lvl_8:"प्लैटिनम",
+      lvl_9:"रेडियोधर्मी",
+      lvl_10:"परमाणु",
+      lvl_11:"आणविक",
+      lvl_12:"कोशिकीय",
+      lvl_13:"बुद्धिमान",
+      lvl_14:"ग्रहीय",
+      lvl_15:"तारकीय",
+      lvl_16:"गैलेक्सी",
+      lvl_17:"ब्रह्मांडीय"
+    },
+    fi: {
+
+    "db_checking": "Yhdistetään palvelimeen…",
+    "db_ok_mysql": "palvelin ja tietokanta verkossa — hyvää peliä!",
+    "db_ok_sqlite": "varmuusSQL-tietokanta aktiivinen — tietosi tallentuvat",
+    "db_down": "Palvelin ei ole tavoitettavissa. Tarkista että server.py on käynnissä (http://localhost:8000)",
+      _AUTH:{"auth_title":"Kirjaudu sisään","register_title":"Rekisteröidy","login_ph":"Tunnus","password_ph":"Salasana","email_ph":"Sähköposti","confirm_ph":"Vahvista salasana","to_register":"Eikö tilillä? Luo tili","to_login":"Onko tilisi jo olemassa? Kirjaudu","btn_enter":"Kirjaudu","btn_create":"Luo tili","or_social":"tai kirjaudu palvelulla","logout":"Kirjaudu ulos","welcome":"Tervetuloa, {name}!","account":"Tili","cloud_saved":"☁ Tallennettu pilveen","err_bad_login":"Tunnus: 3–32 merkkiä (kirjaimet, numerot, _ . -)","err_bad_email":"Virheellinen sähköposti","err_weak":"Salasanassa vähintään 6 merkkiä","err_mismatch":"Salasanat eivät täsmää","err_login_taken":"Tämä tunnus on jo käytössä","err_email_taken":"Tämä sähköposti on jo rekisteröity","err_bad_credentials":"Väärä tunnus tai salasana","err_not_configured":"Kirjautuminen tämän verkon kautta ei ole vielä palvelimella määritetty (client_id tarvitaan). Kirjaudu tunnuksella tai määritä OAuth.","err_denied":"Peruutit kirjautumisen","err_state_mismatch":"Turvatarkastus epäonnistui, yritä uudelleen","err_exchange_failed":"Palvelimen verkkoyhteys ei toimi, yritä myöhemmin","err_no_identity":"Verkko ei palauttanut profiilia","err_offline":"Palvin ei tavoitu — paikallinen peli, edistyminen tallentuu selaimeen","guest_skip":"Pelaa ilman tiliä","sync_done":"☁ Edistyminen ladattu pilvestä","oauth_popup":"Salli ponnahdusikkuna kirjautumista varten","auth_hint":"Edistymisesi tallentuu tilille eikä katoa","server_off":"Paikallinen tila: tietokanta ei tavoitettavissa","lang_label_auth":"Kieli","pw_show":"Näytä salasana","local_guest":"Vieras (paikallinen peli)",leaderboard_title:"Pelaajien tilasto",lb_online:"Paikalla: {n}",lb_loading:"Paikalla: …",lb_my_rank:"Oma sija: {n}",lb_me:"Oma sija: —",lb_total:"Pelaajia yhteensä: {n}",lb_earned:"ansaittu",lb_level:"Taso {n}",lb_clicks:"klikkausta",lb_empty:"Ei tietoja vielä — ole ensimmäinen!",lb_offline:"Palvelin ei vastaa",need_account:"Tämä on online-peli — kirjaudu tai luo tili",lb_top:"Eniten ansainneet 🏆",lb_you:"Sinä"},
+      title:"BARCOIN",
+      subtitle:"Napsautuspeli",
+      rank_novice:"Tulokas",
+      rank_amateur:"Harrastaja",
+      rank_trader:"Kauppias",
+      rank_investor:"Sijoittaja",
+      rank_tycoon:"Mahtimies",
+      rank_baron:"Kryptobaaroni",
+      rank_lord:"Barc-lordi",
+      rank_legend:"Legenda",
+      level_short:"TAS.",
+      crit_stat:"Kriivit:",
+      energy:"Energia",
+      xp:"Kokemus",
+      regen_info:"+1 energia {n} s välein",
+      rate_label:"BARC-kurssi",
+      chart_left:"← viimeiset 80 pistettä",
+      chart_right:"nyt →",
+      chart_high:"Ylös:",
+      chart_low:"Alas:",
+      chart_points:"Kynttilät:",
+      day_change:"24 v muutos:",
+      balance_label:"Saldo",
+      sold_label:"Myyty:",
+      coin_word:"kolikko",
+      per_click:"+{n} per napsautus",
+      crit_suffix:"kriivi {n}%",
+      shop_upgrade:"Kolikon päivitys",
+      shop_upgrades:"Päivitykset",
+      level_of:"Taso {a} / {b}",
+      next_level:"Seuraava taso",
+      from_to:"{a} → {b}",
+      maxed_title:"MAKSIMI SAAVUTETTU",
+      maxed_desc:"Olet päivittänyt kolikon loppuun",
+      cost_label:"hinta",
+      sell_all:"Myy kaikki",
+      reset:"Nollaa",
+      footer:"Napsautus = tuloa • Kurssi muuttuu 2 s välein",
+      no_energy:"⚡ Ei energiaa! Odenn regeneroitumista",
+      coin_unlocked:"🎉 Kolikko {name} avattu!",
+      level_up:"⬆️ Taso {n}! +0,5 % kriivi, +2 energiaa",
+      upgrade_bought:"✅ {name} ostettu!",
+      sold_msg:"💰 ${net} (vero ${tax})",
+      confirm_reset:"Nollataanko koko edistyminen?",
+      collecting:"Kerätään dataa...",
+      market_normal:"Normaali markkina",
+      event_bull:"Bull-markkina",
+      event_bear:"Bear-markkina",
+      event_crash:"ROMAHDUS!",
+      event_moon:"KUUTAASEEN!",
+      event_volatile:"Vaihtelu",
+      upg_energyMax:"Energiavarasto",
+      upg_energyRegen:"Nopea regenerointi",
+      upg_critChance:"Kriivisku",
+      upg_critMult:"Kriivin teho",
+      upg_mult2:"x2 kerroin",
+      upg_auto1:"Autonapsauttaja",
+      upg_mult5:"x5 kerroin",
+      upg_auto2:"Robottikäsi",
+      upg_auto3:"Tila",
+      eff_energyMax:"+15 maksimenergiaa",
+      eff_energyRegen:"regenerointi 2x nopeampi",
+      eff_critChance:"+2 % kriivimahdollisuus",
+      eff_critMult:"+1x kriivikerroin",
+      eff_mult2:"x2 per napsautus",
+      eff_auto1:"+5/s",
+      eff_mult5:"x5 per napsautus",
+      eff_auto2:"+100/s",
+      eff_auto3:"+2000/s",
+      settings_title:"Asetukset",
+      theme_label:"Teema",
+      language_label:"Käyttöliittymän kieli",
+      other_label:"Muut",
+      sound_name:"Äänet",
+      sound_desc:"Napsautusten ja ostosten äänitehosteet",
+      fx_name:"Kolikkotehoste",
+      fx_desc:"Lentävät kolikot napsautuksella",
+      lang_search_ph:"Etsi kieltä...",
+      lang_count:"Kieliä yhteensä: {n}",
+      close:"Sulje",
+      theme_default:"Klassinen",
+      theme_emerald:"Smaragdi",
+      theme_ruby:"Rubiini",
+      theme_sunset:"Auringonlasku",
+      theme_ocean:"Valtameri",
+      theme_purple:"Ametisti",
+      theme_neon:"Neon",
+      theme_candy:"Karkki",
+      theme_light:"Vaalea",
+      lvl_0:"Tavallinen",
+      lvl_1:"Kivi",
+      lvl_2:"Puinen",
+      lvl_3:"Metalli",
+      lvl_4:"Pronssi",
+      lvl_5:"Rauta",
+      lvl_6:"Hopea",
+      lvl_7:"Kulta",
+      lvl_8:"Platina",
+      lvl_9:"Radioaktiivinen",
+      lvl_10:"Atomi",
+      lvl_11:"Molekyyli",
+      lvl_12:"Solukko",
+      lvl_13:"Tunteva",
+      lvl_14:"Planeetta",
+      lvl_15:"Tähti",
+      lvl_16:"Galaksi",
+      lvl_17:"Maailmankaikkeus"
+    },
+    no: {
+
+    "db_checking": "Kobler til serveren…",
+    "db_ok_mysql": "server og database er online — god spillglede!",
+    "db_ok_sqlite": "reserve-SQL-database aktiv — dataene lagres",
+    "db_down": "Serveren er utilgjengelig. Sjekk at server.py kjører (http://localhost:8000)",
+      _AUTH:{"auth_title":"Logg inn","register_title":"Registrer","login_ph":"Brukernavn","password_ph":"Passord","email_ph":"E-post","confirm_ph":"Bekreft passord","to_register":"Ingen konto? Opprett konto","to_login":"Har du konto fra før? Logg inn","btn_enter":"Logg inn","btn_create":"Opprett konto","or_social":"eller logg inn med","logout":"Logg ut","welcome":"Velkommen, {name}!","account":"Konto","cloud_saved":"☁ Lagret i skyen","err_bad_login":"Brukernavn: 3–32 tegn (bokstaver, tall, _ . -)","err_bad_email":"Ugyldig e-postadresse","err_weak":"Passordet må ha minst 6 tegn","err_mismatch":"Passordene er ikke like","err_login_taken":"Dette brukernavnet er opptatt","err_email_taken":"Denne e-posten er allerede registrert","err_bad_credentials":"Feil brukernavn eller passord","err_not_configured":"Innlogging via dette nettverket er ikke konfigurert på serveren ennå (client_id trengs). Logg inn med brukernavn eller sett opp OAuth.","err_denied":"Du avbrøt innloggingen","err_state_mismatch":"Sikkerhetskontroll feilet, prøv igjen","err_exchange_failed":"Leverandørserver utilgjengelig, prøv senere","err_no_identity":"Leverandøren returnerte ingen profil","err_offline":"Server utilgjengelig — lokal spill, fremgang lagres i nettleseren","guest_skip":"Spill uten konto","sync_done":"☁ Fremgang lastet fra skyen","oauth_popup":"Tillat popup-vindu for innlogging","auth_hint":"Fremgangen din lagres på kontoen og går ikke tapt","server_off":"Lokal modus: database utilgjengelig","lang_label_auth":"Språk","pw_show":"Vis passord","local_guest":"Gjest (lokal spill)",leaderboard_title:"Spillerliste",lb_online:"Pålogget: {n}",lb_loading:"Pålogget: …",lb_my_rank:"Min plass: {n}",lb_me:"Min plass: —",lb_total:"Spillere totalt: {n}",lb_earned:"tjent",lb_level:"Nivå {n}",lb_clicks:"klikk",lb_empty:"Ingen data ennå — bli den første!",lb_offline:"Server utilgjengelig",need_account:"Dette er et nettspill — logg inn eller opprett konto",lb_top:"Mest tjent 🏆",lb_you:"Du"},
+      title:"BARCOIN",
+      subtitle:"Klikker",
+      rank_novice:"Nybegynner",
+      rank_amateur:"Amatør",
+      rank_trader:"Trader",
+      rank_investor:"Investor",
+      rank_tycoon:"Mogul",
+      rank_baron:"Kryptobarón",
+      rank_lord:"Barc-lorde",
+      rank_legend:"Legende",
+      level_short:"NV.",
+      crit_stat:"Krit:",
+      energy:"Energi",
+      xp:"Erfaring",
+      regen_info:"+1 energi hver {n}. sek",
+      rate_label:"BARC-kurs",
+      chart_left:"← siste 80 punkter",
+      chart_right:"nå →",
+      chart_high:"Høy:",
+      chart_low:"Lav:",
+      chart_points:"Lysestage:",
+      day_change:"24 t endring:",
+      balance_label:"Saldo",
+      sold_label:"Solgt:",
+      coin_word:"mynt",
+      per_click:"+{n} per klikk",
+      crit_suffix:"krit {n}%",
+      shop_upgrade:"Myntoppgradering",
+      shop_upgrades:"Oppgraderinger",
+      level_of:"Nivå {a} / {b}",
+      next_level:"Neste nivå",
+      from_to:"Fra {a} → {b}",
+      maxed_title:"MAKS NÅDD",
+      maxed_desc:"Du har oppgradert mynten fullstendig",
+      cost_label:"kostnad",
+      sell_all:"Selg alt",
+      reset:"Nullstill",
+      footer:"Klikk = inntekt • Kursen endres hver 2. sek",
+      no_energy:"⚡ Ingen energi! Vent på regenerering",
+      coin_unlocked:"🎉 {name}-mynt låst opp!",
+      level_up:"⬆️ Nivå {n}! +0,5 % krit, +2 energi",
+      upgrade_bought:"✅ {name} kjøpt!",
+      sold_msg:"💰 ${net} (skatt ${tax})",
+      confirm_reset:"Nullstill hele fremdriften?",
+      collecting:"Samler data...",
+      market_normal:"Normalt marked",
+      event_bull:"Oksemarked",
+      event_bear:"Bjørnemarked",
+      event_crash:"KRACK!",
+      event_moon:"TIL MÅNEN!",
+      event_volatile:"Volatilitet",
+      upg_energyMax:"Energireserve",
+      upg_energyRegen:"Rask regenerering",
+      upg_critChance:"Kritisk støt",
+      upg_critMult:"Kritkraft",
+      upg_mult2:"x2-multiplikator",
+      upg_auto1:"Autoklikker",
+      upg_mult5:"x5-multiplikator",
+      upg_auto2:"Robotarm",
+      upg_auto3:"Gård",
+      eff_energyMax:"+15 maks energi",
+      eff_energyRegen:"regenerering 2x raskere",
+      eff_critChance:"+2 % krit-sjanse",
+      eff_critMult:"+1x krit-multiplikator",
+      eff_mult2:"x2 per klikk",
+      eff_auto1:"+5/s",
+      eff_mult5:"x5 per klikk",
+      eff_auto2:"+100/s",
+      eff_auto3:"+2000/s",
+      settings_title:"Innstillinger",
+      theme_label:"Tema",
+      language_label:"Grensesnittsspråk",
+      other_label:"Annet",
+      sound_name:"Lyder",
+      sound_desc:"Lydeffekter for klikk og kjøp",
+      fx_name:"Mynteffekt",
+      fx_desc:"Flygende mynter ved klikk",
+      lang_search_ph:"Søk språk...",
+      lang_count:"Språk totalt: {n}",
+      close:"Lukk",
+      theme_default:"Klassisk",
+      theme_emerald:"Smaragd",
+      theme_ruby:"Rubin",
+      theme_sunset:"Solnedgang",
+      theme_ocean:"Osean",
+      theme_purple:"Ametist",
+      theme_neon:"Neon",
+      theme_candy:"Godteri",
+      theme_light:"Lys",
+      lvl_0:"Vanlig",
+      lvl_1:"Stein",
+      lvl_2:"Tre",
+      lvl_3:"Metall",
+      lvl_4:"Bronse",
+      lvl_5:"Jern",
+      lvl_6:"Sølv",
+      lvl_7:"Gull",
+      lvl_8:"Platinum",
+      lvl_9:"Radioaktiv",
+      lvl_10:"Atomær",
+      lvl_11:"Molekylær",
+      lvl_12:"Celulær",
+      lvl_13:"Følsom",
+      lvl_14:"Planetarisk",
+      lvl_15:"Stellær",
+      lvl_16:"Galaktisk",
+      lvl_17:"Universell"
+    },
+    he: {
+
+    "db_checking": "מתחבר לשרת…",
+    "db_ok_mysql": "השרת ומסד הנתונים מקוונים — תהנו!",
+    "db_ok_sqlite": "מסד נתוני SQL לגיבוי פעיל — הנתונים נשמרים",
+    "db_down": "השרת אינו זמין. ודאו ש-server.py פועל (http://localhost:8000)",
+      _AUTH:{"auth_title":"התחברות","register_title":"הרשמה","login_ph":"שם משתמש","password_ph":"סיסמה","email_ph":"דואל","confirm_ph":"אימות סיסמה","to_register":"אין לך חשבון? צור חשבון","to_login":"כבר יש חשבון? התחבר","btn_enter":"התחבר","btn_create":"צור חשבון","or_social":"או התחבר עם","logout":"התנתק","welcome":"ברוך הבא, {name}!","account":"חשבון","cloud_saved":"☁ נשמר בענן","err_bad_login":"שם משתמש: 3–32 תווים (אותיות, ספרות, _ . -)","err_bad_email":"כתובת דואל לא תקינה","err_weak":"הסיסמה חייבת להכיל לפחות 6 תווים","err_mismatch":"הסיסמאות אינן תואמות","err_login_taken":"שם המשתמש תפוס","err_email_taken":"הדואל כבר רשום","err_bad_credentials":"שם משתמש או סיסמה שגויים","err_not_configured":"התחברות דרך הרשת החברתית הזו עדיין לא מוגדרת בשרת (נדרש client_id). התחבר עם שם משתמש או הגדר OAuth.","err_denied":"ביטלת את ההתחברות","err_state_mismatch":"בדיקת האבטחה נכשלה, נסה שוב","err_exchange_failed":"שרת הספק לא זמין, נסה מאוחר יותר","err_no_identity":"הספק לא החזיר פרופיל","err_offline":"השרת לא זמין — משחק מקומי, ההתקדמות נשמרת בדפדפן","guest_skip":"שחק ללא חשבון","sync_done":"☁ ההתקדמות נטענה מהענן","oauth_popup":"אפשר חלונית קופצת להתחברות חברתית","auth_hint":"ההתקדמות נשמרת בחשבון ולא תאבד","server_off":"מצב מקומי: מסד הנתונים לא זמין","lang_label_auth":"שפה","pw_show":"הצג סיסמה","local_guest":"אורח (משחק מקומי)",leaderboard_title:"טבלת מובילים",lb_online:"מקוונים: {n}",lb_loading:"מקוונים: …",lb_my_rank:"המיקום שלי: {n}",lb_me:"המיקום שלי: —",lb_total:"סך השחקנים: {n}",lb_earned:"הרוויח",lb_level:"רמה {n}",lb_clicks:"לחיצות",lb_empty:"אין נתונים עדיין — היו הראשונים!",lb_offline:"השרט אינו זמין",need_account:"המשחק מקוון — התחבר או צור חשבון",lb_top:"המרוויחים הגדולים 🏆",lb_you:"אתה"},
+      title:"BARCOIN",
+      subtitle:"קליקר",
+      rank_novice:"מתחיל",
+      rank_amateur:"חובב",
+      rank_trader:"סוחר",
+      rank_investor:"משקיע",
+      rank_tycoon:"איל הון",
+      rank_baron:"ברון קריפטו",
+      rank_lord:"אדון בארק",
+      rank_legend:"לגדה",
+      level_short:"רמה",
+      crit_stat:"פגיעות חוזרות:",
+      energy:"אנרגיה",
+      xp:"ניסיון",
+      regen_info:"+1 אנרגיה כל {n} שניות",
+      rate_label:"שער BARC",
+      chart_left:"← 80 הנקודות האחרונות",
+      chart_right:"עכשיו →",
+      chart_high:"גבוה:",
+      chart_low:"נמוך:",
+      chart_points:"נרות:",
+      day_change:"שינוי 24 שע׳:",
+      balance_label:"היתרה שלך",
+      sold_label:"נמכר:",
+      coin_word:"מטבע",
+      per_click:"+{n} לכל לחיצה",
+      crit_suffix:"קריט {n}%",
+      shop_upgrade:"שדרוג המטבע",
+      shop_upgrades:"שדרוגים",
+      level_of:"רמה {a} / {b}",
+      next_level:"הרמה הבאה",
+      from_to:"מ־{a} אל {b}",
+      maxed_title:"השדרוג המקסימלי הושג",
+      maxed_desc:"שדרגת את המטבע עד הסוף",
+      cost_label:"עלות",
+      sell_all:"מכור הכול",
+      reset:"איפוס",
+      footer:"לחיצה = הכנסה • השער משתנה כל 2 שניות",
+      no_energy:"⚡ אין אנרגיה! חכה להתחדשות",
+      coin_unlocked:"🎉 מטבע {name} נפתח!",
+      level_up:"⬆️ רמה {n}! +0.5% קריט, +2 אנרגיה",
+      upgrade_bought:"✅ {name} נרכש!",
+      sold_msg:"💰 ${net} (מס ${tax})",
+      confirm_reset:"לאפס את כל ההתקדמות?",
+      collecting:"אוסף נתונים...",
+      market_normal:"שוק רגיל",
+      event_bull:"שור עולה",
+      event_bear:"דוב יורד",
+      event_crash:"קרס!",
+      event_moon:"אל הירח!",
+      event_volatile:"תנודתיות",
+      upg_energyMax:"מאגר אנרגיה",
+      upg_energyRegen:"התחדשות מהירה",
+      upg_critChance:"מכה קריטית",
+      upg_critMult:"עוצמת קריט",
+      upg_mult2:"מכפיל x2",
+      upg_auto1:"לחיצה אוטומטית",
+      upg_mult5:"מכפיל x5",
+      upg_auto2:"זרוע רובוטית",
+      upg_auto3:"חוות כרייה",
+      eff_energyMax:"+15 אנרגיה מקס׳",
+      eff_energyRegen:"התחדשות מהירה פי 2",
+      eff_critChance:"+2% סיכוי קריט",
+      eff_critMult:"+1x מכפיל קריט",
+      eff_mult2:"x2 לכל לחיצה",
+      eff_auto1:"+5/שנייה",
+      eff_mult5:"x5 לכל לחיצה",
+      eff_auto2:"+100/שנייה",
+      eff_auto3:"+2000/שנייה",
+      settings_title:"הגדרות",
+      theme_label:"ערכת נושא",
+      language_label:"שפת הממשק",
+      other_label:"אחר",
+      sound_name:"צלילים",
+      sound_desc:"אפקטי קול בלחיצות וקניות",
+      fx_name:"אפקט מטבעות",
+      fx_desc:"מטבעות מרחפים בלחיצה",
+      lang_search_ph:"חיפוש שפה...",
+      lang_count:"סה״כ שפות: {n}",
+      close:"סגור",
+      theme_default:"קלאסי",
+      theme_emerald:"אמרלד",
+      theme_ruby:"אודם",
+      theme_sunset:"שקיעה",
+      theme_ocean:"אוקיינוס",
+      theme_purple:"אמתיסט",
+      theme_neon:"ניאון",
+      theme_candy:"ממתק",
+      theme_light:"בהיר",
+      lvl_0:"רגיל",
+      lvl_1:"אבן",
+      lvl_2:"עץ",
+      lvl_3:"מתכת",
+      lvl_4:"ברונזה",
+      lvl_5:"ברזל",
+      lvl_6:"כסף",
+      lvl_7:"זהב",
+      lvl_8:"פלטינה",
+      lvl_9:"רדיואקטיבי",
+      lvl_10:"אטומי",
+      lvl_11:"מולקולרי",
+      lvl_12:"תאי",
+      lvl_13:"תבוּנָתי",
+      lvl_14:"פלנטרי",
+      lvl_15:"סטלרי",
+      lvl_16:"גלקטי",
+      lvl_17:"אוניברסלי"
+    },
+    ar: {
+
+    "db_checking": "جارٍ الاتصال بالخادم…",
+    "db_ok_mysql": "الخادم وقاعدة البيانات متصلان — استمتع باللعب!",
+    "db_ok_sqlite": "قاعدة بيانات SQL احتياطية نشطة — يتم حفظ بياناتك",
+    "db_down": "الخادم غير متاح. تأكد من تشغيل server.py (http://localhost:8000)",
+      _AUTH:{"auth_title":"تسجيل الدخول","register_title":"إنشاء حساب","login_ph":"اسم المستخدم","password_ph":"كلمة المرور","email_ph":"البريد الإلكتروني","confirm_ph":"تأكيد كلمة المرور","to_register":"لا تملك حساباً؟ أنشئ حساباً","to_login":"لديك حساب بالفعل؟ سجّل الدخول","btn_enter":"دخول","btn_create":"إنشاء حساب","or_social":"أو سجّل الدخول عبر","logout":"خروج","welcome":"مرحباً، {name}!","account":"الحساب","cloud_saved":"☁ تم الحفظ في السحابة","err_bad_login":"اسم المستخدم: 3–32 حرفاً (أحرف وأرقام و _ . -)","err_bad_email":"عنوان بريد إلكتروني غير صالح","err_weak":"يجب أن تكون كلمة المرور 6 أحرف على الأقل","err_mismatch":"كلمتا المرور غير متطابقتين","err_login_taken":"اسم المستخدم محجوز","err_email_taken":"هذا البريد مسجل مسبقاً","err_bad_credentials":"اسم المستخدم أو كلمة المرور خاطئة","err_not_configured":"تسجيل الدخول عبر هذه الشبكة الاجتماعية غير مُهيأ بعد على الخادم (يلزم client_id). استخدم اسم المستخدم أو اضبط OAuth.","err_denied":"لقد ألغيت تسجيل الدخول الاجتماعي","err_state_mismatch":"فشل فحص الأمان، حاول مرة أخرى","err_exchange_failed":"خادم المزود غير متاح، حاول لاحقاً","err_no_identity":"لم يرجع المزود أي ملف شخصي","err_offline":"الخادم غير متاح — لعب محلي، يتم حفظ التقدم في المتصفح","guest_skip":"العب بدون حساب","sync_done":"☁ تم تحميل التقدم من السحابة","oauth_popup":"اسمح بالنافذة المنبثقة لتسجيل الدخول الاجتماعي","auth_hint":"يتم حفظ تقدمك في الحساب ولن يضيع","server_off":"الوضع المحلي: قاعدة البيانات غير متاحة","lang_label_auth":"اللغة","pw_show":"إظهار كلمة المرور","local_guest":"ضيف (لعب محلي)",leaderboard_title:"لوحة صدارة اللاعبين",lb_online:"متصل: {n}",lb_loading:"متصل: …",lb_my_rank:"مركزي: {n}",lb_me:"مركزي: —",lb_total:"إجمالي اللاعبين: {n}",lb_earned:"مكسوب",lb_level:"مستوى {n}",lb_clicks:"نقرة",lb_empty:"لا توجد بيانات بعد — كن الأول!",lb_offline:"الخادم غير متاح",need_account:"اللعبة عبر الإنترنت — سجّل الدخول أو أنشئ حساباً",lb_top:"الأكثر ربحاً 🏆",lb_you:"أنت"},
+      title:"باركوين",
+      subtitle:"لعبة نقر",
+      rank_novice:"مبتدئ",
+      rank_amateur:"هاوٍ",
+      rank_trader:"متداول",
+      rank_investor:"مستثمر",
+      rank_tycoon:"قطب أعمال",
+      rank_baron:"بارون العملات الرقمية",
+      rank_lord:"سيد بارك",
+      rank_legend:"أسطورة",
+      level_short:"مستوى",
+      crit_stat:"ضربات حرجة:",
+      energy:"طاقة",
+      xp:"خبرة",
+      regen_info:"+1 طاقة كل {n} ثانية",
+      rate_label:"سعر BARC",
+      chart_left:"← آخر 80 نقطة",
+      chart_right:"الآن ←",
+      chart_high:"أعلى:",
+      chart_low:"أدنى:",
+      chart_points:"شموع:",
+      day_change:"تغير 24 س:",
+      balance_label:"رصيدك",
+      sold_label:"مُباع:",
+      coin_word:"عملة",
+      per_click:"+{n} لكل نقرة",
+      crit_suffix:"حرج {n}%",
+      shop_upgrade:"ترقية العملة",
+      shop_upgrades:"الترقيات",
+      level_of:"المستوى {a} / {b}",
+      next_level:"المستوى التالي",
+      from_to:"من {a} إلى {b}",
+      maxed_title:"تم بلوغ الحد الأقصى",
+      maxed_desc:"لقد رقّيت العملة بالكامل",
+      cost_label:"التكلفة",
+      sell_all:"بيع الكل",
+      reset:"إعادة تعيين",
+      footer:"النقر = دخل • يتغير السعر كل ثانيتين",
+      no_energy:"⚡ لا توجد طاقة! انتظر التعافي",
+      coin_unlocked:"🎉 تم فتح عملة {name}!",
+      level_up:"⬆️ المستوى {n}! +0.5% حرج، +2 طاقة",
+      upgrade_bought:"✅ تم شراء {name}!",
+      sold_msg:"💰 ${net} (ضريبة ${tax})",
+      confirm_reset:"إعادة تعيين كل التقدم؟",
+      collecting:"جارٍ جمع البيانات...",
+      market_normal:"سوق عادي",
+      event_bull:"سوق صاعد",
+      event_bear:"سوق هابط",
+      event_crash:"انهيار!",
+      event_moon:"إلى القمر!",
+      event_volatile:"تقلب",
+      upg_energyMax:"احتياطي الطاقة",
+      upg_energyRegen:"تجديد سريع",
+      upg_critChance:"ضربة حرجة",
+      upg_critMult:"قوة الضربة الحرجة",
+      upg_mult2:"مضاعف ×2",
+      upg_auto1:"نقر تلقائي",
+      upg_mult5:"مضاعف ×5",
+      upg_auto2:"ذراع روبوتية",
+      upg_auto3:"مزرعة",
+      eff_energyMax:"+15 طاقة قصوى",
+      eff_energyRegen:"تجديد أسرع مرتين",
+      eff_critChance:"+2% فرصة ضربة حرجة",
+      eff_critMult:"+1× مضاعف حرج",
+      eff_mult2:"×2 لكل نقرة",
+      eff_auto1:"+5/ثانية",
+      eff_mult5:"×5 لكل نقرة",
+      eff_auto2:"+100/ثانية",
+      eff_auto3:"+2000/ثانية",
+      settings_title:"الإعدادات",
+      theme_label:"السمة",
+      language_label:"لغة الواجهة",
+      other_label:"أخرى",
+      sound_name:"الأصوات",
+      sound_desc:"مؤثرات صوتية للنقر والعمليات الشرائية",
+      fx_name:"تأثير العملات",
+      fx_desc:"عملات متطايرة عند النقر",
+      lang_search_ph:"ابحث عن لغة...",
+      lang_count:"إجمالي اللغات: {n}",
+      close:"إغلاق",
+      theme_default:"كلاسيكي",
+      theme_emerald:"زمردي",
+      theme_ruby:"ياقوتي",
+      theme_sunset:"غروب",
+      theme_ocean:"محيط",
+      theme_purple:"جمشت",
+      theme_neon:"نيون",
+      theme_candy:"حلوى",
+      theme_light:"فاتح",
+      lvl_0:"عادية",
+      lvl_1:"حجرية",
+      lvl_2:"خشبية",
+      lvl_3:"معدنية",
+      lvl_4:"برونزية",
+      lvl_5:"حديدية",
+      lvl_6:"فضية",
+      lvl_7:"ذهبية",
+      lvl_8:"بلاتينية",
+      lvl_9:"مشعة",
+      lvl_10:"ذرية",
+      lvl_11:"جزيئية",
+      lvl_12:"خلوية",
+      lvl_13:"واعية",
+      lvl_14:"كوكبية",
+      lvl_15:"نجمية",
+      lvl_16:"مجرية",
+      lvl_17:"كونية"
+    },
+        uk: {
+
+        "db_checking": "Перевіряю з'єднання з сервером…",
+        "db_ok_mysql": "сервер і база даних у мережі — грайте на здоров'я!",
+        "db_ok_sqlite": "резервна SQL-база активна — ваші дані зберігаються",
+        "db_down": "Сервер недоступний. Перевірте, чи запущено server.py (http://localhost:8000)",
+      _AUTH:{"auth_title":"Вхід","register_title":"Реєстрація","login_ph":"Логін","password_ph":"Пароль","email_ph":"Електронна пошта","confirm_ph":"Підтвердіть пароль","to_register":"Немає акаунта? Створити акаунт","to_login":"Вже є акаунт? Увійти","btn_enter":"Увійти","btn_create":"Створити акаунт","or_social":"або увійдіть через","logout":"Вийти","welcome":"Ласкаво просимо, {name}!","account":"Акаунт","cloud_saved":"☁ Збережено у хмарі","err_bad_login":"Логін: 3–32 символи (літери, цифри, _ . -)","err_bad_email":"Некоректна електронна пошта","err_weak":"Пароль щонайменше 6 символів","err_mismatch":"Паролі не збігаються","err_login_taken":"Такий логін уже зайнятий","err_email_taken":"Ця пошта вже зареєстрована","err_bad_credentials":"Невірний логін або пароль","err_not_configured":"Вхід через цю соцмережу ще не налаштований на сервері (потрібен client_id). Увійдіть за логіном або налаштуйте OAuth.","err_denied":"Ви скасували вхід через соцмережу","err_state_mismatch":"Перевірка безпеки не пройдена, спробуйте ще раз","err_exchange_failed":"Сервер соцмережі недоступний, спробуйте пізніше","err_no_identity":"Соцмережа не повернула профіль","err_offline":"Сервер недоступний — грайте локально, прогрес зберігається в браузері","guest_skip":"Грати без акаунта","sync_done":"☁ Прогрес завантажено з хмари","oauth_popup":"Дозвольте спливаюче вікно для входу через соцмережу","auth_hint":"Прогрес зберігається в акаунті й не загубиться","server_off":"Локальний режим: база даних недоступна","lang_label_auth":"Мова інтерфейсу","pw_show":"Показати пароль","local_guest":"Гість (локальна гра)"},
+      title:"БАРКОІН",
+      subtitle:"Клікер",
+      rank_novice:"Новачок",
+      rank_amateur:"Аматор",
+      rank_trader:"Трейдér",
+      rank_investor:"Інвестор",
+      rank_tycoon:"Магнат",
+      rank_baron:"Крипто-барон",
+      rank_lord:"Баронський лорд",
+      rank_legend:"Легендарний",
+      level_short:"Рів.",
+      crit_stat:"Крити:",
+      energy:"Енергія",
+      xp:"Досвід",
+      regen_info:"+1 енергії кожні {n} с",
+      rate_label:"BARC курс",
+      chart_left:"← останні 80 точок",
+      chart_right:"зараз →",
+      chart_high:"High:",
+      chart_low:"Мін:",
+      chart_points:"Свічки:",
+      day_change:"Зміна 24 год:",
+      balance_label:"Ваш баланс",
+      sold_label:"Продано:",
+      coin_word:"монета",
+      per_click:"+{n} за клік",
+      crit_suffix:"крид {n}%",
+      shop_upgrade:"Покращення монети",
+      shop_upgrades:"Покращення",
+      level_of:"Рівень {a} / {b}",
+      next_level:"Наступний рівень",
+      from_to:"Від {a} → {b}",
+      maxed_title:"МАКСИМУМ ДОСЯГНУТО",
+      maxed_desc:"Ви повністю покращили монету",
+      cost_label:"вартість",
+      sell_all:"Продати все",
+      reset:"Скинути",
+      footer:"Клік = дохід • Курс змінюється кожні 2 с",
+      no_energy:"⚡ Немає енергії! Зачекайте відновлення",
+      coin_unlocked:"🎉 {name} монету розблоковано!",
+      level_up:"⬆️ Рівень {n}! +0.5% крид, +2 енергії",
+      upgrade_bought:"✅ {name} куплено!",
+      sold_msg:"💰 ${net} (податок ${tax})",
+      confirm_reset:"Скинути весь прогрес?",
+      collecting:"Збір даних...",
+      market_normal:"Звичайний ринок",
+      event_bull:"бичачий ринок",
+      event_bear:"ведмежий ринок",
+      event_crash:"КРАХ!",
+      event_moon:"ДО МІСЯЦЯ!",
+      event_volatile:"Волатильність",
+      upg_energyMax:"Запас енергії",
+      upg_energyRegen:"Швидка регенерація",
+      upg_critChance:"Критичний удар",
+      upg_critMult:"Сила криту",
+      upg_mult2:"Множник x2",
+      upg_auto1:"Автоклікер",
+      upg_mult5:"Множник x5",
+      upg_auto2:"Роборука",
+      upg_auto3:"Ферма",
+      eff_energyMax:"+15 макс. енергії",
+      eff_energyRegen:"регенерація вдвічі швидша",
+      eff_critChance:"+2% шанс криду",
+      eff_critMult:"+1x множник криду",
+      eff_mult2:"x2 за клік",
+      eff_auto1:"+5/sec",
+      eff_mult5:"x5 за клік",
+      eff_auto2:"+100/sec",
+      eff_auto3:"+2000/sec",
+      settings_title:"Налаштування",
+      theme_label:"Тема",
+      language_label:"Мова інтерфейсу",
+      other_label:"Інше",
+      sound_name:"Звуки",
+      sound_desc:"Звукові ефекти кліків і покупок",
+      fx_name:"Ефект монеток",
+      fx_desc:"Монети, що летять при кліку",
+      lang_search_ph:"Пошук мови...",
+      lang_count:"Усього мов: {n}",
+      close:"Закрити",
+      theme_default:"Класична",
+      theme_emerald:"Смарагдова",
+      theme_ruby:"Рубінова",
+      theme_sunset:"Захід сонця",
+      theme_ocean:"Океанічний",
+      theme_purple:"Аметистова",
+      theme_neon:"Неонова",
+      theme_candy:"Цукеркова",
+      theme_light:"Світла",
+      lvl_0:"Звичайна",
+      lvl_1:"Камінь",
+      lvl_2:"Дерево",
+      lvl_3:"Метал",
+      lvl_4:"Бронза",
+      lvl_5:"Залізо",
+      lvl_6:"Срібло",
+      lvl_7:"Золото",
+      lvl_8:"Платина",
+      lvl_9:"Радіоактивна",
+      lvl_10:"Атомна",
+      lvl_11:"Молекулярна",
+      lvl_12:"Клітинна",
+      lvl_13:"Відчутна",
+      lvl_14:"Планетарна",
+      lvl_15:"Зоряна",
+      lvl_16:"Галактична",
+      lvl_17:"Всесвітня",
+      leaderboard_title:"Рейтинг гравців",lb_online:"Онлайн: {n}",lb_loading:"Онлайн: …",lb_my_rank:"Моє місце: {n}",lb_me:"Моє місце: —",lb_total:"Усього гравців: {n}",lb_earned:"зароблено",lb_level:"Рев. {n}",lb_clicks:"кліків",lb_empty:"Даних ще немає — станьте першим у рейтингу!",lb_offline:"Сервер недоступний",need_account:"Гра мережева — увійдіть або створіть акаунт",lb_top:"Топ заробітчан 🏆",lb_you:"Ви"
+    }
+  };
+
+
+  function t(key, params) {
+    const dict = TRANSLATIONS[currentLang] || {};
+    const enDict = TRANSLATIONS.en;
+    let s = dict[key] !== undefined ? dict[key]
+            : ((dict._AUTH && dict._AUTH[key] !== undefined) ? dict._AUTH[key]
+            : ((enDict._AUTH && enDict._AUTH[key] !== undefined) ? enDict._AUTH[key]
+            : (enDict[key] !== undefined ? enDict[key] : key)));
+    if (params) for (const k in params) s = s.replace(new RegExp('\\{' + k + '\\}', 'g'), params[k]);
+    return s;
+  }
+
+  function coinName(i) { return t('lvl_' + i); }
+
+  function applyStaticTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    $('langSearch').placeholder = t('lang_search_ph');
+    $('settingsBtn').title = t('settings_title');
+    $('settingsClose').setAttribute('aria-label', t('close'));
+    $('langCount').textContent = t('lang_count', { n: Object.keys(LANG_NAMES).length });
+  }
+
+  // ================================================================
+  // ТЕМЫ
+  // ================================================================
+  const THEME_DEFS = [
+    { id:'default',  bgTop:'#1a1f3a', bgBot:'#0a0d1a', accent:'#ffd700' },
+    { id:'emerald',  bgTop:'#0c2b1e', bgBot:'#04120b', accent:'#35e08a' },
+    { id:'ruby',     bgTop:'#3a1020', bgBot:'#14040a', accent:'#ff5c8a' },
+    { id:'sunset',   bgTop:'#3a1a0a', bgBot:'#160802', accent:'#ffab40' },
+    { id:'ocean',    bgTop:'#06263a', bgBot:'#010d16', accent:'#4fc3f7' },
+    { id:'purple',   bgTop:'#241040', bgBot:'#0d0518', accent:'#b388ff' },
+    { id:'neon',     bgTop:'#0a1420', bgBot:'#02060a', accent:'#00fff0' },
+    { id:'candy',    bgTop:'#ffe0ec', bgBot:'#ffc9dd', accent:'#e040a0' },
+    { id:'light',    bgTop:'#f4f6fb', bgBot:'#dde3f0', accent:'#1565c0' }
+  ];
+  // Утилиты цвета: все оттенки темы выводятся из accent + фона, поэтому цвета гарантированно сочетаются
+  function hexToRgb(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+  function rgbToHex(r,g,b){ return '#' + [r,g,b].map(x => Math.max(0,Math.min(255,Math.round(x))).toString(16).padStart(2,'0')).join(''); }
+  function mix(a, b, tA){ const A=hexToRgb(a), B=hexToRgb(b); return rgbToHex(A[0]+(B[0]-A[0])*tA, A[1]+(B[1]-A[1])*tA, A[2]+(B[2]-A[2])*tA); }
+  function rgba(hexStr, a){ const c = hexToRgb(hexStr); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+  function lum(hexStr){ const c = hexToRgb(hexStr).map(v => { v/=255; return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); }); return 0.2126*c[0] + 0.7152*c[1] + 0.0722*c[2]; }
+  const THEMES = THEME_DEFS.map(d => ({ id: d.id, bg: [d.bgTop, d.bgBot], accent: d.accent }));
+
+  const settings = { theme: 'default', lang: 'ru', sounds: false, coinFx: true };
+
+  function loadSettings() {
+    try {
+      const d = JSON.parse(localStorage.getItem('barcoin_settings') || '{}');
+      if (d.theme && THEMES.some(th => th.id === d.theme)) settings.theme = d.theme;
+      if (d.lang && LANG_NAMES[d.lang]) settings.lang = d.lang;
+      settings.sounds = !!d.sounds;
+      settings.coinFx = d.coinFx !== false;
+    } catch(e) {}
+  }
+  function saveSettings() { localStorage.setItem('barcoin_settings', JSON.stringify(settings)); }
+
+  function applyTheme(themeId) {
+    settings.theme = themeId;
+    document.body.setAttribute('data-theme', themeId);
+    const d = THEME_DEFS.find(x => x.id === themeId) || THEME_DEFS[0];
+    const dark = lum(d.bgBot) < 0.2;
+    const root = document.documentElement.style;
+    const set = (k, v) => root.setProperty(k, v);
+    set('--bg-top', d.bgTop);
+    set('--bg-bottom', d.bgBot);
+    set('--card-from', mix(d.bgTop, d.accent, dark ? 0.05 : 0.06));
+    set('--card-to', mix(d.bgBot, d.accent, dark ? 0.04 : 0.05));
+    set('--card-border', mix(d.bgTop, d.accent, dark ? 0.22 : 0.45));
+    set('--accent', d.accent);
+    set('--gold', d.accent);
+    set('--accent-soft', rgba(d.accent, 0.14));
+    set('--accent-glow', rgba(d.accent, dark ? 0.4 : 0.3));
+    if (dark) {
+      set('--text', '#ffffff');
+      set('--text-dim', mix(d.accent, '#ffffff', 0.55));
+      set('--text-darker', mix(d.accent, d.bgBot, 0.55));
+      set('--btn-text', mix(d.accent, '#000000', 0.72));
+      set('--track', 'rgba(0,0,0,0.4)');
+      set('--grid-line', mix(d.bgBot, d.accent, 0.12));
+      set('--chart-label', mix(d.accent, d.bgBot, 0.5));
+      set('--green', '#00e676');
+      set('--red', '#ff5252');
+    } else {
+      set('--text', mix(d.bgBot, '#000000', 0.25));
+      set('--text-dim', mix(d.bgBot, '#000000', 0.55));
+      set('--text-darker', mix(d.bgBot, '#000000', 0.35));
+      set('--btn-text', '#ffffff');
+      set('--track', 'rgba(0,0,0,0.12)');
+      set('--grid-line', mix(d.bgBot, '#000000', 0.08));
+      set('--chart-label', mix(d.bgBot, '#000000', 0.45));
+      set('--green', '#00a152');
+      set('--red', '#e03434');
+    }
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', d.bgBot);
+    document.querySelectorAll('.theme-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.theme === themeId);
+      const def = THEME_DEFS.find(x => x.id === c.dataset.theme);
+      if (def) {
+        const prev = c.querySelector('.theme-preview');
+        if (prev) {
+          prev.style.background = `linear-gradient(160deg, ${def.bgTop}, ${def.bgBot})`;
+          prev.style.setProperty('--tp-accent', def.accent);
+        }
+      }
+    });
+    saveSettings();
+    drawChart();
+  }
+
+  function buildThemeGrid() {
+    const grid = $('themeGrid');
+    grid.innerHTML = '';
+    THEMES.forEach(th => {
+      const card = document.createElement('div');
+      card.className = 'theme-card' + (th.id === settings.theme ? ' active' : '');
+      card.dataset.theme = th.id;
+      const prev = document.createElement('div');
+      prev.className = 'theme-preview';
+      prev.style.background = `linear-gradient(160deg, ${th.bg[0]}, ${th.bg[1]})`;
+      prev.style.setProperty('--tp-accent', th.accent);
+      // превью повторяет реальную палитру темы: фон + акцент
+      const name = document.createElement('div');
+      name.className = 'theme-name';
+      name.textContent = th.id === 'default' ? '★ ' : '';
+      name.append(t('theme_' + th.id));
+      card.append(prev, name);
+      card.onclick = () => { applyTheme(th.id); playSound('buy'); };
+      grid.appendChild(card);
+    });
+  }
+
+  function buildLangSelect(filter) {
+    const sel = $('langSelect');
+    const cur = sel.value || settings.lang;
+    sel.innerHTML = '';
+    const f = (filter || '').trim().toLowerCase();
+    const entries = Object.entries(LANG_NAMES)
+      .filter(([code, name]) => !f || name.toLowerCase().includes(f) || code.includes(f) ||
+        (TRANSLATIONS[code] && TRANSLATIONS[code].language_label ? TRANSLATIONS[code].language_label.toLowerCase().includes(f) : false))
+      .sort((a, b) => a[1].localeCompare(b[1]));
+    entries.forEach(([code, name]) => {
+      const opt = document.createElement('option');
+      opt.value = code;
+      opt.textContent = name + '  (' + code.toUpperCase() + ')';
+      if (code === settings.lang) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    if (!entries.length) {
+      const opt = document.createElement('option');
+      opt.value = ''; opt.textContent = '—';
+      sel.appendChild(opt);
+    }
+  }
+
+  function setLanguage(lang) {
+    settings.lang = lang;
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'he' || lang === 'ar') ? 'rtl' : 'ltr';
+    applyStaticTranslations();
+    buildThemeGrid();
+    renderUpgrades();
+    renderCoin();
+    renderPlayerBars();
+    updateRank();
+    renderEventTag();
+    updateBalanceDisplay();
+    drawChart();
+    saveSettings();
+  }
+
+  // ===== ЗВУКИ =====
+  let audioCtx = null;
+  function playSound(type) {
+    if (!settings.sounds) return;
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+      if (type === 'click') { o.frequency.value = 900 + Math.random()*200; g.gain.setValueAtTime(0.06, now); }
+      else if (type === 'crit') { o.frequency.value = 1400; g.gain.setValueAtTime(0.1, now); }
+      else { o.type = 'triangle'; o.frequency.value = 600; o.frequency.exponentialRampToValueAtTime(1200, now+0.12); g.gain.setValueAtTime(0.08, now); }
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+      o.start(now); o.stop(now + 0.16);
+    } catch(e) {}
+  }
+
+  // ===== ЭФФЕТ РАЗЛЕТАЮЩИХСЯ МОНЕТ (image/coin.png) =====
+  function spawnCoinBurst(x, y, count) {
+    if (!settings.coinFx) return;
+    for (let i = 0; i < count; i++) {
+      const img = document.createElement('img');
+      img.className = 'fly-coin';
+      img.src = 'image/coin.png';
+      img.alt = '';
+      img.draggable = false;
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 60 + Math.random() * 90;
+      img.style.left = x + 'px';
+      img.style.top = y + 'px';
+      img.style.setProperty('--fx', Math.cos(ang) * dist + 'px');
+      img.style.setProperty('--fy', (-Math.abs(Math.sin(ang)) - 0.4) * dist + 'px');
+      img.style.setProperty('--fr', (Math.random() * 720 - 360) + 'deg');
+      img.style.width = img.style.height = (20 + Math.random() * 16) + 'px';
+      coinZoneEl.appendChild(img);
+      setTimeout(() => img.remove(), 900);
+    }
+  }
+
   const ratePriceEl = $('ratePrice'), arrowEl = $('arrow'), rateChangeEl = $('rateChange');
   const balanceEl = $('balance'), balanceUsdEl = $('balanceUsd');
   const coinEl = $('coin'), coinZoneEl = $('coinZone');
@@ -990,18 +3871,27 @@
     drawChart();
   }
 
+  function cssVar(name, fallback) {
+    const v = getComputedStyle(document.body).getPropertyValue(name).trim();
+    return v || fallback;
+  }
+
   function drawChart() {
     const rect = canvas.getBoundingClientRect();
+    const COL_LABEL = cssVar('--chart-label', '#4a5474');
+    const COL_GRID  = cssVar('--grid-line', '#1e2540');
+    const COL_GREEN = cssVar('--green', '#00e676');
+    const COL_RED   = cssVar('--red', '#ff5252');
     const W = rect.width, H = rect.height;
     if (W < 10 || H < 10) return;
     ctx.clearRect(0, 0, W, H);
 
     const data = state.priceHistory;
     if (data.length < 2) {
-      ctx.fillStyle = '#4a5474';
+      ctx.fillStyle = COL_LABEL;
       ctx.font = '11px Segoe UI';
       ctx.textAlign = 'center';
-      ctx.fillText('Накапливаю данные...', W/2, H/2);
+      ctx.fillText(t('collecting'), W/2, H/2);
       return;
     }
 
@@ -1014,10 +3904,10 @@
     const pad = (max - min) * 0.15 || 0.1;
     max += pad; min -= pad;
 
-    ctx.strokeStyle = '#1e2540';
+    ctx.strokeStyle = COL_GRID;
     ctx.lineWidth = 1;
     ctx.font = '9px Segoe UI';
-    ctx.fillStyle = '#4a5474';
+    ctx.fillStyle = COL_LABEL;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
@@ -1042,7 +3932,7 @@
     const toY = v => padT + chartH - ((v - min) / (max - min)) * chartH;
 
     const isUp = data[data.length - 1].price >= data[0].price;
-    const lineColor = isUp ? '#00e676' : '#ff5252';
+    const lineColor = isUp ? COL_GREEN : COL_RED;
     const fillColor = isUp ? 'rgba(0,230,118,0.18)' : 'rgba(255,82,82,0.18)';
 
     ctx.beginPath();
@@ -1072,7 +3962,7 @@
       if (isMax || isMin) {
         ctx.beginPath();
         ctx.arc(toX(i), toY(d.price), 3, 0, Math.PI * 2);
-        ctx.fillStyle = isMax ? '#ff5252' : '#00e676';
+        ctx.fillStyle = isMax ? COL_RED : COL_GREEN;
         ctx.fill();
       }
     });
@@ -1109,10 +3999,10 @@
       inset 0 -10px 20px rgba(0,0,0,0.3),
       inset 0 10px 20px rgba(255,255,255,0.3)`;
     coinEl.style.color = lvl.textColor;
-    coinEl.textContent = lvl.icon;
-    coinNameEl.textContent = lvl.name + ' монета';
+    $('coinGlyph').textContent = lvl.icon;
+    coinNameEl.textContent = coinName(state.levelIndex) + ' ' + t('coin_word');
     coinNameEl.style.color = lvl.color[0];
-    coinBonusEl.textContent = '+' + formatNumber(getPerClick()) + ' за клик' + (state.critChance > BASE_CRIT_CHANCE ? ' • крит ' + Math.round(state.critChance*100) + '%' : '');
+    coinBonusEl.textContent = t('per_click', { n: formatNumber(getPerClick()) }) + (state.critChance > BASE_CRIT_CHANCE ? ' • ' + t('crit_suffix', { n: Math.round(state.critChance*100) }) : '');
     renderUpgradeMain();
     updateBalanceDisplay();
   }
@@ -1122,11 +4012,11 @@
     if (isMaxed) {
       upgradeMainEl.classList.add('maxed');
       upgradeMainEl.classList.remove('disabled');
-      upgTitleEl.textContent = 'Уровень ' + MAX_LEVEL + ' / ' + MAX_LEVEL;
+      upgTitleEl.textContent = t('level_of', { a: MAX_LEVEL, b: MAX_LEVEL });
       upgArrowEl.textContent = '★';
       upgIconEl.textContent = '🏆';
-      upgNewNameEl.textContent = 'МАКСИМУМ ДОСТИГНУТ';
-      upgDescEl.textContent = 'Ты прокачал монету до конца';
+      upgNewNameEl.textContent = t('maxed_title');
+      upgDescEl.textContent = t('maxed_desc');
       upgBonusEl.textContent = '';
       upgCostEl.textContent = '';
       upgradeMainEl.onclick = null;
@@ -1137,15 +4027,15 @@
     const canBuy = state.balance >= next.cost;
     upgradeMainEl.classList.remove('maxed');
     upgradeMainEl.classList.toggle('disabled', !canBuy);
-    upgTitleEl.textContent = 'Уровень ' + (state.levelIndex + 1) + ' / ' + MAX_LEVEL;
+    upgTitleEl.textContent = t('level_of', { a: state.levelIndex + 1, b: MAX_LEVEL });
     upgArrowEl.textContent = '→';
     upgIconEl.textContent = next.icon;
-    upgNewNameEl.textContent = next.name + ' монета';
+    upgNewNameEl.textContent = coinName(state.levelIndex + 1) + ' ' + t('coin_word');
     upgNewNameEl.style.color = next.color[0];
-    upgDescEl.textContent = `С ${current.name.toLowerCase()} → ${next.name.toLowerCase()}`;
-    upgBonusEl.textContent = '+' + formatNumber(next.bonus * clickMultiplier) + ' за клик';
+    upgDescEl.textContent = t('from_to', { a: coinName(state.levelIndex), b: coinName(state.levelIndex + 1) });
+    upgBonusEl.textContent = t('per_click', { n: formatNumber(next.bonus * clickMultiplier) });
     upgCostEl.textContent = formatNumber(next.cost) + ' BARC';
-    upgCostEl.style.color = canBuy ? '#ffd700' : '#8892b0';
+    upgCostEl.style.color = canBuy ? 'var(--accent)' : 'var(--text-dim)';
     upgradeMainEl.onclick = buyCoinUpgrade;
   }
 
@@ -1157,8 +4047,8 @@
     state.levelIndex++;
     renderCoin();
     updateUpgradesDisplay();
-    saveGame();
-    showToast('🎉 ' + next.name + ' монета открыта!');
+    cloudSave();
+    showToast(t('coin_unlocked', { name: coinName(state.levelIndex) }));
   }
 
   function xpNeeded(lvl) { return Math.floor(XP_PER_LEVEL_BASE * Math.pow(XP_GROWTH, lvl - 1)); }
@@ -1176,35 +4066,35 @@
       state.maxEnergy += 2;
       state.energy = state.maxEnergy;
       updateRank();
-      showToast('⬆️ Уровень ' + state.playerLevel + '! +0.5% крит, +2 энергии');
+      showToast(t('level_up', { n: state.playerLevel }));
     }
     renderPlayerBars();
-    saveGame();
+    cloudSave();
   }
 
   function updateRank() {
     let rank = RANKS[0];
     for (const r of RANKS) if (state.playerLevel >= r.minLvl) rank = r;
-    rankBadge.textContent = state.playerLevel + ' УР.';
-    rankTitle.textContent = rank.title;
+    rankBadge.textContent = state.playerLevel + ' ' + t('level_short');
+    rankTitle.textContent = t(rank.key);
   }
 
   function renderPlayerBars() {
     const ePercent = (state.energy / state.maxEnergy) * 100;
     energyBar.style.width = ePercent + '%';
-    energyText.textContent = Math.floor(state.energy) + ' / ' + state.maxEnergy;
+    energyText.textContent = Math.floor(state.energy) + ' / ' + state.maxEnergy + ' • ' + t('energy');
     if (ePercent < 20) energyBar.style.background = 'linear-gradient(90deg, #ff5252, #b71c1c)';
     else energyBar.style.background = 'linear-gradient(90deg, #ffca28, #ff8f00)';
 
     const need = xpNeeded(state.playerLevel);
     const xPercent = (state.xp / need) * 100;
     xpBar.style.width = xPercent + '%';
-    xpText.textContent = formatNumber(state.xp) + ' / ' + formatNumber(need) + ' XP';
+    xpText.textContent = formatNumber(state.xp) + ' / ' + formatNumber(need) + ' ' + t('xp');
 
-    critStat.textContent = 'Криты: ' + Math.round(state.critChance * 100) + '% • x' + state.critMult;
+    critStat.textContent = t('crit_stat') + ' ' + Math.round(state.critChance * 100) + '% • x' + state.critMult;
 
     const regenInterval = getRegenInterval();
-    regenInfo.textContent = '+1 энергии за ' + regenInterval + ' сек';
+    regenInfo.textContent = t('regen_info', { n: regenInterval });
 
     coinEl.classList.toggle('no-energy', state.energy < ENERGY_PER_CLICK);
   }
@@ -1235,7 +4125,7 @@
       if (state.marketEvent.ticksLeft <= 0) {
         state.marketEvent = null;
         eventTag.className = 'event bull';
-        eventTag.textContent = '📈 Обычный рынок';
+        renderEventTag();
       } else renderEventTag();
     } else if (Math.random() < 0.15) startRandomEvent();
   }
@@ -1249,22 +4139,22 @@
       if (r <= 0) { chosen = e; break; }
     }
     state.marketEvent = {
-      type: chosen.type, name: chosen.name, emoji: chosen.emoji,
+      type: chosen.type, emoji: chosen.emoji,
       ticksLeft: chosen.ticks, effect: chosen.effect
     };
     renderEventTag();
-    showToast(chosen.emoji + ' ' + chosen.name + '!');
+    showToast(chosen.emoji + ' ' + t('event_' + chosen.type) + '!');
   }
 
   function renderEventTag() {
     if (!state.marketEvent) {
       eventTag.className = 'event bull';
-      eventTag.textContent = '📈 Обычный рынок';
+      eventTag.textContent = '📈 ' + t('market_normal');
       return;
     }
     const ev = state.marketEvent;
     eventTag.className = 'event ' + ev.type;
-    eventTag.textContent = ev.emoji + ' ' + ev.name + ' (' + ev.ticksLeft + 'с)';
+    eventTag.textContent = ev.emoji + ' ' + t('event_' + ev.type) + ' (' + ev.ticksLeft + ')';
   }
 
   function updateRate() {
@@ -1298,7 +4188,7 @@
     const oldest = state.priceHistory[0].price;
     const dayPct = ((state.price - oldest) / oldest) * 100;
     dayChangeEl.textContent = (dayPct >= 0 ? '+' : '') + dayPct.toFixed(2) + '%';
-    dayChangeEl.style.color = dayPct >= 0 ? '#00e676' : '#ff5252';
+    dayChangeEl.style.color = dayPct >= 0 ? 'var(--green)' : 'var(--red)';
 
     drawChart();
     tickMarketEvent();
@@ -1308,13 +4198,13 @@
   function updateBalanceDisplay() {
     balanceEl.textContent = formatNumber(state.balance);
     const usd = state.balance * state.price;
-    balanceUsdEl.textContent = `≈ $${formatNumber(usd)} • Продано: $${state.usdBalance.toFixed(2)}`;
+    balanceUsdEl.textContent = `≈ $${formatNumber(usd)} • ${t('sold_label')} $${state.usdBalance.toFixed(2)}`;
     sellBtn.disabled = state.balance < 1;
   }
 
   function handleClick(e) {
     if (state.energy < ENERGY_PER_CLICK) {
-      showToast('⚡ Нет энергии! Подожди восстановления', true);
+      showToast(t('no_energy'), true); playSound('click');
       return;
     }
     state.energy -= ENERGY_PER_CLICK;
@@ -1328,6 +4218,7 @@
     }
 
     state.balance += gain;
+    state.totalEarned += gain;            // суммарный заработок — для сетевого рейтинга
     state.totalClicks++;
     addXP(XP_PER_CLICK);
 
@@ -1347,7 +4238,7 @@
 
     const floatEl = document.createElement('div');
     floatEl.className = 'float-num' + (isCrit ? ' crit' : '');
-    floatEl.textContent = (isCrit ? '💥 КРИТ +' : '+') + formatNumber(gain);
+    floatEl.textContent = (isCrit ? '💥 ' + t('crit_stat').replace(':','') + ' +' : '+') + formatNumber(gain);
     floatEl.style.left = x + 'px';
     floatEl.style.top = y + 'px';
     floatEl.style.transform = 'translate(-50%, -50%)';
@@ -1355,11 +4246,14 @@
     coinZoneEl.appendChild(floatEl);
     setTimeout(() => floatEl.remove(), 900);
 
+    spawnCoinBurst(x, y, isCrit ? 8 : 4);
+    playSound(isCrit ? 'crit' : 'click');
+
     renderPlayerBars();
     updateBalanceDisplay();
     updateUpgradesDisplay();
     renderUpgradeMain();
-    saveGame();
+    cloudSave();
   }
 
   function renderUpgrades() {
@@ -1369,8 +4263,8 @@
       const div = document.createElement('div');
       div.className = 'upgrade' + (canBuy ? '' : ' disabled');
       div.innerHTML = `
-        <div class="upgrade-name">${u.name}</div>
-        <div class="upgrade-effect">${u.effect}</div>
+        <div class="upgrade-name">${t('upg_' + u.id)}</div>
+        <div class="upgrade-effect">${t('eff_' + u.id)}</div>
         <div class="upgrade-cost-small">${formatNumber(u.cost)} BARC${u.bought > 0 ? ' • x' + u.bought : ''}</div>
       `;
       div.onclick = () => buyUpgrade(u);
@@ -1397,13 +4291,14 @@
       case 'auto':       autoPerSec += u.value; break;
     }
 
-    u.cost = Math.floor(u.cost * COST_MULTIPLIER);
+    u.cost = Math.floor(u.cost * UPGRADE_COST_MULT);
     renderUpgrades();
     renderCoin();
     renderPlayerBars();
     updateUpgradesDisplay();
-    saveGame();
-    showToast('✅ ' + u.name + ' куплен!');
+    cloudSave();
+    playSound('buy');
+    showToast(t('upgrade_bought', { name: t('upg_' + u.id) }));
   }
 
   sellBtn.onclick = () => {
@@ -1416,12 +4311,14 @@
     updateBalanceDisplay();
     updateUpgradesDisplay();
     renderUpgradeMain();
-    saveGame();
-    showToast(`💰 $${net.toFixed(2)} (налог $${tax.toFixed(2)})`);
+    cloudSave();
+    playSound('buy');
+    showToast(t('sold_msg', { net: net.toFixed(2), tax: tax.toFixed(2) }));
   };
 
-  resetBtn.onclick = () => {
-    if (!confirm('Сбросить весь прогресс?')) return;
+  resetBtn.onclick = async () => {
+    if (!confirm(t('confirm_reset'))) return;
+    try { await apiPost('/api/save', { save: {} }); } catch(e) {}
     localStorage.removeItem('barcoin_clicker_v5');
     location.reload();
   };
@@ -1431,11 +4328,12 @@
 
     if (autoPerSec > 0) {
       state.balance += autoPerSec;
+      state.totalEarned += autoPerSec;    // автокликер тоже капает в рейтинг
       addXP(1);
       updateBalanceDisplay();
       updateUpgradesDisplay();
       renderUpgradeMain();
-      saveGame();
+      cloudSave();
     }
 
     if (state.energy < state.maxEnergy) {
@@ -1456,6 +4354,7 @@
       balance: state.balance,
       levelIndex: state.levelIndex,
       usdBalance: state.usdBalance,
+      totalEarned: state.totalEarned,
       totalClicks: state.totalClicks,
       energy: state.energy,
       maxEnergy: state.maxEnergy,
@@ -1480,6 +4379,7 @@
         balance: d.balance || 0,
         levelIndex: d.levelIndex || 0,
         usdBalance: d.usdBalance || 0,
+        totalEarned: d.totalEarned || (d.balance || 0),
         totalClicks: d.totalClicks || 0,
         energy: d.energy ?? MAX_ENERGY,
         maxEnergy: d.maxEnergy || MAX_ENERGY,
@@ -1504,6 +4404,417 @@
     } catch(e) { console.log('Ошибка загрузки', e); }
   }
 
+  // ================================================================
+  // АВТОРИЗАЦИЯ / РЕГИСТРАЦИЯ / БАЗА ДАННЫХ (сервер server.py: SQLite)
+  // Вход в игру возможен только после авторизации (или как гость — локально).
+  // OAuth VK / Google / Яндекс / Discord — по-настоящему: сервер делает
+  // Authorization Code + PKCE редирект на страницу входа провайдера.
+  // ================================================================
+  const AUTH_TOKEN_KEY = 'barcoin_auth_token';
+  const GUEST_KEY = 'barcoin_guest_ok';
+  let currentUser = null;      // {id, login, email, provider, avatar_url}
+  let authToken = localStorage.getItem(AUTH_TOKEN_KEY) || '';
+  let serverOnline = false;
+  let cloudSaveTimer = null;
+
+  async function api(path, opts = {}) {
+    const headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+    if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+    const res = await fetch(path, { ...opts, headers });
+    let data = {};
+    try { data = await res.json(); } catch(e) {}
+    if (!res.ok) { const err = new Error(data.error || ('HTTP ' + res.status)); err.code = data.code; throw err; }
+    return data;
+  }
+  const apiPost = (path, body) => api(path, { method: 'POST', body: JSON.stringify(body || {}) });
+  const apiGet  = (path) => api(path);
+
+  // --- гейт: блокирует игру до входа ---
+  const authGateEl = $('authGate');
+  function lockGame() { authGateEl.classList.remove('hidden'); document.body.classList.add('locked'); }
+  function unlockGame() { authGateEl.classList.add('hidden'); document.body.classList.remove('locked'); }
+
+  // --- индикатор состояния SQL-базы данных на экране входа ---
+  async function refreshDbBadge() {
+    const el = $('dbBadge');
+    if (!el) return;
+    try {
+      const d = await apiGet('/api/db_status');
+      if (d.ok && d.engine === 'mysql') {
+        el.className = 'db-badge ok';
+        el.innerHTML = '🗄️ <b>MySQL</b> · ' + t('db_ok_mysql');
+      } else if (d.ok) {
+        el.className = 'db-badge warn';
+        el.innerHTML = '🗄️ <b>SQLite</b> · ' + t('db_ok_sqlite');
+      } else {
+        throw new Error('bad');
+      }
+    } catch (e) {
+      el.className = 'db-badge bad';
+      el.innerHTML = '⚠️ ' + t('db_down');
+    }
+  }
+
+  // --- чип пользователя в шапке ---
+  function renderUserChip() {
+    const chip = $('userChip');
+    if (!chip) return;
+    if (!currentUser) { chip.hidden = true; chip.innerHTML = ''; return; }
+    chip.hidden = false;
+    chip.innerHTML = '';
+    const av = document.createElement('img');
+    av.style.cssText = 'width:22px;height:22px;border-radius:50%;object-fit:contain;background:var(--accent-soft)';
+    av.src = currentUser.avatar || 'image/coin.png';
+    av.alt = '';
+    const name = document.createElement('span');
+    name.className = 'chip-login';
+    name.textContent = currentUser.login;
+    const status = document.createElement('span');
+    status.className = 'chip-status' + (serverOnline ? '' : ' offline');
+    status.textContent = serverOnline ? t('cloud_saved') : t('server_off');
+    const out = document.createElement('button');
+    out.textContent = t('logout');
+    out.onclick = logout;
+    chip.append(av, name, status, out);
+  }
+
+  // --- облачное сохранение прогресса ---
+  function cloudSave() {
+    saveGame();                                  // локальная копия — всегда
+    if (!serverOnline || !currentUser) return;   // без аккаунта — только localStorage
+    clearTimeout(cloudSaveTimer);
+    cloudSaveTimer = setTimeout(async () => {
+      try { await apiPost('/api/save', { save: snapshotData() }); refreshNetworkStats(); } catch(e) {}
+    }, 1500);
+  }
+
+  function snapshotData() {
+    return {
+      balance: state.balance, levelIndex: state.levelIndex, usdBalance: state.usdBalance,
+      totalEarned: state.totalEarned,
+      totalClicks: state.totalClicks, energy: state.energy, maxEnergy: state.maxEnergy,
+      energyProgress: state.energyProgress, xp: state.xp, playerLevel: state.playerLevel,
+      critChance: state.critChance, critMult: state.critMult, price: state.price,
+      priceHistory: state.priceHistory.slice(-CHART_POINTS), autoPerSec, clickMultiplier,
+      upgrades: upgrades.map(u => ({ bought: u.bought, cost: u.cost }))
+    };
+  }
+  function applySnapshot(d) {
+    if (!d || typeof d !== 'object' || d.balance === undefined) return false;
+    Object.assign(state, {
+      balance: d.balance || 0, levelIndex: d.levelIndex || 0, usdBalance: d.usdBalance || 0,
+      totalEarned: Math.max(d.totalEarned || 0, d.balance || 0),
+      totalClicks: d.totalClicks || 0, energy: d.energy ?? MAX_ENERGY,
+      maxEnergy: d.maxEnergy || MAX_ENERGY, energyProgress: d.energyProgress || 0,
+      xp: d.xp || 0, playerLevel: d.playerLevel || 1,
+      critChance: d.critChance || BASE_CRIT_CHANCE, critMult: d.critMult || BASE_CRIT_MULT,
+      price: d.price || 1.0, priceHistory: d.priceHistory || []
+    });
+    autoPerSec = d.autoPerSec || 0;
+    clickMultiplier = d.clickMultiplier || 1;
+    if (Array.isArray(d.upgrades)) d.upgrades.forEach((u, i) => {
+      if (upgrades[i]) { upgrades[i].bought = u.bought || 0; if (u.cost) upgrades[i].cost = u.cost; }
+    });
+    return true;
+  }
+
+  // --- вход/выход ---
+  async function pullCloudSave() {
+    try {
+      const d = await apiGet('/api/save');
+      if (d && d.ok && applySnapshot(d.save)) {
+        updateRank(); renderUpgrades(); renderCoin(); renderPlayerBars();
+        updateUpgradesDisplay(); updateBalanceDisplay(); drawChart();
+        saveGame();
+        showToast(t('sync_done'));
+      }
+    } catch(e) {}
+  }
+  function afterLogin(user) {
+    currentUser = user;
+    localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+    unlockGame();
+    renderUserChip();
+    showToast(t('welcome', { name: user.login }));
+    pullCloudSave();
+  }
+  async function logout() {
+    try { await apiPost('/api/logout', {}); } catch(e) {}
+    localStorage.removeItem(GUEST_KEY);          // после выхода — снова нужен вход
+    location.reload();
+  }
+
+  // --- переключение вкладок Вход/Регистрация ---
+  const tabLoginEl = $('tabLogin'), tabRegisterEl = $('tabRegister');
+  const loginFormEl = $('loginForm'), registerFormEl = $('registerForm');
+  function showAuthTab(reg) {
+    tabLoginEl.classList.toggle('active', !reg);
+    tabRegisterEl.classList.toggle('active', reg);
+    loginFormEl.style.display = reg ? 'none' : '';
+    registerFormEl.style.display = reg ? '' : 'none';
+    $('loginError').textContent = ''; $('regError').textContent = '';
+  }
+  tabLoginEl.onclick = () => showAuthTab(false);
+  tabRegisterEl.onclick = () => showAuthTab(true);
+  $('goRegister').onclick = e => { e.preventDefault(); showAuthTab(true); };
+  $('goLogin').onclick = e => { e.preventDefault(); showAuthTab(false); };
+
+  const LOGIN_RE = /^[A-Za-zА-Яа-яЁё0-9_.\-]{3,32}$/;
+  const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/;
+
+  loginFormEl.addEventListener('submit', async e => {
+    e.preventDefault();
+    const errEl = $('loginError'), btn = $('liSubmit');
+    errEl.textContent = ''; errEl.classList.remove('auth-ok');
+    const login = $('liLogin').value.trim(), pass = $('liPass').value;
+    if (!LOGIN_RE.test(login)) { errEl.textContent = t('err_bad_login'); return; }
+    if (pass.length < 6) { errEl.textContent = t('err_weak'); return; }
+    btn.disabled = true;
+    try {
+      const d = await apiPost('/api/login', { login, password: pass, lang: settings.lang });
+      authToken = d.token;
+      afterLogin(d.user);
+    } catch(err) {
+      serverOnline = !!(err && err.code);   // HTTP-ответ был => сервер жив
+      const code = err && err.code;
+      if (!serverOnline || code === undefined) errEl.textContent = t('err_offline');
+      else errEl.textContent = t(code === 'bad_credentials' ? 'err_bad_credentials'
+                                : code === 'weak_password' ? 'err_weak' : 'err_bad_login');
+    } finally { btn.disabled = false; }
+  });
+
+  registerFormEl.addEventListener('submit', async e => {
+    e.preventDefault();
+    const errEl = $('regError'), btn = $('rgSubmit');
+    errEl.textContent = ''; errEl.classList.remove('auth-ok');
+    const login = $('rgLogin').value.trim(), email = $('rgEmail').value.trim();
+    const pass = $('rgPass').value, pass2 = $('rgPass2').value;
+    if (!LOGIN_RE.test(login)) { errEl.textContent = t('err_bad_login'); return; }
+    if (!EMAIL_RE.test(email)) { errEl.textContent = t('err_bad_email'); return; }
+    if (pass.length < 6) { errEl.textContent = t('err_weak'); return; }
+    if (pass !== pass2) { errEl.textContent = t('err_mismatch'); return; }
+    btn.disabled = true;
+    try {
+      const d = await apiPost('/api/register', { login, email, password: pass, lang: settings.lang });
+      authToken = d.token;
+      afterLogin(d.user);
+    } catch(err) {
+      serverOnline = !!(err && err.code);   // HTTP-ответ был => сервер жив
+      const rmap = { bad_login: 'err_bad_login', bad_email: 'err_bad_email',
+                     weak_password: 'err_weak', password_mismatch: 'err_mismatch',
+                     login_taken: 'err_login_taken', email_taken: 'err_email_taken' };
+      const code = err && err.code;
+      errEl.textContent = (code && rmap[code]) ? t(rmap[code]) : t('err_offline');
+    } finally { btn.disabled = false; }
+  });
+
+  // --- соцсети: настоящий OAuth через сервер (/auth/<p>/start → редирект провайдера) ---
+  document.querySelectorAll('.social-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const provider = btn.dataset.provider;
+      const w = window.open('/auth/' + provider + '/start', 'oauth_' + provider, 'width=520,height=720');
+      if (!w) showToast(t('oauth_popup'), true);
+    });
+  });
+  // результат из localStorage (на случай, если postMessage не дошёл)
+  window.addEventListener('storage', ev => {
+    if (ev.key !== 'barcoin_oauth_result' || !ev.newValue) return;
+    let d = null; try { d = JSON.parse(ev.newValue); } catch(e) {}
+    if (!d) return;
+    localStorage.removeItem('barcoin_oauth_result');
+    if (d.ok && authToken) {
+      apiGet('/api/me').then(r => { if (r.ok && r.user) afterLogin(r.user); }).catch(() => {});
+    } else if (!d.ok) {
+      const map = { denied: 'err_denied', state_mismatch: 'err_state_mismatch',
+                    exchange_failed: 'err_exchange_failed', no_identity: 'err_no_identity',
+                    not_configured: 'err_not_configured' };
+      showToast(t(map[d.error] || 'err_exchange_failed'), true);
+    }
+  });
+
+  // --- приём результата OAuth из popup-окна ---
+  window.addEventListener('message', ev => {
+    const d = ev.data;
+    if (!d || d.type !== 'barcoin-oauth') return;
+    if (d.ok && d.token) {
+      authToken = d.token;
+      try { localStorage.setItem(AUTH_TOKEN_KEY, authToken); } catch(e) {}
+      apiGet('/api/me').then(r => afterLogin(r.user)).catch(() => location.reload());
+    } else if (d.ok) {
+      // успех пришёл через /?token=... в этом же окне — обработан ниже при старте
+    } else if (d.error) {
+      const map = { denied: 'err_denied', state: 'err_state_mismatch', state_mismatch: 'err_state_mismatch',
+                    exchange: 'err_exchange_failed', exchange_failed: 'err_exchange_failed',
+                    identity: 'err_no_identity', no_identity: 'err_no_identity',
+                    not_configured: 'err_not_configured' };
+      showToast(t(map[d.error] || 'err_exchange_failed'), true);
+    }
+  });
+
+  // --- гость (локальная игра без аккаунта) ---
+  $('guestSkip').onclick = () => {
+    // Игра сетевая: без аккаунта играть нельзя — открываем вкладку регистрации
+    showAuthTab(true);
+    const errEl = $('regError');
+    if (errEl) { errEl.textContent = t('need_account'); errEl.classList.remove('auth-ok'); }
+    try { $('rgLogin').focus(); } catch(e) {}
+  };
+
+  // --- язык внутри форм входа/регистрации ---
+  function buildAuthLangSelect() {
+    const sel = $('authLangSelect');
+    if (!sel) return;
+    sel.innerHTML = '';
+    Object.entries(LANG_NAMES).sort((a,b) => a[1].localeCompare(b[1])).forEach(([code, name]) => {
+      const opt = document.createElement('option');
+      opt.value = code; opt.textContent = name;
+      if (code === settings.lang) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+  $('authLangSelect').addEventListener('change', e => { if (e.target.value) setLanguage(e.target.value); });
+
+  // --- проверка сессии при старте; результат — в window.__authReady ---
+  window.__authReady = (async () => {
+    refreshDbBadge();
+    // параметры от OAuth-callback (?token=... или ошибка)
+    const qp = new URLSearchParams(location.search);
+    if (qp.get('oauth') === '1' && qp.get('token')) {
+      authToken = qp.get('token');
+      localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+      try { window.opener && window.opener.postMessage({ type: 'barcoin-oauth', ok: true, token: authToken }, '*'); } catch(e) {}
+      history.replaceState(null, '', location.pathname);
+    } else if (qp.get('oauth') === '1') {
+      const emap = { access_denied: 'err_denied', state: 'err_state_mismatch', exchange: 'err_exchange_failed', identity: 'err_no_identity' };
+      try { window.opener && window.opener.postMessage({ type: 'barcoin-oauth', ok: false, error: emap[qp.get('err')] || 'exchange' }, '*'); } catch(e) {}
+      history.replaceState(null, '', location.pathname);
+    }
+    try {
+      const d = await apiGet('/api/me');
+      serverOnline = true;
+      if (d.ok && d.user) { currentUser = d.user; return; }
+    } catch(e) {
+      serverOnline = false;
+      if (authToken) { localStorage.removeItem(AUTH_TOKEN_KEY); authToken = ''; }
+    }
+  })();
+
+  // ================================================================
+  // СЕТЕВОЙ СЧЁТЧИК ИГРОКОВ + РЕЙТИНГ (данные с сервера, /api/leaderboard)
+  // ================================================================
+  let lbData = null;                 // последний ответ /api/leaderboard
+  const LB_REFRESH_MS = 15000;       // автообновление каждые 15 секунд
+
+  function renderLeaderboard() {
+    const list = $('lbList');
+    if (!list) return;
+    list.innerHTML = '';
+    const info = $('lbInfo'), hint = $('lbRefreshHint');
+    if (!serverOnline || !lbData) {
+      if (info) info.textContent = t('lb_offline');
+      if (hint) hint.textContent = '';
+      const empty = document.createElement('div');
+      empty.className = 'lb-empty';
+      empty.textContent = t('lb_offline');
+      list.appendChild(empty);
+      return;
+    }
+    if (info) info.textContent = t('lb_total', { n: lbData.total_players || 0 }) +
+                                 ' • ' + t('lb_online', { n: lbData.online || 0 });
+    if (hint) hint.textContent = t('lb_top');
+    const rows = lbData.leaderboard || [];
+    if (!rows.length) {
+      const empty = document.createElement('div');
+      empty.className = 'lb-empty';
+      empty.textContent = t('lb_empty');
+      list.appendChild(empty);
+      return;
+    }
+    rows.slice(0, 50).forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'lb-row' + (currentUser && p.login === currentUser.login ? ' me' : '');
+      const pos = document.createElement('span');
+      pos.className = 'lb-pos';
+      pos.textContent = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1);
+      const ava = document.createElement('img');
+      ava.className = 'lb-ava';
+      ava.src = p.avatar || 'image/coin.png';   // логотип-монетка как аватар по умолчанию
+      ava.alt = '';
+      ava.onerror = () => { ava.onerror = null; ava.src = 'image/coin.png'; };
+      const name = document.createElement('span');
+      name.className = 'lb-name';
+      name.textContent = p.login + (currentUser && p.login === currentUser.login ? ' (' + t('lb_you') + ')' : '');
+      const dot = document.createElement('span');
+      dot.className = p.online ? 'lb-online-tag' : 'lb-offline-tag';
+      dot.title = p.online ? t('lb_online', { n: 1 }) : t('lb_offline');
+      const earned = document.createElement('span');
+      earned.className = 'lb-earned';
+      earned.textContent = formatNumber(p.earned || 0) + ' ' + t('lb_earned');
+      const meta = document.createElement('span');
+      meta.className = 'lb-meta';
+      meta.textContent = t('lb_level', { n: p.level || 1 }) + ' • ' + (p.clicks || 0) + ' ' + t('lb_clicks');
+      row.append(pos, ava, name, dot, earned, meta);
+      list.appendChild(row);
+    });
+  }
+
+  async function refreshNetworkStats() {
+    try {
+      const d = await apiGet('/api/leaderboard');
+      serverOnline = true;
+      lbData = d;
+      const dot = $('onlineDot');
+      if (dot) { dot.classList.remove('dead'); dot.classList.add('live'); }
+      const oc = $('onlineCount');
+      if (oc) oc.textContent = t('lb_online', { n: d.online || 0 });
+      const mr = $('myRank');
+      if (mr) mr.textContent = d.me_rank ? t('lb_my_rank', { n: d.me_rank }) : t('lb_me');
+      const rowEl = $('onlineRow');
+      if (rowEl) rowEl.title = t('lb_total', { n: d.total_players || 0 });
+      renderUserChip();
+      if ($('lbOverlay') && $('lbOverlay').classList.contains('open')) renderLeaderboard();
+    } catch (err) {
+      // сервер недоступен — честно показываем это в счётчике
+      serverOnline = !!(err && err.code);   // HTTP-ответ был => сервер жив
+      const dot = $('onlineDot');
+      if (dot) { dot.classList.remove('live'); dot.classList.add('dead'); }
+      const oc = $('onlineCount');
+      if (oc) oc.textContent = t('lb_offline');
+      if ($('lbOverlay') && $('lbOverlay').classList.contains('open')) renderLeaderboard();
+    }
+  }
+  setInterval(refreshNetworkStats, LB_REFRESH_MS);
+
+  // открытие/закрытие окна рейтинга
+  const lbOverlayEl = $('lbOverlay');
+  function openLeaderboard() {
+    renderLeaderboard();
+    lbOverlayEl.classList.add('open');
+    requestAnimationFrame(() => lbOverlayEl.classList.add('visible'));
+    refreshNetworkStats();
+  }
+  function closeLeaderboard() {
+    lbOverlayEl.classList.remove('visible');
+    setTimeout(() => lbOverlayEl.classList.remove('open'), 250);
+  }
+  if ($('lbOpenBtn')) $('lbOpenBtn').onclick = openLeaderboard;
+  if ($('lbClose')) $('lbClose').onclick = closeLeaderboard;
+  if (lbOverlayEl) lbOverlayEl.addEventListener('click', e => { if (e.target === lbOverlayEl) closeLeaderboard(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLeaderboard(); });
+
+  // ================================================================
+  // СТАРТ ИГРЫ
+  // ================================================================
+  loadSettings();
+  currentLang = settings.lang;
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = (currentLang === 'he' || currentLang === 'ar') ? 'rtl' : 'ltr';
+  applyTheme(settings.theme);
+  applyStaticTranslations();
+  buildThemeGrid();
+  buildLangSelect('');
+  buildAuthLangSelect();
+
   loadGame();
   updateRank();
   renderUpgrades();
@@ -1511,6 +4822,58 @@
   renderPlayerBars();
   updateUpgradesDisplay();
   coinEl.addEventListener('click', handleClick);
+
+  // Игра закрыта экраном входа, пока игрок не авторизуется (или не выберет гостевой режим)
+  lockGame();
+  window.__authReady.then(async () => {
+    refreshNetworkStats();   // счётчик игроков и онлайн-статус — сразу при старте
+    renderUserChip();
+    if (currentUser) {
+      // аккаунт найден — грузим облачное сохранение (облако важнее локальной копии)
+      await pullCloudSave();
+      unlockGame();
+    } else if (localStorage.getItem(GUEST_KEY) === '1') {
+      delete localStorage[GUEST_KEY];   // гостевой режим убран: игра сетевая
+    }
+    // иначе остаёмся на экране авторизации — в игру вход закрыт
+  });
+
+  // ================================================================
+  // НАСТРОЙКИ: открытие/закрытие, выбор темы, языка, переключатели
+  // ================================================================
+  const overlay = $('settingsOverlay');
+
+  function openSettings() {
+    buildThemeGrid();
+    buildLangSelect($('langSearch').value);
+    overlay.classList.add('open');
+    requestAnimationFrame(() => overlay.classList.add('visible'));
+  }
+  function closeSettings() {
+    overlay.classList.remove('visible');
+    setTimeout(() => overlay.classList.remove('open'), 250);
+  }
+
+  $('settingsBtn').onclick = openSettings;
+  $('settingsClose').onclick = closeSettings;
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeSettings(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSettings(); });
+
+  $('langSearch').addEventListener('input', () => buildLangSelect($('langSearch').value));
+  $('langSelect').addEventListener('change', e => { if (e.target.value) setLanguage(e.target.value); });
+
+  $('soundToggle').checked = settings.sounds;
+  $('soundToggle').addEventListener('change', e => {
+    settings.sounds = e.target.checked;
+    saveSettings();
+    if (settings.sounds) playSound('buy');
+  });
+
+  $('coinFxToggle').checked = settings.coinFx;
+  $('coinFxToggle').addEventListener('change', e => {
+    settings.coinFx = e.target.checked;
+    saveSettings();
+  });
   window.addEventListener('resize', resizeCanvas);
   window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 200));
 

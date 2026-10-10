@@ -1,0 +1,6 @@
+{
+  "vk":       { "client_id": "ВАШ_APP_ID_VK", "client_secret": "", "scope": "userinfo" },
+  "google":   { "client_id": "ВАШ_CLIENT_ID.apps.googleusercontent.com", "client_secret": "ВАШ_SECRET" },
+  "yandex":   { "client_id": "ВАШ_OAUTH_YANDEX_ID", "client_secret": "ВАШ_SECRET" },
+  "discord":  { "client_id": "ВАШ_DISCORD_CLIENT_ID", "client_secret": "ВАШ_SECRET" }
+}
