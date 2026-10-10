@@ -88,6 +88,16 @@ def init_db():
         updated_at REAL NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+    -- сетевой рейтинг: заработок каждого игрока + время последнего действия (онлайн-статус)
+    CREATE TABLE IF NOT EXISTS stats(
+        user_id   INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+        earned    REAL NOT NULL DEFAULT 0,
+        balance   REAL NOT NULL DEFAULT 0,
+        clicks    INTEGER NOT NULL DEFAULT 0,
+        level     INTEGER NOT NULL DEFAULT 1,
+        last_seen REAL NOT NULL DEFAULT 0
+    );
+    CREATE INDEX IF NOT EXISTS idx_stats_earned ON stats(earned DESC);
     ''')
     conn.commit()
     conn.close()
@@ -389,6 +399,50 @@ class Handler(SimpleHTTPRequestHandler):
             save = json.loads(srow['data']) if srow else None
             return self.send_json({'ok': True, 'save': save,
                                    'saved_at': srow['updated_at'] if srow else None})
+        if path == '/api/online':
+            # сколько игроков сейчас в сети (активны за последние 2 минуты)
+            conn = db()
+            n = conn.execute(
+                "SELECT COUNT(*) c FROM stats WHERE last_seen > ?",
+                (time.time() - 120,)).fetchone()['c']
+            conn.close()
+            return self.send_json({'ok': True, 'online': n})
+        if path == '/api/leaderboard':
+            # сетевой рейтинг: кто больше всех заработал + текущий онлайн
+            limit = 50
+            try:
+                limit = max(1, min(100, int((qs.get('limit') or ['50'])[0])))
+            except ValueError:
+                pass
+            now = time.time()
+            conn = db()
+            rows = conn.execute(
+                '''SELECT u.login login, u.avatar_url avatar, s.earned earned,
+                          s.balance balance, s.clicks clicks, s.level level,
+                          s.last_seen last_seen
+                   FROM stats s JOIN users u ON u.id = s.user_id
+                   ORDER BY s.earned DESC LIMIT ?''', (limit,)).fetchall()
+            online = conn.execute(
+                "SELECT COUNT(*) c FROM stats WHERE last_seen > ?",
+                (now - 120,)).fetchone()['c']
+            total = conn.execute("SELECT COUNT(*) c FROM stats").fetchone()['c']
+            me_rank = None
+            bearer_row = session_user(self.bearer())
+            if bearer_row:
+                mine = conn.execute('SELECT earned FROM stats WHERE user_id=?',
+                                    (bearer_row['id'],)).fetchone()
+                if mine:
+                    me_rank = conn.execute(
+                        'SELECT COUNT(*) c FROM stats WHERE earned > ?',
+                        (mine['earned'],)).fetchone()['c'] + 1
+            conn.close()
+            lb = [{'login': r['login'], 'avatar': r['avatar'],
+                   'earned': r['earned'], 'balance': r['balance'],
+                   'clicks': r['clicks'], 'level': r['level'],
+                   'online': bool(now - r['last_seen'] < 120)} for r in rows]
+            return self.send_json({'ok': True, 'leaderboard': lb,
+                                   'online': online, 'total_players': total,
+                                   'me_rank': me_rank})
         return self.send_json({'ok': False, 'error': 'not_found'}, 404)
 
     def api_post(self, path):
@@ -400,7 +454,9 @@ class Handler(SimpleHTTPRequestHandler):
             login = (body.get('login') or '').strip()
             email = (body.get('email') or '').strip().lower()
             password = body.get('password') or ''
-            confirm = body.get('confirm') or ''
+            # подтверждение пароля проверяет фронтенд; сервер сверяет, только
+            # если поле прислали (иначе это не ошибка формата)
+            confirm = body.get('confirm')
             lang = body.get('lang') if body.get('lang') in (
                 'ru','en','de','fr','es','pt','el','tr','zh','th','ja','ko',
                 'pl','uk','hi','fi','no','he','ar') else 'ru'
@@ -410,7 +466,7 @@ class Handler(SimpleHTTPRequestHandler):
                 return self.send_json({'ok': False, 'error': 'bad_email'}, 400)
             if len(password) < PASSWORD_MIN:
                 return self.send_json({'ok': False, 'error': 'weak_password'}, 400)
-            if password != confirm:
+            if confirm is not None and password != confirm:
                 return self.send_json({'ok': False, 'error': 'password_mismatch'}, 400)
             conn = db()
             if conn.execute('SELECT 1 FROM users WHERE login=? COLLATE NOCASE', (login,)).fetchone():
@@ -497,10 +553,28 @@ class Handler(SimpleHTTPRequestHandler):
             if len(payload) > 1024 * 1024:
                 return self.send_json({'ok': False, 'error': 'too_large'}, 413)
             conn = db()
+            # защита от накрутки рейтинга: сервер хранит МАКСИМУМ достижений,
+            # поэтому переписать результат меньшим значением нельзя
+            prev = conn.execute('SELECT earned FROM stats WHERE user_id=?', (row['id'],)).fetchone()
+            prev_earned = float(prev['earned']) if prev else 0.0
+            def num(key, default=0.0):
+                try: return max(0.0, float(save.get(key, default)))
+                except (TypeError, ValueError): return default
+            earned = max(prev_earned, num('totalEarned'))
+            balance = num('balance')
+            clicks = int(num('totalClicks'))
+            lvl = int(num('playerLevel', 1))
             conn.execute(
                 'INSERT INTO saves(user_id,data,updated_at) VALUES(?,?,?) '
                 'ON CONFLICT(user_id) DO UPDATE SET data=excluded.data, updated_at=excluded.updated_at',
                 (row['id'], payload, time.time()))
+            conn.execute(
+                'INSERT INTO stats(user_id,earned,balance,clicks,level,last_seen) VALUES(?,?,?,?,?,?) '
+                'ON CONFLICT(user_id) DO UPDATE SET '
+                'earned=MAX(stats.earned,excluded.earned), balance=excluded.balance, '
+                'clicks=MAX(stats.clicks,excluded.clicks), level=MAX(stats.level,excluded.level), '
+                'last_seen=excluded.last_seen',
+                (row['id'], earned, balance, clicks, lvl, time.time()))
             conn.commit()
             conn.close()
             return self.send_json({'ok': True, 'saved_at': time.time()})
