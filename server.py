@@ -30,7 +30,6 @@ API:
 import os
 import re
 import json
-import sqlite3
 import hashlib
 import secrets
 import base64
@@ -53,56 +52,233 @@ PASSWORD_MIN = 6
 PROVIDERS = ('vk', 'google', 'yandex', 'discord')
 
 
-# ===================== База данных =====================
-def db():
+# ===================== База данных (SQL) =====================
+# Поддерживаются ДВЕ настоящие SQL-СУБД:
+#   1. MySQL / MariaDB — основная «настоящая» база данных.
+#      Включается файлом db_config.json или переменными окружения:
+#        DB_ENGINE=mysql  MYSQL_HOST=127.0.0.1  MYSQL_PORT=3306
+#        MYSQL_USER=barcoin  MYSQL_PASSWORD=...  MYSQL_DB=barcoin
+#      (или через сокет: MYSQL_SOCKET=/run/mysqld/mysqld.sock)
+#      Установка:  apt install mariadb-server && service mariadb start
+#                  mysql -e "CREATE DATABASE barcoin; CREATE USER 'barcoin'@'localhost' IDENTIFIED BY '...'; GRANT ALL ON barcoin.* TO 'barcoin'@'localhost';"
+#                  pip install pymysql
+#   2. SQLite — встроенная резервная SQL-база (файл barcoin.db), работает
+#      всегда и без установки чего-либо. Если MySQL недоступен, сервер
+#      автоматически продолжает работу на SQLite — поэтому сервер доступен
+#      ВСЕГДА. Все запросы пишутся в универсальном SQL-диалекте.
+try:
+    import sqlite3
+except ImportError:
+    sqlite3 = None
+try:
+    import pymysql
+    import pymysql.cursors
+except ImportError:
+    pymysql = None
+
+MYSQL_CFG = {}
+if os.path.exists('db_config.json'):
+    try:
+        with open('db_config.json', encoding='utf-8') as f:
+            MYSQL_CFG = json.load(f)
+    except Exception:
+        MYSQL_CFG = {}
+for _k in ('host', 'port', 'user', 'password', 'database', 'socket'):
+    _env = os.environ.get('MYSQL_' + _k.upper())
+    if _env is not None:
+        MYSQL_CFG[_k] = int(_env) if _k == 'port' else _env
+
+
+class Row(dict):
+    """Совместимость: строки MySQL доступны и как row['col'], и как row[i]."""
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return list(self.values())[key]
+        return dict.__getitem__(self, key)
+
+
+class DB:
+    """Универсальный тонкий слой: %s-параметры, ? -> %s, авто-реконнект."""
+    def __init__(self, conn, engine):
+        self.conn = conn
+        self.engine = engine
+
+    def execute(self, sql, params=()):
+        if self.engine == 'sqlite':
+            sql = sql.replace('%s', '?')
+        cur = self.conn.cursor()
+        cur.execute(sql, tuple(params))
+        return cur
+
+    def commit(self):
+        self.conn.commit()
+
+    def close(self):
+        try:
+            self.conn.close()
+        except Exception:
+            pass
+
+
+def _connect():
+    if pymysql is not None and MYSQL_CFG:
+        kw = dict(
+            host=MYSQL_CFG.get('host', '127.0.0.1'),
+            port=int(MYSQL_CFG.get('port', 3306)),
+            user=MYSQL_CFG.get('user', 'root'),
+            password=MYSQL_CFG.get('password', ''),
+            database=MYSQL_CFG.get('database', 'barcoin'),
+            charset='utf8mb4',
+            autocommit=False,
+            cursorclass=pymysql.cursors.DictCursor,
+        )
+        if MYSQL_CFG.get('socket'):
+            kw['unix_socket'] = MYSQL_CFG['socket']
+            kw.pop('host'); kw.pop('port')
+        return DB(pymysql.connect(**kw), 'mysql')
+    if sqlite3 is None:
+        raise RuntimeError('Нет ни pymysql, ни sqlite3')
     conn = sqlite3.connect(DB_PATH, timeout=15)
     conn.row_factory = sqlite3.Row
     conn.execute('PRAGMA journal_mode=WAL')
     conn.execute('PRAGMA synchronous=FULL')
     conn.execute('PRAGMA foreign_keys=ON')
-    return conn
+    return DB(conn, 'sqlite')
+
+
+def db():
+    """Возвращает соединение с живой СУБД (MySQL при доступности, иначе SQLite)."""
+    global _DB_MODE
+    if _DB_MODE == 'auto' and pymysql is not None and MYSQL_CFG:
+        try:
+            c = _connect()
+            c.execute('SELECT 1').fetchone()
+            _DB_MODE = 'mysql'
+            print('[db] подключено к MySQL/MariaDB: %s' % (MYSQL_CFG.get('host') or MYSQL_CFG.get('socket')))
+            return c
+        except Exception as e:
+            print('[db] MySQL недоступен (%s) — работаю на резервной SQLite' % e)
+            _DB_MODE = 'none'
+    if _DB_MODE == 'mysql':
+        try:
+            return _connect()
+        except Exception as e:
+            print('[db] MySQL потеряно (%s) — перехожу на SQLite' % e)
+            _DB_MODE = 'none'
+    return _connect()
+
+
+def db_engine():
+    c = db(); eng = c.engine; c.close()
+    return eng
+
+
+_DB_MODE = 'auto'   # auto | mysql | none(=sqlite)
+
+_SQLITE_SCHEMA = '''
+CREATE TABLE IF NOT EXISTS users(
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    login         TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    email         TEXT NOT NULL COLLATE NOCASE,
+    pass_salt     TEXT,
+    pass_hash     TEXT,
+    provider      TEXT,
+    provider_uid  TEXT,
+    avatar_url    TEXT,
+    created_at    REAL NOT NULL,
+    UNIQUE(provider, provider_uid)
+);
+CREATE TABLE IF NOT EXISTS sessions(
+    token      TEXT PRIMARY KEY,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at REAL NOT NULL,
+    expires_at REAL NOT NULL
+);
+CREATE TABLE IF NOT EXISTS saves(
+    user_id  INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    data     TEXT NOT NULL,
+    updated_at REAL NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+CREATE TABLE IF NOT EXISTS stats(
+    user_id   INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    earned    REAL NOT NULL DEFAULT 0,
+    balance   REAL NOT NULL DEFAULT 0,
+    clicks    INTEGER NOT NULL DEFAULT 0,
+    level     INTEGER NOT NULL DEFAULT 1,
+    last_seen REAL NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_stats_earned ON stats(earned DESC);
+'''
+
+_MYSQL_SCHEMA = [
+    "CREATE TABLE IF NOT EXISTS users("
+    " id BIGINT AUTO_INCREMENT PRIMARY KEY,"
+    " login VARCHAR(64) NOT NULL,"
+    " email VARCHAR(255) NOT NULL,"
+    " pass_salt VARCHAR(64),"
+    " pass_hash VARCHAR(128),"
+    " provider VARCHAR(32),"
+    " provider_uid VARCHAR(191),"
+    " avatar_url TEXT,"
+    " created_at DOUBLE NOT NULL,"
+    " UNIQUE KEY uq_login (login),"
+    " UNIQUE KEY uq_email (email),"
+    " UNIQUE KEY uq_provider (provider, provider_uid)"
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+    "CREATE TABLE IF NOT EXISTS sessions("
+    " token VARCHAR(64) PRIMARY KEY,"
+    " user_id BIGINT NOT NULL,"
+    " created_at DOUBLE NOT NULL,"
+    " expires_at DOUBLE NOT NULL,"
+    " KEY idx_sessions_user (user_id),"
+    " CONSTRAINT fk_sess_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+    "CREATE TABLE IF NOT EXISTS saves("
+    " user_id BIGINT PRIMARY KEY,"
+    " data LONGTEXT NOT NULL,"
+    " updated_at DOUBLE NOT NULL,"
+    " CONSTRAINT fk_save_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+    "CREATE TABLE IF NOT EXISTS stats("
+    " user_id BIGINT PRIMARY KEY,"
+    " earned DOUBLE NOT NULL DEFAULT 0,"
+    " balance DOUBLE NOT NULL DEFAULT 0,"
+    " clicks BIGINT NOT NULL DEFAULT 0,"
+    " level INT NOT NULL DEFAULT 1,"
+    " last_seen DOUBLE NOT NULL DEFAULT 0,"
+    " KEY idx_stats_earned (earned),"
+    " CONSTRAINT fk_stats_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+]
 
 
 def init_db():
-    conn = db()
-    conn.executescript('''
-    CREATE TABLE IF NOT EXISTS users(
-        id            INTEGER PRIMARY KEY AUTOINCREMENT,
-        login         TEXT NOT NULL UNIQUE COLLATE NOCASE,
-        email         TEXT NOT NULL COLLATE NOCASE,
-        pass_salt     TEXT,
-        pass_hash     TEXT,
-        provider      TEXT,
-        provider_uid  TEXT,
-        avatar_url    TEXT,
-        created_at    REAL NOT NULL,
-        UNIQUE(provider, provider_uid)
-    );
-    CREATE TABLE IF NOT EXISTS sessions(
-        token      TEXT PRIMARY KEY,
-        user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        created_at REAL NOT NULL,
-        expires_at REAL NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS saves(
-        user_id  INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-        data     TEXT NOT NULL,
-        updated_at REAL NOT NULL
-    );
-    CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
-    -- сетевой рейтинг: заработок каждого игрока + время последнего действия (онлайн-статус)
-    CREATE TABLE IF NOT EXISTS stats(
-        user_id   INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-        earned    REAL NOT NULL DEFAULT 0,
-        balance   REAL NOT NULL DEFAULT 0,
-        clicks    INTEGER NOT NULL DEFAULT 0,
-        level     INTEGER NOT NULL DEFAULT 1,
-        last_seen REAL NOT NULL DEFAULT 0
-    );
-    CREATE INDEX IF NOT EXISTS idx_stats_earned ON stats(earned DESC);
-    ''')
-    conn.commit()
-    conn.close()
+    c = db()
+    if c.engine == 'mysql':
+        for stmt in _MYSQL_SCHEMA:
+            c.execute(stmt)
+    else:
+        c.conn.executescript(_SQLITE_SCHEMA)
+    c.commit()
+    c.close()
+
+
+def _upsert(conn, table, cols, vals, updates):
+    """INSERT ... ON CONFLICT/ON DUPLICATE KEY UPDATE (SQLite и MySQL)."""
+    if conn.engine == 'mysql':
+        ph = ', '.join(['%s'] * len(cols))
+        sets = ', '.join('%s=VALUES(%s)' % (c, c) for c in updates)
+        sql = 'INSERT INTO %s(%s) VALUES(%s) ON DUPLICATE KEY UPDATE %s' % (
+            table, ', '.join(cols), ph, sets)
+        conn.execute(sql, vals)
+    else:
+        ph = ', '.join(['?'] * len(cols))
+        ex = ', '.join('excluded.' + c for c in updates)
+        sets = ', '.join('%s=%s' % (c, 'excluded.' + c) for c in updates)
+        sql = ('INSERT INTO %s(%s) VALUES(%s) ON CONFLICT(user_id) DO UPDATE SET %s'
+               % (table, ', '.join(cols), ph, sets))
+        conn.execute(sql, vals)
 
 
 # ===================== Пароли =====================
@@ -127,9 +303,9 @@ def create_session(user_id):
     token = secrets.token_urlsafe(32)
     now = time.time()
     conn = db()
-    conn.execute('INSERT INTO sessions(token,user_id,created_at,expires_at) VALUES(?,?,?,?)',
+    conn.execute('INSERT INTO sessions(token,user_id,created_at,expires_at) VALUES(%s,%s,%s,%s)',
                  (token, user_id, now, now + SESSION_TTL))
-    conn.execute('DELETE FROM sessions WHERE expires_at < ?', (now,))
+    conn.execute('DELETE FROM sessions WHERE expires_at < %s', (now,))
     conn.commit()
     conn.close()
     return token
@@ -141,7 +317,7 @@ def session_user(token):
     conn = db()
     row = conn.execute(
         'SELECT u.* FROM sessions s JOIN users u ON u.id=s.user_id '
-        'WHERE s.token=? AND s.expires_at>?', (token, time.time())).fetchone()
+        'WHERE s.token=%s AND s.expires_at>%s', (token, time.time())).fetchone()
     conn.close()
     return row
 
@@ -295,7 +471,7 @@ def exchange_code(provider, code, verifier, base_url):
 
 
 def find_or_create_provider_user(conn, provider, puid, prof):
-    row = conn.execute('SELECT * FROM users WHERE provider=? AND provider_uid=?',
+    row = conn.execute('SELECT * FROM users WHERE provider=%s AND provider_uid=%s',
                        (provider, puid)).fetchone()
     if row:
         return row
@@ -308,16 +484,16 @@ def find_or_create_provider_user(conn, provider, puid, prof):
             login = cand
     if not login:
         login = '%s_%s' % (provider, puid[:8])
-    while conn.execute('SELECT 1 FROM users WHERE login=? COLLATE NOCASE', (login,)).fetchone():
+    while conn.execute('SELECT 1 FROM users WHERE LOWER(login)=LOWER(%s)', (login,)).fetchone():
         login = login[:24] + '_' + secrets.token_hex(2)
     if not email:
         email = '%s@%s.oauth' % (puid[:16], provider)
     cur = conn.execute(
         'INSERT INTO users(login,email,pass_salt,pass_hash,provider,provider_uid,avatar_url,created_at)'
-        ' VALUES(?,?,?,?,?,?,?,?)',
+        ' VALUES(%s,%s,%s,%s,%s,%s,%s,%s)',
         (login, email, None, None, provider, puid, prof.get('avatar'), time.time()))
     conn.commit()
-    return conn.execute('SELECT * FROM users WHERE id=?', (cur.lastrowid,)).fetchone()
+    return conn.execute('SELECT * FROM users WHERE id=%s', (cur.lastrowid,)).fetchone()
 
 
 # ===================== HTTP =====================
@@ -381,6 +557,10 @@ class Handler(SimpleHTTPRequestHandler):
 
     # ---------- API ----------
     def api_get(self, path, qs):
+        if path == '/api/db_status':
+            eng = db_engine()
+            return self.send_json({'ok': True, 'engine': eng,
+                                   'mysql_configured': bool(MYSQL_CFG and pymysql)})
         if path == '/api/config':
             cfg = load_oauth_config()
             return self.send_json({'ok': True, 'providers': {
@@ -395,7 +575,7 @@ class Handler(SimpleHTTPRequestHandler):
             if not row:
                 return self.send_json({'ok': False, 'error': 'unauthorized'}, 401)
             conn = db()
-            srow = conn.execute('SELECT data,updated_at FROM saves WHERE user_id=?',
+            srow = conn.execute('SELECT data,updated_at FROM saves WHERE user_id=%s',
                                 (row['id'],)).fetchone()
             conn.close()
             save = json.loads(srow['data']) if srow else None
@@ -405,7 +585,7 @@ class Handler(SimpleHTTPRequestHandler):
             # сколько игроков сейчас в сети (активны за последние 2 минуты)
             conn = db()
             n = conn.execute(
-                "SELECT COUNT(*) c FROM stats WHERE last_seen > ?",
+                "SELECT COUNT(*) c FROM stats WHERE last_seen > %s",
                 (time.time() - 120,)).fetchone()['c']
             conn.close()
             return self.send_json({'ok': True, 'online': n})
@@ -423,19 +603,19 @@ class Handler(SimpleHTTPRequestHandler):
                           s.balance balance, s.clicks clicks, s.level level,
                           s.last_seen last_seen
                    FROM stats s JOIN users u ON u.id = s.user_id
-                   ORDER BY s.earned DESC LIMIT ?''', (limit,)).fetchall()
+                   ORDER BY s.earned DESC LIMIT %s''', (limit,)).fetchall()
             online = conn.execute(
-                "SELECT COUNT(*) c FROM stats WHERE last_seen > ?",
+                "SELECT COUNT(*) c FROM stats WHERE last_seen > %s",
                 (now - 120,)).fetchone()['c']
             total = conn.execute("SELECT COUNT(*) c FROM stats").fetchone()['c']
             me_rank = None
             bearer_row = session_user(self.bearer())
             if bearer_row:
-                mine = conn.execute('SELECT earned FROM stats WHERE user_id=?',
+                mine = conn.execute('SELECT earned FROM stats WHERE user_id=%s',
                                     (bearer_row['id'],)).fetchone()
                 if mine:
                     me_rank = conn.execute(
-                        'SELECT COUNT(*) c FROM stats WHERE earned > ?',
+                        'SELECT COUNT(*) c FROM stats WHERE earned > %s',
                         (mine['earned'],)).fetchone()['c'] + 1
             conn.close()
             lb = [{'login': r['login'], 'avatar': r['avatar'],
@@ -471,31 +651,31 @@ class Handler(SimpleHTTPRequestHandler):
             if confirm is not None and password != confirm:
                 return self.send_json({'ok': False, 'error': 'password_mismatch'}, 400)
             conn = db()
-            if conn.execute('SELECT 1 FROM users WHERE login=? COLLATE NOCASE', (login,)).fetchone():
+            if conn.execute('SELECT 1 FROM users WHERE LOWER(login)=LOWER(%s)', (login,)).fetchone():
                 conn.close()
                 return self.send_json({'ok': False, 'error': 'login_taken'}, 409)
-            if conn.execute('SELECT 1 FROM users WHERE email=? COLLATE NOCASE', (email,)).fetchone():
+            if conn.execute('SELECT 1 FROM users WHERE LOWER(email)=LOWER(%s)', (email,)).fetchone():
                 conn.close()
                 return self.send_json({'ok': False, 'error': 'email_taken'}, 409)
             salt, ph = hash_password(password)
             cur = conn.execute(
-                'INSERT INTO users(login,email,pass_salt,pass_hash,created_at) VALUES(?,?,?,?,?)',
+                'INSERT INTO users(login,email,pass_salt,pass_hash,created_at) VALUES(%s,%s,%s,%s,%s)',
                 (login, email, salt, ph, time.time()))
             uid = cur.lastrowid
             default_save = json.dumps({'lang': lang, 'theme': 'default'})
-            conn.execute('INSERT INTO saves(user_id,data,updated_at) VALUES(?,?,?)',
+            conn.execute('INSERT INTO saves(user_id,data,updated_at) VALUES(%s,%s,%s)',
                          (uid, default_save, time.time()))
             conn.commit()
             conn.close()
             token = create_session(uid)
-            row = db().execute('SELECT * FROM users WHERE id=?', (uid,)).fetchone()
+            row = db().execute('SELECT * FROM users WHERE id=%s', (uid,)).fetchone()
             return self.send_json({'ok': True, 'token': token, 'user': user_public(row)})
 
         if path == '/api/login':
             login = (body.get('login') or '').strip()
             password = body.get('password') or ''
             conn = db()
-            row = conn.execute('SELECT * FROM users WHERE login=? COLLATE NOCASE',
+            row = conn.execute('SELECT * FROM users WHERE LOWER(login)=LOWER(%s)',
                                (login,)).fetchone()
             conn.close()
             if not row or not row['pass_hash'] or \
@@ -506,7 +686,7 @@ class Handler(SimpleHTTPRequestHandler):
 
         if path == '/api/logout':
             conn = db()
-            conn.execute('DELETE FROM sessions WHERE token=?', (self.bearer() or '',))
+            conn.execute('DELETE FROM sessions WHERE token=%s', (self.bearer() or '',))
             conn.commit()
             conn.close()
             return self.send_json({'ok': True})
@@ -557,7 +737,7 @@ class Handler(SimpleHTTPRequestHandler):
             conn = db()
             # защита от накрутки рейтинга: сервер хранит МАКСИМУМ достижений,
             # поэтому переписать результат меньшим значением нельзя
-            prev = conn.execute('SELECT earned FROM stats WHERE user_id=?', (row['id'],)).fetchone()
+            prev = conn.execute('SELECT earned FROM stats WHERE user_id=%s', (row['id'],)).fetchone()
             prev_earned = float(prev['earned']) if prev else 0.0
             def num(key, default=0.0):
                 try: return max(0.0, float(save.get(key, default)))
@@ -566,17 +746,24 @@ class Handler(SimpleHTTPRequestHandler):
             balance = num('balance')
             clicks = int(num('totalClicks'))
             lvl = int(num('playerLevel', 1))
-            conn.execute(
-                'INSERT INTO saves(user_id,data,updated_at) VALUES(?,?,?) '
-                'ON CONFLICT(user_id) DO UPDATE SET data=excluded.data, updated_at=excluded.updated_at',
-                (row['id'], payload, time.time()))
-            conn.execute(
-                'INSERT INTO stats(user_id,earned,balance,clicks,level,last_seen) VALUES(?,?,?,?,?,?) '
-                'ON CONFLICT(user_id) DO UPDATE SET '
-                'earned=MAX(stats.earned,excluded.earned), balance=excluded.balance, '
-                'clicks=MAX(stats.clicks,excluded.clicks), level=MAX(stats.level,excluded.level), '
-                'last_seen=excluded.last_seen',
-                (row['id'], earned, balance, clicks, lvl, time.time()))
+            _upsert(conn, 'saves', ['user_id', 'data', 'updated_at'],
+                    (row['id'], payload, time.time()), ['data', 'updated_at'])
+            if conn.engine == 'mysql':
+                conn.execute(
+                    'INSERT INTO stats(user_id,earned,balance,clicks,level,last_seen) '
+                    'VALUES(%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE '
+                    'earned=GREATEST(earned,%s), balance=%s, '
+                    'clicks=GREATEST(clicks,%s), level=GREATEST(level,%s), last_seen=%s',
+                    (row['id'], earned, balance, clicks, lvl, time.time(),
+                     earned, balance, clicks, lvl, time.time()))
+            else:
+                conn.execute(
+                    'INSERT INTO stats(user_id,earned,balance,clicks,level,last_seen) '
+                    'VALUES(?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET '
+                    'earned=MAX(stats.earned,excluded.earned), balance=excluded.balance, '
+                    'clicks=MAX(stats.clicks,excluded.clicks), level=MAX(stats.level,excluded.level), '
+                    'last_seen=excluded.last_seen',
+                    (row['id'], earned, balance, clicks, lvl, time.time()))
             conn.commit()
             conn.close()
             return self.send_json({'ok': True, 'saved_at': time.time()})

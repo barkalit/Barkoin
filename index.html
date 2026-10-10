@@ -1099,6 +1099,16 @@
   /* ============================================================
      СЕТЕВОЙ РЕЙТИНГ: счётчик онлайна + таблица лидеров
      ============================================================ */
+  .db-badge {
+    display: flex; align-items: center; gap: 8px; margin: 2px 0 10px;
+    padding: 7px 10px; border-radius: 10px; font-size: 12.5px; line-height: 1.3;
+    border: 1px solid var(--border, rgba(255,255,255,.14));
+    background: rgba(127,127,127,.08); color: var(--text-dim, #9aa);
+  }
+  .db-badge b { color: var(--text, #eee); }
+  .db-badge.ok   { border-color: rgba(46,204,113,.5); }
+  .db-badge.warn { border-color: rgba(241,196,15,.55); }
+  .db-badge.bad  { border-color: rgba(231,76,60,.6); }
   .online-row {
     display: flex; align-items: center; gap: 8px;
     margin-top: 10px; padding: 7px 10px;
@@ -1373,6 +1383,7 @@
         <h1 data-i18n="title">БАРКОИН</h1>
         <div class="gate-sub"><span data-i18n="subtitle">Кликер</span> • BARC</div>
       </div>
+      <div class="db-badge" id="dbBadge"><span data-i18n="db_checking">Проверяю подключение к серверу…</span></div>
       <div class="modal-body">
         <div class="auth-tabs">
           <div class="auth-tab active" id="tabLogin" data-i18n="auth_title">Вход</div>
@@ -1556,6 +1567,11 @@
   // ================================================================
   const TRANSLATIONS = {
     ru: {
+
+    "db_checking": "Проверяю подключение к серверу…",
+    "db_ok_mysql": "сервер и база данных в сети — играйте на здоровье!",
+    "db_ok_sqlite": "резервная SQL-база активна — данные сохраняются",
+    "db_down": "Сервер недоступен. Проверьте, запущен ли server.py (http://localhost:8000)",
       _AUTH:{"auth_title":"Вход","register_title":"Регистрация","login_ph":"Логин","password_ph":"Пароль","email_ph":"Электронная почта","confirm_ph":"Подтвердите пароль","to_register":"Нет аккаунта? Создать аккаунт","to_login":"Уже есть аккаунт? Войти","btn_enter":"Войти","btn_create":"Создать аккаунт","or_social":"или войдите через","logout":"Выйти","welcome":"Добро пожаловать, {name}!","account":"Аккаунт","cloud_saved":"☁ Сохранено в облако","err_bad_login":"Логин: 3–32 символа (буквы, цифры, _ . -)","err_bad_email":"Некорректная электронная почта","err_weak":"Пароль минимум 6 символов","err_mismatch":"Пароли не совпадают","err_login_taken":"Такой логин уже занят","err_email_taken":"Эта почта уже зарегистрирована","err_bad_credentials":"Неверный логин или пароль","err_not_configured":"Вход через эту соцсеть пока не настроен на сервере (нужен client_id). Войдите по логину или настройте OAuth.","err_denied":"Вы отменили вход через соцсеть","err_state_mismatch":"Проверка безопасности не пройдена, попробуйте ещё раз","err_exchange_failed":"Сервер соцсети недоступен, попробуйте позже","err_no_identity":"Соцсеть не вернула профиль","err_offline":"Сервер недоступен — играйте локально, прогресс сохраняется в браузере","guest_skip":"Играть без аккаунта","sync_done":"☁ Прогресс загружен из облака","oauth_popup":"Разрешите всплывающее окно для входа через соцсеть","auth_hint":"Прогресс сохраняется в аккаунт и не потеряется","server_off":"Локальный режим: база данных недоступна","lang_label_auth":"Язык интерфейса","pw_show":"Показать пароль","local_guest":"Гость (локальная игра)",leaderboard_title:"Рейтинг игроков",lb_online:"Онлайн: {n}",lb_loading:"Онлайн: …",lb_my_rank:"Моё место: {n}",lb_me:"Моё место: —",lb_total:"Всего игроков: {n}",lb_earned:"заработано",lb_level:"Ур. {n}",lb_clicks:"кликов",lb_empty:"Пока нет данных — станьте первым в рейтинге!",lb_offline:"Сервер недоступен",need_account:"Игра сетевая — войдите или создайте аккаунт",lb_top:"Топ заработавших 🏆",lb_you:"Вы"},
       title:'БАРКОИН', subtitle:'Кликер',
       rank_novice:'Новичок', rank_amateur:'Любитель', rank_trader:'Трейдер', rank_investor:'Инвестор',
@@ -1595,6 +1611,11 @@
       lvl_15:'Звёздная', lvl_16:'Галактическая', lvl_17:'Вселенская'
     },
     en: {
+
+    "db_checking": "Checking server connection…",
+    "db_ok_mysql": "server & database online — happy playing!",
+    "db_ok_sqlite": "backup SQL database active — your data is saved",
+    "db_down": "Server unavailable. Make sure server.py is running (http://localhost:8000)",
       _AUTH:{"auth_title":"Sign in","register_title":"Sign up","login_ph":"Login","password_ph":"Password","email_ph":"Email","confirm_ph":"Confirm password","to_register":"No account? Create one","to_login":"Already have an account? Sign in","btn_enter":"Sign in","btn_create":"Create account","or_social":"or sign in with","logout":"Log out","welcome":"Welcome, {name}!","account":"Account","cloud_saved":"☁ Saved to cloud","err_bad_login":"Login: 3–32 characters (letters, digits, _ . -)","err_bad_email":"Invalid email address","err_weak":"Password must be at least 6 characters","err_mismatch":"Passwords do not match","err_login_taken":"This login is already taken","err_email_taken":"This email is already registered","err_bad_credentials":"Wrong login or password","err_not_configured":"Sign-in with this social network is not configured on the server yet (client_id required). Use login/password or set up OAuth.","err_denied":"You cancelled the social sign-in","err_state_mismatch":"Security check failed, please try again","err_exchange_failed":"Social provider server unavailable, try later","err_no_identity":"The provider returned no profile","err_offline":"Server unavailable — playing locally, progress saved in browser","guest_skip":"Play without an account","sync_done":"☁ Progress loaded from cloud","oauth_popup":"Allow the popup window to sign in with a social network","auth_hint":"Your progress is stored in the account and won't be lost","server_off":"Local mode: database unavailable","lang_label_auth":"Language","pw_show":"Show password","local_guest":"Guest (local game)",leaderboard_title:"Player Leaderboard",lb_online:"Online: {n}",lb_loading:"Online: …",lb_my_rank:"My rank: {n}",lb_me:"My rank: —",lb_total:"Total players: {n}",lb_earned:"earned",lb_level:"Lv. {n}",lb_clicks:"clicks",lb_empty:"No data yet — be the first on the leaderboard!",lb_offline:"Server unavailable",need_account:"This is an online game — sign in or create an account",lb_top:"Top earners 🏆",lb_you:"You"},
       title:'BARCOIN', subtitle:'Clicker',
       rank_novice:'Novice', rank_amateur:'Amateur', rank_trader:'Trader', rank_investor:'Investor',
@@ -1634,6 +1655,11 @@
       lvl_15:'Stellar', lvl_16:'Galactic', lvl_17:'Universal'
     },
     de: {
+
+    "db_checking": "Verbinde zum Server…",
+    "db_ok_mysql": "Server & Datenbank online — viel Spaß!",
+    "db_ok_sqlite": "Backup-SQL-Datenbank aktiv — Daten werden gespeichert",
+    "db_down": "Server nicht erreichbar. Prüfen Sie, ob server.py läuft (http://localhost:8000)",
       _AUTH:{"auth_title":"Anmelden","register_title":"Registrieren","login_ph":"Benutzername","password_ph":"Passwort","email_ph":"E-Mail","confirm_ph":"Passwort bestätigen","to_register":"Noch kein Konto? Konto erstellen","to_login":"Schon ein Konto? Anmelden","btn_enter":"Anmelden","btn_create":"Konto erstellen","or_social":"oder anmelden mit","logout":"Abmelden","welcome":"Willkommen, {name}!","account":"Konto","cloud_saved":"☁ In der Cloud gespeichert","err_bad_login":"Benutzername: 3–32 Zeichen (Buchstaben, Ziffern, _ . -)","err_bad_email":"Ungültige E-Mail-Adresse","err_weak":"Passwort mindestens 6 Zeichen","err_mismatch":"Passwörter stimmen nicht überein","err_login_taken":"Dieser Name ist bereits vergeben","err_email_taken":"Diese E-Mail ist bereits registriert","err_bad_credentials":"Falscher Name oder Passwort","err_not_configured":"Anmeldung über dieses Netzwerk ist auf dem Server noch nicht eingerichtet (client_id nötig). Melde dich per Benutzername an oder richte OAuth ein.","err_denied":"Du hast die Anmeldung abgebrochen","err_state_mismatch":"Sicherheitsprüfung fehlgeschlagen, bitte erneut versuchen","err_exchange_failed":"Server des Netzwerks nicht erreichbar, versuche es später","err_no_identity":"Netzwerk lieferte kein Profil","err_offline":"Server nicht erreichbar — lokales Spiel, Fortschritt im Browser gespeichert","guest_skip":"Ohne Konto spielen","sync_done":"☁ Fortschritt aus der Cloud geladen","oauth_popup":"Popup-Fenster für die Anmeldung erlauben","auth_hint":"Dein Fortschritt wird im Konto gespeichert und geht nicht verloren","server_off":"Lokaler Modus: Datenbank nicht verfügbar","lang_label_auth":"Sprache","pw_show":"Passwort anzeigen","local_guest":"Gast (lokales Spiel)",leaderboard_title:"Spieler-Rangliste",lb_online:"Online: {n}",lb_loading:"Online: …",lb_my_rank:"Mein Platz: {n}",lb_me:"Mein Platz: —",lb_total:"Spieler gesamt: {n}",lb_earned:"verdient",lb_level:"St. {n}",lb_clicks:"Klicks",lb_empty:"Noch keine Daten — sei der Erste in der Rangliste!",lb_offline:"Server nicht erreichbar",need_account:"Dies ist ein Onlinespiel — melde dich an oder erstelle ein Konto",lb_top:"Top-Verdiener 🏆",lb_you:"Du"},
       title:"BARCOIN",
       subtitle:"Klicker",
@@ -1744,6 +1770,11 @@
       lvl_17:"Universal"
     },
     fr: {
+
+    "db_checking": "Connexion au serveur…",
+    "db_ok_mysql": "serveur et base de données en ligne — bon jeu !",
+    "db_ok_sqlite": "base SQL de secours active — vos données sont sauvegardées",
+    "db_down": "Serveur indisponible. Vérifiez que server.py est lancé (http://localhost:8000)",
       _AUTH:{"auth_title":"Connexion","register_title":"Inscription","login_ph":"Identifiant","password_ph":"Mot de passe","email_ph":"E-mail","confirm_ph":"Confirmer le mot de passe","to_register":"Pas de compte ? Créer un compte","to_login":"Déjà un compte ? Se connecter","btn_enter":"Se connecter","btn_create":"Créer le compte","or_social":"ou se connecter avec","logout":"Déconnexion","welcome":"Bienvenue, {name} !","account":"Compte","cloud_saved":"☁ Enregistré dans le cloud","err_bad_login":"Identifiant : 3 à 32 caractères (lettres, chiffres, _ . -)","err_bad_email":"Adresse e-mail invalide","err_weak":"Mot de passe : 6 caractères minimum","err_mismatch":"Les mots de passe ne correspondent pas","err_login_taken":"Cet identifiant est déjà pris","err_email_taken":"Cet e-mail est déjà enregistré","err_bad_credentials":"Identifiant ou mot de passe incorrect","err_not_configured":"La connexion via ce réseau n'est pas encore configurée sur le serveur (client_id requis). Connectez-vous par identifiant ou configurez OAuth.","err_denied":"Vous avez annulé la connexion sociale","err_state_mismatch":"Contrôle de sécurité échoué, réessayez","err_exchange_failed":"Serveur du réseau indisponible, réessayez plus tard","err_no_identity":"Le réseau n'a pas renvoyé de profil","err_offline":"Serveur indisponible — jeu local, progression enregistrée dans le navigateur","guest_skip":"Jouer sans compte","sync_done":"☁ Progression chargée depuis le cloud","oauth_popup":"Autorisez la fenêtre pop-up pour la connexion sociale","auth_hint":"Votre progression est sauvegardée dans le compte","server_off":"Mode local : base de données indisponible","lang_label_auth":"Langue","pw_show":"Afficher le mot de passe","local_guest":"Invité (jeu local)",leaderboard_title:"Classement des joueurs",lb_online:"En ligne : {n}",lb_loading:"En ligne : …",lb_my_rank:"Ma place : {n}",lb_me:"Ma place : —",lb_total:"Joueurs au total : {n}",lb_earned:"gagnés",lb_level:"Niv. {n}",lb_clicks:"clics",lb_empty:"Aucune donnée pour l’instant — soyez le premier du classement !",lb_offline:"Serveur indisponible",need_account:"Le jeu est en ligne — connectez-vous ou créez un compte",lb_top:"Meilleurs gains 🏆",lb_you:"Vous"},
       title:"BARCOIN",
       subtitle:"Clicker",
@@ -1854,6 +1885,11 @@
       lvl_17:"Universelle"
     },
     es: {
+
+    "db_checking": "Conectando con el servidor…",
+    "db_ok_mysql": "servidor y base de datos en línea — ¡a jugar!",
+    "db_ok_sqlite": "base SQL de respaldo activa — tus datos se guardan",
+    "db_down": "Servidor no disponible. Comprueba que server.py está en marcha (http://localhost:8000)",
       _AUTH:{"auth_title":"Iniciar sesión","register_title":"Registrarse","login_ph":"Usuario","password_ph":"Contraseña","email_ph":"Correo electrónico","confirm_ph":"Confirmar contraseña","to_register":"¿Sin cuenta? Crea una","to_login":"¿Ya tienes cuenta? Inicia sesión","btn_enter":"Entrar","btn_create":"Crear cuenta","or_social":"o entra con","logout":"Salir","welcome":"¡Bienvenido, {name}!","account":"Cuenta","cloud_saved":"☁ Guardado en la nube","err_bad_login":"Usuario: 3–32 caracteres (letras, números, _ . -)","err_bad_email":"Correo electrónico no válido","err_weak":"La contraseña debe tener al menos 6 caracteres","err_mismatch":"Las contraseñas no coinciden","err_login_taken":"Ese usuario ya existe","err_email_taken":"Ese correo ya está registrado","err_bad_credentials":"Usuario o contraseña incorrectos","err_not_configured":"El acceso con esta red social aún no está configurado en el servidor (se necesita client_id). Entra con usuario o configura OAuth.","err_denied":"Has cancelado el acceso social","err_state_mismatch":"Comprobación de seguridad fallida, inténtalo de nuevo","err_exchange_failed":"Servidor de la red no disponible, inténtalo más tarde","err_no_identity":"La red no devolvió perfil","err_offline":"Servidor no disponible — juego local, progreso guardado en el navegador","guest_skip":"Jugar sin cuenta","sync_done":"☁ Progreso cargado desde la nube","oauth_popup":"Permite la ventana emergente para entrar con la red social","auth_hint":"Tu progreso se guarda en la cuenta y no se perderá","server_off":"Modo local: base de datos no disponible","lang_label_auth":"Idioma","pw_show":"Mostrar contraseña","local_guest":"Invitado (juego local)",leaderboard_title:"Clasificación de jugadores",lb_online:"En línea: {n}",lb_loading:"En línea: …",lb_my_rank:"Mi puesto: {n}",lb_me:"Mi puesto: —",lb_total:"Jugadores totales: {n}",lb_earned:"ganado",lb_level:"Nv. {n}",lb_clicks:"clics",lb_empty:"¡Aún no hay datos — sé el primero en la clasificación!",lb_offline:"Servidor no disponible",need_account:"El juego es en línea: inicia sesión o crea una cuenta",lb_top:"Más ganadores 🏆",lb_you:"Tú"},
       title:"BARCOIN",
       subtitle:"Clicador",
@@ -1964,6 +2000,11 @@
       lvl_17:"Universal"
     },
     pt: {
+
+    "db_checking": "Conectando ao servidor…",
+    "db_ok_mysql": "servidor e banco de dados online — bom jogo!",
+    "db_ok_sqlite": "banco SQL reserva ativo — seus dados são salvos",
+    "db_down": "Servidor indisponível. Verifique se o server.py está rodando (http://localhost:8000)",
       _AUTH:{"auth_title":"Entrar","register_title":"Cadastrar-se","login_ph":"Usuário","password_ph":"Senha","email_ph":"E-mail","confirm_ph":"Confirmar senha","to_register":"Sem conta? Crie uma","to_login":"Já tem conta? Entrar","btn_enter":"Entrar","btn_create":"Criar conta","or_social":"ou entre com","logout":"Sair","welcome":"Bem-vindo, {name}!","account":"Conta","cloud_saved":"☁ Salvo na nuvem","err_bad_login":"Usuário: 3–32 caracteres (letras, números, _ . -)","err_bad_email":"E-mail inválido","err_weak":"A senha deve ter pelo menos 6 caracteres","err_mismatch":"As senhas não coincidem","err_login_taken":"Esse usuário já existe","err_email_taken":"Esse e-mail já está cadastrado","err_bad_credentials":"Usuário ou senha incorretos","err_not_configured":"O acesso por esta rede ainda não está configurado no servidor (client_id necessário). Entre com usuário ou configure o OAuth.","err_denied":"Você cancelou o acesso pela rede","err_state_mismatch":"Verificação de segurança falhou, tente novamente","err_exchange_failed":"Servidor da rede indisponível, tente mais tarde","err_no_identity":"A rede não retornou perfil","err_offline":"Servidor indisponível — jogo local, progresso salvo no navegador","guest_skip":"Jogar sem conta","sync_done":"☁ Progresso carregado da nuvem","oauth_popup":"Permita a janela pop-up para entrar pela rede","auth_hint":"Seu progresso é salvo na conta e não será perdido","server_off":"Modo local: banco de dados indisponível","lang_label_auth":"Idioma","pw_show":"Mostrar senha","local_guest":"Convidado (jogo local)",leaderboard_title:"Classificação de jogadores",lb_online:"Online: {n}",lb_loading:"Online: …",lb_my_rank:"Meu lugar: {n}",lb_me:"Meu lugar: —",lb_total:"Total de jogadores: {n}",lb_earned:"ganho",lb_level:"Nv. {n}",lb_clicks:"cliques",lb_empty:"Sem dados ainda — seja o primeiro na classificação!",lb_offline:"Servidor indisponível",need_account:"O jogo é online — entre ou crie uma conta",lb_top:"Maiores ganhos 🏆",lb_you:"Você"},
       title:"BARCOIN",
       subtitle:"Clicador",
@@ -2074,6 +2115,11 @@
       lvl_17:"Universal"
     },
     tr: {
+
+    "db_checking": "Sunucuya bağlanılıyor…",
+    "db_ok_mysql": "sunucu ve veritabanı çevrimiçi — iyi oyunlar!",
+    "db_ok_sqlite": "yedek SQL veritabanı etkin — verileriniz kaydediliyor",
+    "db_down": "Sunucuya ulaşılamıyor. server.py çalıştığından emin olun (http://localhost:8000)",
       _AUTH:{"auth_title":"Giriş","register_title":"Kayıt ol","login_ph":"Kullanıcı adı","password_ph":"Şifre","email_ph":"E-posta","confirm_ph":"Şifreyi onayla","to_register":"Hesabın yok mu? Hesap oluştur","to_login":"Zaten hesabın var mı? Giriş yap","btn_enter":"Giriş yap","btn_create":"Hesap oluştur","or_social":"veya şununla giriş yap","logout":"Çıkış","welcome":"Hoş geldin, {name}!","account":"Hesap","cloud_saved":"☁ Buluta kaydedildi","err_bad_login":"Kullanıcı adı: 3–32 karakter (harf, rakam, _ . -)","err_bad_email":"Geçersiz e-posta","err_weak":"Şifre en az 6 karakter olmalı","err_mismatch":"Şifreler eşleşmiyor","err_login_taken":"Bu kullanıcı adı alınmış","err_email_taken":"Bu e-posta zaten kayıtlı","err_bad_credentials":"Yanlış kullanıcı adı veya şifre","err_not_configured":"Bu ağ ile giriş sunucuda henüz yapılandırılmadı (client_id gerekli). Kullanıcı adı ile gir veya OAuth kur.","err_denied":"Sosyal girişi iptal ettiniz","err_state_mismatch":"Güvenlik doğrulaması başarısız, tekrar deneyin","err_exchange_failed":"Sağlayıcı sunucusu mevcut değil, sonra deneyin","err_no_identity":"Sağlayıcı profil döndürmedi","err_offline":"Sunucu erişilemez — yerel oyun, ilerleme tarayıcıda saklanır","guest_skip":"Hesapsız oyna","sync_done":"☁ İlerleme buluttan yüklendi","oauth_popup":"Sosyal giriş için açılır pencereye izin ver","auth_hint":"İlerlemen hesapta saklanır ve kaybolmaz","server_off":"Yerel mod: veritabanı erişilemez","lang_label_auth":"Dil","pw_show":"Şifreyi göster","local_guest":"Misafir (yerel oyun)",leaderboard_title:"Oyuncu sıralaması",lb_online:"Çevrimiçi: {n}",lb_loading:"Çevrimiçi: …",lb_my_rank:"Benim sıram: {n}",lb_me:"Benim sıram: —",lb_total:"Toplam oyuncu: {n}",lb_earned:"kazanılan",lb_level:"Sv. {n}",lb_clicks:"tıklama",lb_empty:"Henüz veri yok — ilk siz olun!",lb_offline:"Sunucu kullanılamıyor",need_account:"Oyun çevrimiçidir — giriş yapın veya hesap oluşturun",lb_top:"En çok kazananlar 🏆",lb_you:"Siz"},
       title:"BARCOIN",
       subtitle:"Tıklayıcı",
@@ -2184,6 +2230,11 @@
       lvl_17:"Evrensel"
     },
     el: {
+
+    "db_checking": "Σύνδεση με τον διακομιστή…",
+    "db_ok_mysql": "διακομιστής και βάση δεδομένων σε λειτουργία — καλό παιχνίδι!",
+    "db_ok_sqlite": "ενεργή αντιγραφική SQL βάση — τα δεδομένα αποθηκεύονται",
+    "db_down": "Ο διακομιστής δεν είναι διαθέσιμος. Βεβαιωθείτε ότι τρέχει το server.py (http://localhost:8000)",
       _AUTH:{"auth_title":"Σύνδεση","register_title":"Εγγραφή","login_ph":"Όνομα χρήστη","password_ph":"Κωδικός","email_ph":"E-mail","confirm_ph":"Επιβεβαίωση κωδικού","to_register":"Δεν έχεις λογαριασμό; Δημιουργία","to_login":"Έχεις ήδη λογαριασμό; Σύνδεση","btn_enter":"Σύνδεση","btn_create":"Δημιουργία λογαριασμού","or_social":"ή σύνδεση με","logout":"Αποσύνδεση","welcome":"Καλωσόρισμα, {name}!","account":"Λογαριασμός","cloud_saved":"☁ Αποθηκεύτηκε στο cloud","err_bad_login":"Όνομα χρήστη: 3–32 χαρακτήρες (γράμματα, ψηφία, _ . -)","err_bad_email":"Μη έγκυρο e-mail","err_weak":"Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες","err_mismatch":"Οι κωδικοί δεν ταιριάζουν","err_login_taken":"Αυτό το όνομα υπάρχει ήδη","err_email_taken":"Αυτό το e-mail είναι ήδη εγγεγραμμένο","err_bad_credentials":"Λάθος όνομα ή κωδικός","err_not_configured":"Η σύνδεση με αυτό το δίκτυο δεν έχει ρυθμιστεί ακόμα στον διακομιστή (χρειάζεται client_id). Συνδέσου με όνομα ή ρύθμισε το OAuth.","err_denied":"Ακυρώσατε τη σύνδεση","err_state_mismatch":"Ο έλεγχος ασφαλείας απέτυχε, δοκιμάστε ξανά","err_exchange_failed":"Ο διακομιστής δικτύου δεν είναι διαθέσιμος","err_no_identity":"Το δίκτυο δεν επέστρεψε προφίλ","err_offline":"Διακομιστής μη διαθέσιμος — τοπικό παιχνίδι, η πρόοδος αποθηκεύεται στον browser","guest_skip":"Παίξε χωρίς λογαριασμό","sync_done":"☁ Η πρόοδος φορτώθηκε από το cloud","oauth_popup":"Επιτρέψτε το pop-up για σύνδεση","auth_hint":"Η πρόοδός σας αποθηκεύεται στον λογαριασμό","server_off":"Τοπική λειτουργία: βάση δεδομένων μη διαθέσιμη","lang_label_auth":"Γλώσσα","pw_show":"Εμφάνιση κωδικού","local_guest":"Επισκέπτης (τοπικά)",leaderboard_title:"Κατάταξη παικτών",lb_online:"Σε σύνδεση: {n}",lb_loading:"Σε σύνδεση: …",lb_my_rank:"Η θέση μου: {n}",lb_me:"Η θέση μου: —",lb_total:"Σύνολο παικτών: {n}",lb_earned:"κερδημένα",lb_level:"Επ. {n}",lb_clicks:"κλικ",lb_empty:"Δεν υπάρχουν δεδομένα — γίνετε ο πρώτος!",lb_offline:"Ο διακομιστής δεν είναι διαθέσιμος",need_account:"Το παιχνίδι είναι διαδικτυακό — συνδεθείτε ή δημιουργήστε λογαριασμό",lb_top:"Κορυφαίοι 🏆",lb_you:"Εσείς"},
       title:"BARCOIN",
       subtitle:"Κλικέρ",
@@ -2294,6 +2345,11 @@
       lvl_17:"Καθολικό"
     },
     zh: {
+
+    "db_checking": "正在连接服务器…",
+    "db_ok_mysql": "服务器和数据库在线——祝您游戏愉快！",
+    "db_ok_sqlite": "备用SQL数据库已启用——数据正在保存",
+    "db_down": "服务器不可用。请确认 server.py 已启动（http://localhost:8000）",
       _AUTH:{"auth_title":"登录","register_title":"注册","login_ph":"用户名","password_ph":"密码","email_ph":"电子邮箱","confirm_ph":"确认密码","to_register":"没有账号？创建账号","to_login":"已有账号？去登录","btn_enter":"登录","btn_create":"创建账号","or_social":"或使用以下方式登录","logout":"退出","welcome":"欢迎，{name}！","account":"账号","cloud_saved":"☁ 已保存到云端","err_bad_login":"用户名：3–32个字符（字母、数字、_ . -）","err_bad_email":"邮箱地址无效","err_weak":"密码至少6位","err_mismatch":"两次密码不一致","err_login_taken":"该用户名已被占用","err_email_taken":"该邮箱已注册","err_bad_credentials":"用户名或密码错误","err_not_configured":"服务器尚未配置该社交网络登录（需要 client_id）。请用用户名登录或配置 OAuth。","err_denied":"您取消了社交登录","err_state_mismatch":"安全校验失败，请重试","err_exchange_failed":"社交服务器不可用，请稍后再试","err_no_identity":"社交网络未返回资料","err_offline":"服务器不可用——本地游戏，进度保存在浏览器","guest_skip":"不登录直接玩","sync_done":"☁ 已从云端加载进度","oauth_popup":"允许弹出窗口以进行社交登录","auth_hint":"进度将保存在账号中，不会丢失","server_off":"本地模式：数据库不可用","lang_label_auth":"界面语言","pw_show":"显示密码","local_guest":"游客（本地游戏）",leaderboard_title:"玩家排行榜",lb_online:"在线：{n}",lb_loading:"在线：…",lb_my_rank:"我的排名：{n}",lb_me:"我的排名：—",lb_total:"玩家总数：{n}",lb_earned:"已赚取",lb_level:"等级 {n}",lb_clicks:"点击",lb_empty:"暂无数据——快来成为第一名！",lb_offline:"服务器不可用",need_account:"这是网络游戏——请登录或创建账号",lb_top:"收入榜 🏆",lb_you:"你"},
       title:"BARCOIN",
       subtitle:"点击器",
@@ -2404,6 +2460,11 @@
       lvl_17:"宇宙"
     },
     th: {
+
+    "db_checking": "กำลังเชื่อมต่อเซิร์ฟเวอร์…",
+    "db_ok_mysql": "เซิร์ฟเวอร์และฐานข้อมูลออนไลน์ — เล่นให้สนุก!",
+    "db_ok_sqlite": "ฐานข้อมูล SQL สำรองทำงานอยู่ — ข้อมูลของคุณถูกบันทึก",
+    "db_down": "เซิร์ฟเวอร์ไม่พร้อมใช้งาน ตรวจสอบว่ารัน server.py อยู่ (http://localhost:8000)",
       _AUTH:{"auth_title":"เข้าสู่ระบบ","register_title":"สมัครสมาชิก","login_ph":"ชื่อผู้ใช้","password_ph":"รหัสผ่าน","email_ph":"อีเมล","confirm_ph":"ยืนยันรหัสผ่าน","to_register":"ยังไม่มีบัญชี? สร้างบัญชี","to_login":"มีบัญชีแล้ว? เข้าสู่ระบบ","btn_enter":"เข้าสู่ระบบ","btn_create":"สร้างบัญชี","or_social":"หรือเข้าสู่ระบบด้วย","logout":"ออกจากระบบ","welcome":"ยินดีต้อนรับ {name}!","account":"บัญชี","cloud_saved":"☁ บันทึกลงคลาวด์แล้ว","err_bad_login":"ชื่อผู้ใช้: 3–32 ตัวอักษร (ตัวอักษร ตัวเลข _ . -)","err_bad_email":"ที่อยู่อีเมลไม่ถูกต้อง","err_weak":"รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร","err_mismatch":"รหัสผ่านไม่ตรงกัน","err_login_taken":"ชื่อผู้ใช้นี้ถูกใช้แล้ว","err_email_taken":"อีเมลนี้ลงทะเบียนแล้ว","err_bad_credentials":"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง","err_not_configured":"การเข้าสู่ระบบด้วยเครือข่ายนี้ยังไม่ได้รับการตั้งค่าบนเซิร์ฟเวอร์ (ต้องมี client_id) กรุณาเข้าสู่ระบบด้วยชื่อผู้ใช้หรือตั้งค่า OAuth","err_denied":"คุณยกเลิกการเข้าสู่ระบบ","err_state_mismatch":"การตรวจสอบความปลอดภัยไม่สำเร็จ ลองอีกครั้ง","err_exchange_failed":"เซิร์ฟเวอร์ของผู้ให้บริการไม่พร้อมใช้งาน ลองภายหลัง","err_no_identity":"ผู้ให้บริการไม่ส่งโปรไฟล์กลับมา","err_offline":"เซิร์ฟเวอร์ไม่พร้อมใช้งาน — เล่นในเครื่อง ความคืบหน้าบันทึกในเบราว์เซอร์","guest_skip":"เล่นโดยไม่ใช้บัญชี","sync_done":"☁ โหลดความคืบหน้าจากคลาวด์แล้ว","oauth_popup":"อนุญาตป๊อปอัพเพื่อเข้าสู่ระบบ","auth_hint":"ความคืบหน้าจะถูกบันทึกในบัญชีและไม่หาย","server_off":"โหมดโลคัล: ฐานข้อมูลไม่พร้อมใช้งาน","lang_label_auth":"ภาษา","pw_show":"แสดงรหัสผ่าน","local_guest":"แขก (เล่นในเครื่อง)",leaderboard_title:"ตารางผู้เล่น",lb_online:"ออนไลน์: {n}",lb_loading:"ออนไลน์: …",lb_my_rank:"อันดับของฉัน: {n}",lb_me:"อันดับของฉัน: —",lb_total:"ผู้เล่นทั้งหมด: {n}",lb_earned:"หามาได้",lb_level:"เลเวล {n}",lb_clicks:"คลิก",lb_empty:"ยังไม่มีข้อมูล — เป็นคนแรกของคุณ!",lb_offline:"เซิร์ฟเวอร์ไม่พร้อมใช้งาน",need_account:"เกมนี้เป็นเกมออนไลน์ — เข้าสู่ระบบหรือสร้างบัญชี",lb_top:"ผู้หาได้มากที่สุด 🏆",lb_you:"คุณ"},
       title:"BARCOIN",
       subtitle:"คลิกเกอร์",
@@ -2514,6 +2575,11 @@
       lvl_17:"จักรวาล"
     },
     ja: {
+
+    "db_checking": "サーバーに接続中…",
+    "db_ok_mysql": "サーバーとデータベースはオンラインです — 楽しんで！",
+    "db_ok_sqlite": "バックアップSQLデータベース稼働中 — データは保存されます",
+    "db_down": "サーバーに接続できません。server.py が起動しているか確認してください（http://localhost:8000）",
       _AUTH:{"auth_title":"ログイン","register_title":"新規登録","login_ph":"ユーザー名","password_ph":"パスワード","email_ph":"メールアドレス","confirm_ph":"パスワード確認","to_register":"アカウントをお持ちでない方はこちら","to_login":"すでにアカウントをお持ちの方","btn_enter":"ログイン","btn_create":"アカウント作成","or_social":"または次でログイン","logout":"ログアウト","welcome":"ようこそ、{name}さん！","account":"アカウント","cloud_saved":"☁ クラウドに保存しました","err_bad_login":"ユーザー名: 3〜32文字（英数字、_ . -）","err_bad_email":"メールアドレスが正しくありません","err_weak":"パスワードは6文字以上","err_mismatch":"パスワードが一致しません","err_login_taken":"このユーザー名は使われています","err_email_taken":"このメールは登録済みです","err_bad_credentials":"ユーザー名またはパスワードが違います","err_not_configured":"このSNSログインはサーバー側で未設定です（client_idが必要）。ユーザー名でログインするかOAuthを設定してください。","err_denied":"SNSログインがキャンセルされました","err_state_mismatch":"セキュリティ確認に失敗しました。もう一度お試しください","err_exchange_failed":"プロバイダーのサーバーを利用できません。後でお試しください","err_no_identity":"プロバイダーからプロフィールが返されませんでした","err_offline":"サーバーに接続できません—ローカルでプレイ中、進捗はブラウザに保存","guest_skip":"アカウントなしでプレイ","sync_done":"☁ クラウドから進捗を読み込みました","oauth_popup":"SNSログインのためのポップアップを許可してください","auth_hint":"進捗はアカウントに保存され失われません","server_off":"ローカルモード: データベース利用不可","lang_label_auth":"言語","pw_show":"パスワードを表示","local_guest":"ゲスト（ローカル）",leaderboard_title:"プレイヤーランキング",lb_online:"オンライン: {n}",lb_loading:"オンライン: …",lb_my_rank:"私の順位: {n}",lb_me:"私の順位: —",lb_total:"総プレイヤー数: {n}",lb_earned:"獲得",lb_level:"レベル{n}",lb_clicks:"クリック",lb_empty:"データがありません — 最初の1人になろう！",lb_offline:"サーバーに接続できません",need_account:"このゲームはオンラインです — ログインまたはアカウント作成",lb_top:"獲得額トップ 🏆",lb_you:"あなた"},
       title:"BARCOIN",
       subtitle:"クリッカー",
@@ -2624,6 +2690,11 @@
       lvl_17:"宇宙"
     },
     ko: {
+
+    "db_checking": "서버에 연결 중…",
+    "db_ok_mysql": "서버와 데이터베이스가 온라인입니다 — 즐거운 게임 되세요!",
+    "db_ok_sqlite": "백업 SQL 데이터베이스 작동 중 — 데이터가 저장됩니다",
+    "db_down": "서버에 접속할 수 없습니다. server.py 실행 여부를 확인하세요 (http://localhost:8000)",
       _AUTH:{"auth_title":"로그인","register_title":"회원가입","login_ph":"아이디","password_ph":"비밀번호","email_ph":"이메일","confirm_ph":"비밀번호 확인","to_register":"계정이 없으신가요? 가입하기","to_login":"이미 계정이 있으신가요? 로그인","btn_enter":"로그인","btn_create":"계정 만들기","or_social":"또는 다음으로 로그인","logout":"로그아웃","welcome":"환영합니다, {name}님!","account":"계정","cloud_saved":"☁ 클라우드에 저장됨","err_bad_login":"아이디: 3–32자 (문자, 숫자, _ . -)","err_bad_email":"올바른 이메일이 아닙니다","err_weak":"비밀번호는 최소 6자","err_mismatch":"비밀번호가 일치하지 않습니다","err_login_taken":"이미 사용 중인 아이디입니다","err_email_taken":"이미 등록된 이메일입니다","err_bad_credentials":"아이디 또는 비밀번호가 잘못되었습니다","err_not_configured":"이 소셜 로그인은 서버에 아직 설정되지 않았습니다(client_id 필요). 아이디로 로그인하거나 OAuth를 설정하세요.","err_denied":"소셜 로그인이 취소되었습니다","err_state_mismatch":"보안 확인에 실패했습니다. 다시 시도하세요","err_exchange_failed":"제공자 서버를 사용할 수 없습니다. 나중에 시도하세요","err_no_identity":"제공자가 프로필을 반환하지 않았습니다","err_offline":"서버에 연결할 수 없습니다 — 로컬 플레이, 진행 상황은 브라우저에 저장","guest_skip":"계정 없이 플레이","sync_done":"☁ 클라우드에서 진행 상황을 불러왔습니다","oauth_popup":"소셜 로그인을 위해 팝업을 허용하세요","auth_hint":"진행 상황은 계정에 저장되어 사라지지 않습니다","server_off":"로컬 모드: 데이터베이스 사용 불가","lang_label_auth":"언어","pw_show":"비밀번호 표시","local_guest":"게스트 (로컬 게임)",leaderboard_title:"플레이어 랭킹",lb_online:"온라인: {n}",lb_loading:"온라인: …",lb_my_rank:"내 순위: {n}",lb_me:"내 순위: —",lb_total:"전체 플레이어: {n}",lb_earned:"획득",lb_level:"레벨 {n}",lb_clicks:"클릭",lb_empty:"데이터 없음 — 첫 번째가 되어보세요!",lb_offline:"서버에 연결할 수 없음",need_account:"이 게임은 온라인입니다 — 로그인하거나 계정을 만드세요",lb_top:"최고 수입자 🏆",lb_you:"나"},
       title:"BARCOIN",
       subtitle:"클릭커",
@@ -2734,6 +2805,11 @@
       lvl_17:"우주"
     },
     pl: {
+
+    "db_checking": "Łączenie z serwerem…",
+    "db_ok_mysql": "serwer i baza danych online — miłej gry!",
+    "db_ok_sqlite": "zapasowa baza SQL aktywna — dane są zapisywane",
+    "db_down": "Serwer niedostępny. Sprawdź, czy działa server.py (http://localhost:8000)",
       _AUTH:{"auth_title":"Logowanie","register_title":"Rejestracja","login_ph":"Login","password_ph":"Hasło","email_ph":"E-mail","confirm_ph":"Potwierdź hasło","to_register":"Nie masz konta? Załóż konto","to_login":"Masz już konto? Zaloguj się","btn_enter":"Zaloguj się","btn_create":"Utwórz konto","or_social":"lub zaloguj przez","logout":"Wyloguj","welcome":"Witaj, {name}!","account":"Konto","cloud_saved":"☁ Zapisano w chmurze","err_bad_login":"Login: 3–32 znaki (litery, cyfry, _ . -)","err_bad_email":"Nieprawidłowy adres e-mail","err_weak":"Hasło musi mieć co najmniej 6 znaków","err_mismatch":"Hasła nie są takie same","err_login_taken":"Ten login jest zajęty","err_email_taken":"Ten e-mail jest już zarejestrowany","err_bad_credentials":"Zły login lub hasło","err_not_configured":"Logowanie przez tę sieć nie jest jeszcze skonfigurowane na serwerze (wymagany client_id). Zaloguj loginem lub skonfiguruj OAuth.","err_denied":"Anulowano logowanie społecznościowe","err_state_mismatch":"Kontrola bezpieczeństwa nie powiodła się, spróbuj ponownie","err_exchange_failed":"Serwer sieci niedostępny, spróbuj później","err_no_identity":"Sieć nie zwróciła profilu","err_offline":"Serwer niedostępny — gra lokalna, postęp zapisywany w przeglądarce","guest_skip":"Graj bez konta","sync_done":"☁ Wczytano postęp z chmury","oauth_popup":"Zezwól na okienko pop-up, aby zalogować się przez sieć","auth_hint":"Twój postęp jest zapisywany na koncie i nie zniknie","server_off":"Tryb lokalny: baza danych niedostępna","lang_label_auth":"Język","pw_show":"Pokaż hasło","local_guest":"Gość (gra lokalna)",leaderboard_title:"Ranking graczy",lb_online:"Online: {n}",lb_loading:"Online: …",lb_my_rank:"Moje miejsce: {n}",lb_me:"Moje miejsce: —",lb_total:"Wszyscy gracze: {n}",lb_earned:"zarobione",lb_level:"Poz. {n}",lb_clicks:"kliknięć",lb_empty:"Brak danych — zostań pierwszy w rankingu!",lb_offline:"Serwer niedostępny",need_account:"To gra online — zaloguj się lub załóż konto",lb_top:"Najlepsi zarabiający 🏆",lb_you:"Ty"},
       title:"BARCOIN",
       subtitle:"Klikacz",
@@ -2844,6 +2920,11 @@
       lvl_17:"Uniwersalna"
     },
     hi: {
+
+    "db_checking": "सर्वर से कनेक्ट हो रहे हैं…",
+    "db_ok_mysql": "सर्वर और डेटाबेस ऑनलाइन हैं — मज़े करें!",
+    "db_ok_sqlite": "बैकअप SQL डेटाबेस सक्रिय — आपका डेटा सुरक्षित है",
+    "db_down": "सर्वर उपलब्ध नहीं। सुनिश्चित करें कि server.py चल रहा है (http://localhost:8000)",
       _AUTH:{"auth_title":"लॉगिन","register_title":"रजिस्टर","login_ph":"लॉगिन","password_ph":"पासवर्ड","email_ph":"ईमेल","confirm_ph":"पासवर्ड की पुष्टि करें","to_register":"खाता नहीं है? खाता बनाएँ","to_login":"पहले से खाता है? लॉगिन करें","btn_enter":"लॉगिन करें","btn_create":"खाता बनाएँ","or_social":"या इसके साथ लॉगिन करें","logout":"लॉग आउट","welcome":"स्वागत है, {name}!","account":"खाता","cloud_saved":"☁ क्लाउड में सहेजा गया","err_bad_login":"लॉगिन: 3–32 अक्षर (अक्षर, अंक, _ . -)","err_bad_email":"अमान्य ईमेल पता","err_weak":"पासवर्ड कम से कम 6 अक्षर का हो","err_mismatch":"पासवर्ड मेल नहीं खाते","err_login_taken":"यह लॉगिन पहले से लिया गया है","err_email_taken":"यह ईमेल पहले से पंजीकृत है","err_bad_credentials":"गलत लॉगिन या पासवर्ड","err_not_configured":"इस सोशल नेटवर्क से लॉगिन सर्वर पर अभी कॉन्फ़िगर नहीं है (client_id चाहिए)। लॉगिन से प्रवेश करें या OAuth सेट करें।","err_denied":"आपने सोशल लॉगिन रद्द किया","err_state_mismatch":"सुरक्षा जाँच विफल, फिर से कोशिश करें","err_exchange_failed":"प्रदाता सर्वर अनुपलब्ध, बाद में कोशिश करें","err_no_identity":"प्रदाता ने प्रोफ़ाइल नहीं लौटाई","err_offline":"सर्वर अनुपलब्ध — स्थानीय खेल, प्रगति ब्राउज़र में सहेजी जाती है","guest_skip":"खाते के बिना खेलें","sync_done":"☁ प्रगति क्लाउड से लोड हुई","oauth_popup":"सोशल लॉगिन के लिए पॉप-अप की अनुमति दें","auth_hint":"आपकी प्रगति खाते में सहेजी जाती है और नहीं खोएगी","server_off":"स्थानीय मोड: डेटाबेस अनुपलब्ध","lang_label_auth":"भाषा","pw_show":"पासवर्ड दिखाएँ","local_guest":"मेहमान (स्थानीय खेल)",leaderboard_title:" खिलाड़ी रैंकिंग",lb_online:"ऑनलाइन: {n}",lb_loading:"ऑनलाइन: …",lb_my_rank:"मेरा स्थान: {n}",lb_me:"मेरा स्थान: —",lb_total:"कुल खिलाड़ी: {n}",lb_earned:"कमाई",lb_level:"स्तर {n}",lb_clicks:"क्लिक",lb_empty:"अभी कोई डेटा नहीं — पहले बनें!",lb_offline:"सर्वर अनुपलब्ध",need_account:"यह ऑनलाइन गेम है — साइन इन करें या खाता बनाएँ",lb_top:"सर्वाधिक कमाने वाले 🏆",lb_you:"आप"},
       title:"BARCOIN",
       subtitle:"क्लिकर",
@@ -2954,6 +3035,11 @@
       lvl_17:"ब्रह्मांडीय"
     },
     fi: {
+
+    "db_checking": "Yhdistetään palvelimeen…",
+    "db_ok_mysql": "palvelin ja tietokanta verkossa — hyvää peliä!",
+    "db_ok_sqlite": "varmuusSQL-tietokanta aktiivinen — tietosi tallentuvat",
+    "db_down": "Palvelin ei ole tavoitettavissa. Tarkista että server.py on käynnissä (http://localhost:8000)",
       _AUTH:{"auth_title":"Kirjaudu sisään","register_title":"Rekisteröidy","login_ph":"Tunnus","password_ph":"Salasana","email_ph":"Sähköposti","confirm_ph":"Vahvista salasana","to_register":"Eikö tilillä? Luo tili","to_login":"Onko tilisi jo olemassa? Kirjaudu","btn_enter":"Kirjaudu","btn_create":"Luo tili","or_social":"tai kirjaudu palvelulla","logout":"Kirjaudu ulos","welcome":"Tervetuloa, {name}!","account":"Tili","cloud_saved":"☁ Tallennettu pilveen","err_bad_login":"Tunnus: 3–32 merkkiä (kirjaimet, numerot, _ . -)","err_bad_email":"Virheellinen sähköposti","err_weak":"Salasanassa vähintään 6 merkkiä","err_mismatch":"Salasanat eivät täsmää","err_login_taken":"Tämä tunnus on jo käytössä","err_email_taken":"Tämä sähköposti on jo rekisteröity","err_bad_credentials":"Väärä tunnus tai salasana","err_not_configured":"Kirjautuminen tämän verkon kautta ei ole vielä palvelimella määritetty (client_id tarvitaan). Kirjaudu tunnuksella tai määritä OAuth.","err_denied":"Peruutit kirjautumisen","err_state_mismatch":"Turvatarkastus epäonnistui, yritä uudelleen","err_exchange_failed":"Palvelimen verkkoyhteys ei toimi, yritä myöhemmin","err_no_identity":"Verkko ei palauttanut profiilia","err_offline":"Palvin ei tavoitu — paikallinen peli, edistyminen tallentuu selaimeen","guest_skip":"Pelaa ilman tiliä","sync_done":"☁ Edistyminen ladattu pilvestä","oauth_popup":"Salli ponnahdusikkuna kirjautumista varten","auth_hint":"Edistymisesi tallentuu tilille eikä katoa","server_off":"Paikallinen tila: tietokanta ei tavoitettavissa","lang_label_auth":"Kieli","pw_show":"Näytä salasana","local_guest":"Vieras (paikallinen peli)",leaderboard_title:"Pelaajien tilasto",lb_online:"Paikalla: {n}",lb_loading:"Paikalla: …",lb_my_rank:"Oma sija: {n}",lb_me:"Oma sija: —",lb_total:"Pelaajia yhteensä: {n}",lb_earned:"ansaittu",lb_level:"Taso {n}",lb_clicks:"klikkausta",lb_empty:"Ei tietoja vielä — ole ensimmäinen!",lb_offline:"Palvelin ei vastaa",need_account:"Tämä on online-peli — kirjaudu tai luo tili",lb_top:"Eniten ansainneet 🏆",lb_you:"Sinä"},
       title:"BARCOIN",
       subtitle:"Napsautuspeli",
@@ -3064,6 +3150,11 @@
       lvl_17:"Maailmankaikkeus"
     },
     no: {
+
+    "db_checking": "Kobler til serveren…",
+    "db_ok_mysql": "server og database er online — god spillglede!",
+    "db_ok_sqlite": "reserve-SQL-database aktiv — dataene lagres",
+    "db_down": "Serveren er utilgjengelig. Sjekk at server.py kjører (http://localhost:8000)",
       _AUTH:{"auth_title":"Logg inn","register_title":"Registrer","login_ph":"Brukernavn","password_ph":"Passord","email_ph":"E-post","confirm_ph":"Bekreft passord","to_register":"Ingen konto? Opprett konto","to_login":"Har du konto fra før? Logg inn","btn_enter":"Logg inn","btn_create":"Opprett konto","or_social":"eller logg inn med","logout":"Logg ut","welcome":"Velkommen, {name}!","account":"Konto","cloud_saved":"☁ Lagret i skyen","err_bad_login":"Brukernavn: 3–32 tegn (bokstaver, tall, _ . -)","err_bad_email":"Ugyldig e-postadresse","err_weak":"Passordet må ha minst 6 tegn","err_mismatch":"Passordene er ikke like","err_login_taken":"Dette brukernavnet er opptatt","err_email_taken":"Denne e-posten er allerede registrert","err_bad_credentials":"Feil brukernavn eller passord","err_not_configured":"Innlogging via dette nettverket er ikke konfigurert på serveren ennå (client_id trengs). Logg inn med brukernavn eller sett opp OAuth.","err_denied":"Du avbrøt innloggingen","err_state_mismatch":"Sikkerhetskontroll feilet, prøv igjen","err_exchange_failed":"Leverandørserver utilgjengelig, prøv senere","err_no_identity":"Leverandøren returnerte ingen profil","err_offline":"Server utilgjengelig — lokal spill, fremgang lagres i nettleseren","guest_skip":"Spill uten konto","sync_done":"☁ Fremgang lastet fra skyen","oauth_popup":"Tillat popup-vindu for innlogging","auth_hint":"Fremgangen din lagres på kontoen og går ikke tapt","server_off":"Lokal modus: database utilgjengelig","lang_label_auth":"Språk","pw_show":"Vis passord","local_guest":"Gjest (lokal spill)",leaderboard_title:"Spillerliste",lb_online:"Pålogget: {n}",lb_loading:"Pålogget: …",lb_my_rank:"Min plass: {n}",lb_me:"Min plass: —",lb_total:"Spillere totalt: {n}",lb_earned:"tjent",lb_level:"Nivå {n}",lb_clicks:"klikk",lb_empty:"Ingen data ennå — bli den første!",lb_offline:"Server utilgjengelig",need_account:"Dette er et nettspill — logg inn eller opprett konto",lb_top:"Mest tjent 🏆",lb_you:"Du"},
       title:"BARCOIN",
       subtitle:"Klikker",
@@ -3174,6 +3265,11 @@
       lvl_17:"Universell"
     },
     he: {
+
+    "db_checking": "מתחבר לשרת…",
+    "db_ok_mysql": "השרת ומסד הנתונים מקוונים — תהנו!",
+    "db_ok_sqlite": "מסד נתוני SQL לגיבוי פעיל — הנתונים נשמרים",
+    "db_down": "השרת אינו זמין. ודאו ש-server.py פועל (http://localhost:8000)",
       _AUTH:{"auth_title":"התחברות","register_title":"הרשמה","login_ph":"שם משתמש","password_ph":"סיסמה","email_ph":"דואל","confirm_ph":"אימות סיסמה","to_register":"אין לך חשבון? צור חשבון","to_login":"כבר יש חשבון? התחבר","btn_enter":"התחבר","btn_create":"צור חשבון","or_social":"או התחבר עם","logout":"התנתק","welcome":"ברוך הבא, {name}!","account":"חשבון","cloud_saved":"☁ נשמר בענן","err_bad_login":"שם משתמש: 3–32 תווים (אותיות, ספרות, _ . -)","err_bad_email":"כתובת דואל לא תקינה","err_weak":"הסיסמה חייבת להכיל לפחות 6 תווים","err_mismatch":"הסיסמאות אינן תואמות","err_login_taken":"שם המשתמש תפוס","err_email_taken":"הדואל כבר רשום","err_bad_credentials":"שם משתמש או סיסמה שגויים","err_not_configured":"התחברות דרך הרשת החברתית הזו עדיין לא מוגדרת בשרת (נדרש client_id). התחבר עם שם משתמש או הגדר OAuth.","err_denied":"ביטלת את ההתחברות","err_state_mismatch":"בדיקת האבטחה נכשלה, נסה שוב","err_exchange_failed":"שרת הספק לא זמין, נסה מאוחר יותר","err_no_identity":"הספק לא החזיר פרופיל","err_offline":"השרת לא זמין — משחק מקומי, ההתקדמות נשמרת בדפדפן","guest_skip":"שחק ללא חשבון","sync_done":"☁ ההתקדמות נטענה מהענן","oauth_popup":"אפשר חלונית קופצת להתחברות חברתית","auth_hint":"ההתקדמות נשמרת בחשבון ולא תאבד","server_off":"מצב מקומי: מסד הנתונים לא זמין","lang_label_auth":"שפה","pw_show":"הצג סיסמה","local_guest":"אורח (משחק מקומי)",leaderboard_title:"טבלת מובילים",lb_online:"מקוונים: {n}",lb_loading:"מקוונים: …",lb_my_rank:"המיקום שלי: {n}",lb_me:"המיקום שלי: —",lb_total:"סך השחקנים: {n}",lb_earned:"הרוויח",lb_level:"רמה {n}",lb_clicks:"לחיצות",lb_empty:"אין נתונים עדיין — היו הראשונים!",lb_offline:"השרט אינו זמין",need_account:"המשחק מקוון — התחבר או צור חשבון",lb_top:"המרוויחים הגדולים 🏆",lb_you:"אתה"},
       title:"BARCOIN",
       subtitle:"קליקר",
@@ -3284,6 +3380,11 @@
       lvl_17:"אוניברסלי"
     },
     ar: {
+
+    "db_checking": "جارٍ الاتصال بالخادم…",
+    "db_ok_mysql": "الخادم وقاعدة البيانات متصلان — استمتع باللعب!",
+    "db_ok_sqlite": "قاعدة بيانات SQL احتياطية نشطة — يتم حفظ بياناتك",
+    "db_down": "الخادم غير متاح. تأكد من تشغيل server.py (http://localhost:8000)",
       _AUTH:{"auth_title":"تسجيل الدخول","register_title":"إنشاء حساب","login_ph":"اسم المستخدم","password_ph":"كلمة المرور","email_ph":"البريد الإلكتروني","confirm_ph":"تأكيد كلمة المرور","to_register":"لا تملك حساباً؟ أنشئ حساباً","to_login":"لديك حساب بالفعل؟ سجّل الدخول","btn_enter":"دخول","btn_create":"إنشاء حساب","or_social":"أو سجّل الدخول عبر","logout":"خروج","welcome":"مرحباً، {name}!","account":"الحساب","cloud_saved":"☁ تم الحفظ في السحابة","err_bad_login":"اسم المستخدم: 3–32 حرفاً (أحرف وأرقام و _ . -)","err_bad_email":"عنوان بريد إلكتروني غير صالح","err_weak":"يجب أن تكون كلمة المرور 6 أحرف على الأقل","err_mismatch":"كلمتا المرور غير متطابقتين","err_login_taken":"اسم المستخدم محجوز","err_email_taken":"هذا البريد مسجل مسبقاً","err_bad_credentials":"اسم المستخدم أو كلمة المرور خاطئة","err_not_configured":"تسجيل الدخول عبر هذه الشبكة الاجتماعية غير مُهيأ بعد على الخادم (يلزم client_id). استخدم اسم المستخدم أو اضبط OAuth.","err_denied":"لقد ألغيت تسجيل الدخول الاجتماعي","err_state_mismatch":"فشل فحص الأمان، حاول مرة أخرى","err_exchange_failed":"خادم المزود غير متاح، حاول لاحقاً","err_no_identity":"لم يرجع المزود أي ملف شخصي","err_offline":"الخادم غير متاح — لعب محلي، يتم حفظ التقدم في المتصفح","guest_skip":"العب بدون حساب","sync_done":"☁ تم تحميل التقدم من السحابة","oauth_popup":"اسمح بالنافذة المنبثقة لتسجيل الدخول الاجتماعي","auth_hint":"يتم حفظ تقدمك في الحساب ولن يضيع","server_off":"الوضع المحلي: قاعدة البيانات غير متاحة","lang_label_auth":"اللغة","pw_show":"إظهار كلمة المرور","local_guest":"ضيف (لعب محلي)",leaderboard_title:"لوحة صدارة اللاعبين",lb_online:"متصل: {n}",lb_loading:"متصل: …",lb_my_rank:"مركزي: {n}",lb_me:"مركزي: —",lb_total:"إجمالي اللاعبين: {n}",lb_earned:"مكسوب",lb_level:"مستوى {n}",lb_clicks:"نقرة",lb_empty:"لا توجد بيانات بعد — كن الأول!",lb_offline:"الخادم غير متاح",need_account:"اللعبة عبر الإنترنت — سجّل الدخول أو أنشئ حساباً",lb_top:"الأكثر ربحاً 🏆",lb_you:"أنت"},
       title:"باركوين",
       subtitle:"لعبة نقر",
@@ -3394,6 +3495,11 @@
       lvl_17:"كونية"
     },
         uk: {
+
+        "db_checking": "Перевіряю з'єднання з сервером…",
+        "db_ok_mysql": "сервер і база даних у мережі — грайте на здоров'я!",
+        "db_ok_sqlite": "резервна SQL-база активна — ваші дані зберігаються",
+        "db_down": "Сервер недоступний. Перевірте, чи запущено server.py (http://localhost:8000)",
       _AUTH:{"auth_title":"Вхід","register_title":"Реєстрація","login_ph":"Логін","password_ph":"Пароль","email_ph":"Електронна пошта","confirm_ph":"Підтвердіть пароль","to_register":"Немає акаунта? Створити акаунт","to_login":"Вже є акаунт? Увійти","btn_enter":"Увійти","btn_create":"Створити акаунт","or_social":"або увійдіть через","logout":"Вийти","welcome":"Ласкаво просимо, {name}!","account":"Акаунт","cloud_saved":"☁ Збережено у хмарі","err_bad_login":"Логін: 3–32 символи (літери, цифри, _ . -)","err_bad_email":"Некоректна електронна пошта","err_weak":"Пароль щонайменше 6 символів","err_mismatch":"Паролі не збігаються","err_login_taken":"Такий логін уже зайнятий","err_email_taken":"Ця пошта вже зареєстрована","err_bad_credentials":"Невірний логін або пароль","err_not_configured":"Вхід через цю соцмережу ще не налаштований на сервері (потрібен client_id). Увійдіть за логіном або налаштуйте OAuth.","err_denied":"Ви скасували вхід через соцмережу","err_state_mismatch":"Перевірка безпеки не пройдена, спробуйте ще раз","err_exchange_failed":"Сервер соцмережі недоступний, спробуйте пізніше","err_no_identity":"Соцмережа не повернула профіль","err_offline":"Сервер недоступний — грайте локально, прогрес зберігається в браузері","guest_skip":"Грати без акаунта","sync_done":"☁ Прогрес завантажено з хмари","oauth_popup":"Дозвольте спливаюче вікно для входу через соцмережу","auth_hint":"Прогрес зберігається в акаунті й не загубиться","server_off":"Локальний режим: база даних недоступна","lang_label_auth":"Мова інтерфейсу","pw_show":"Показати пароль","local_guest":"Гість (локальна гра)"},
       title:"БАРКОІН",
       subtitle:"Клікер",
@@ -4328,6 +4434,27 @@
   function lockGame() { authGateEl.classList.remove('hidden'); document.body.classList.add('locked'); }
   function unlockGame() { authGateEl.classList.add('hidden'); document.body.classList.remove('locked'); }
 
+  // --- индикатор состояния SQL-базы данных на экране входа ---
+  async function refreshDbBadge() {
+    const el = $('dbBadge');
+    if (!el) return;
+    try {
+      const d = await apiGet('/api/db_status');
+      if (d.ok && d.engine === 'mysql') {
+        el.className = 'db-badge ok';
+        el.innerHTML = '🗄️ <b>MySQL</b> · ' + t('db_ok_mysql');
+      } else if (d.ok) {
+        el.className = 'db-badge warn';
+        el.innerHTML = '🗄️ <b>SQLite</b> · ' + t('db_ok_sqlite');
+      } else {
+        throw new Error('bad');
+      }
+    } catch (e) {
+      el.className = 'db-badge bad';
+      el.innerHTML = '⚠️ ' + t('db_down');
+    }
+  }
+
   // --- чип пользователя в шапке ---
   function renderUserChip() {
     const chip = $('userChip');
@@ -4549,6 +4676,7 @@
 
   // --- проверка сессии при старте; результат — в window.__authReady ---
   window.__authReady = (async () => {
+    refreshDbBadge();
     // параметры от OAuth-callback (?token=... или ошибка)
     const qp = new URLSearchParams(location.search);
     if (qp.get('oauth') === '1' && qp.get('token')) {
