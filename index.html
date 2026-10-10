@@ -113,6 +113,40 @@
 
   /* Кнопка аккаунта — вторая слева в углу шапки */
   .auth-corner-btn { left: 54px; }
+  /* ===== Полноэкранный экран входа (авторизация/регистрация) ===== */
+  .auth-gate {
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(1200px 800px at 50% -10%, var(--accent-soft), transparent 60%),
+                linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+    overflow-y: auto; padding: 20px;
+    transition: opacity .35s ease, visibility .35s;
+  }
+  .auth-gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  .auth-gate-card {
+    width: 440px; max-width: 94vw;
+    background: linear-gradient(160deg, var(--card-from), var(--card-to));
+    border: 1px solid var(--card-border); border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45), 0 0 40px var(--accent-glow);
+    padding: 26px 26px 22px; margin: auto;
+  }
+  .gate-logo { text-align: center; margin-bottom: 18px; }
+  .gate-logo img {
+    width: 84px; height: 84px; object-fit: contain; border-radius: 50%;
+    box-shadow: 0 0 26px var(--accent-glow), 0 6px 18px rgba(0,0,0,.4);
+    animation: gateSpin 7s linear infinite;
+  }
+  @keyframes gateSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+  .gate-logo h1 {
+    font-size: 26px; letter-spacing: 3px; color: var(--gold); margin: 10px 0 2px;
+    text-shadow: 0 0 18px var(--accent-glow);
+  }
+  .gate-sub { font-size: 12px; color: var(--text-dim); letter-spacing: 2px; }
+  .auth-hint { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 12px; }
+  .guest-row { text-align: center; margin-top: 8px; }
+  .guest-row a { font-size: 12px; color: var(--text-dim); cursor: pointer; text-decoration: underline; }
+  .guest-row a:hover { color: var(--accent); }
+  body.locked { overflow: hidden; }
   .user-chip {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
     display: flex; align-items: center; gap: 8px;
@@ -1067,7 +1101,6 @@
 
   <div class="header">
     <button class="settings-btn" id="settingsBtn" title="Настройки" aria-label="Настройки">⚙️</button>
-    <button class="settings-btn auth-corner-btn" id="authOpenBtn" title="Аккаунт" aria-label="Аккаунт">👤</button>
     <div class="logo-row">
       <img class="logo-coin" src="image/coin.png" alt="BARC">
       <h1 data-i18n="title">БАРКОИН</h1>
@@ -1252,55 +1285,54 @@
     </div>
   </div>
 
-  <!-- ===== Модалка авторизации / регистрации ===== -->
-  <div class="modal-overlay" id="authOverlay">
-    <div class="modal auth-modal" role="dialog" aria-modal="true">
-      <div class="modal-header">
-        <div class="modal-title" id="authTitle" data-i18n="auth_login_title">Вход</div>
-        <button class="modal-close" id="authClose" aria-label="Закрыть">✕</button>
+  <!-- ===== ЭКРАН АВТОРИЗАЦИИ / РЕГИСТРАЦИИ (вход в игру) ===== -->
+  <div class="auth-gate" id="authGate">
+    <div class="auth-gate-card">
+      <div class="gate-logo">
+        <img src="image/coin.png" alt="BARC" draggable="false">
+        <h1 data-i18n="title">БАРКОИН</h1>
+        <div class="gate-sub"><span data-i18n="subtitle">Кликер</span> • BARC</div>
       </div>
       <div class="modal-body">
         <div class="auth-tabs">
-          <div class="auth-tab active" id="tabLogin" data-i18n="tab_login">Вход</div>
-          <div class="auth-tab" id="tabRegister" data-i18n="tab_register">Регистрация</div>
+          <div class="auth-tab active" id="tabLogin" data-i18n="auth_title">Вход</div>
+          <div class="auth-tab" id="tabRegister" data-i18n="register_title">Регистрация</div>
         </div>
 
         <form id="loginForm" autocomplete="on">
           <div class="auth-field">
-            <label data-i18n="f_login">Логин</label>
+            <label data-i18n="login_ph">Логин</label>
             <input type="text" id="liLogin" autocomplete="username" required>
           </div>
           <div class="auth-field">
-            <label data-i18n="f_password">Пароль</label>
+            <label data-i18n="password_ph">Пароль</label>
             <input type="password" id="liPass" autocomplete="current-password" required>
           </div>
           <div class="auth-error" id="loginError"></div>
-          <button type="submit" class="auth-submit" data-i18n="btn_enter">Войти</button>
-          <div class="auth-switchlink"><span data-i18n="no_account">Нет аккаунта?</span>
-            <a id="goRegister" data-i18n="create_account">Создать аккаунт</a></div>
+          <button type="submit" class="auth-submit" id="liSubmit" data-i18n="btn_enter">Войти</button>
+          <div class="auth-switchlink"><a id="goRegister" data-i18n="to_register">Нет аккаунта? Создать аккаунт</a></div>
         </form>
 
         <form id="registerForm" style="display:none" autocomplete="on">
           <div class="auth-field">
-            <label data-i18n="f_login">Логин</label>
+            <label data-i18n="login_ph">Логин</label>
             <input type="text" id="rgLogin" autocomplete="username" required>
           </div>
           <div class="auth-field">
-            <label data-i18n="f_email">Электронная почта</label>
+            <label data-i18n="email_ph">Электронная почта</label>
             <input type="email" id="rgEmail" autocomplete="email" required>
           </div>
           <div class="auth-field">
-            <label data-i18n="f_password">Пароль</label>
+            <label data-i18n="password_ph">Пароль</label>
             <input type="password" id="rgPass" autocomplete="new-password" required>
           </div>
           <div class="auth-field">
-            <label data-i18n="f_confirm">Подтвердите пароль</label>
+            <label data-i18n="confirm_ph">Подтвердите пароль</label>
             <input type="password" id="rgPass2" autocomplete="new-password" required>
           </div>
           <div class="auth-error" id="regError"></div>
-          <button type="submit" class="auth-submit" data-i18n="btn_create">Создать аккаунт</button>
-          <div class="auth-switchlink"><span data-i18n="have_account">Уже есть аккаунт?</span>
-            <a id="goLogin" data-i18n="btn_enter">Войти</a></div>
+          <button type="submit" class="auth-submit" id="rgSubmit" data-i18n="btn_create">Создать аккаунт</button>
+          <div class="auth-switchlink"><a id="goLogin" data-i18n="to_login">Уже есть аккаунт? Войти</a></div>
         </form>
 
         <div class="auth-divider"><span data-i18n="or_social">или войдите через соцсети</span></div>
@@ -1323,6 +1355,8 @@
           <div class="settings-label">🌍 <span data-i18n="language_label">Язык интерфейса</span></div>
           <select id="authLangSelect"></select>
         </div>
+        <div class="auth-hint" data-i18n="auth_hint">Прогресс сохраняется в аккаунт и не потеряется</div>
+        <div class="guest-row"><a id="guestSkip" data-i18n="guest_skip">Играть без аккаунта</a></div>
       </div>
     </div>
   </div>
@@ -1442,6 +1476,7 @@
   // ================================================================
   const TRANSLATIONS = {
     ru: {
+      _AUTH:{"auth_title":"Вход","register_title":"Регистрация","login_ph":"Логин","password_ph":"Пароль","email_ph":"Электронная почта","confirm_ph":"Подтвердите пароль","to_register":"Нет аккаунта? Создать аккаунт","to_login":"Уже есть аккаунт? Войти","btn_enter":"Войти","btn_create":"Создать аккаунт","or_social":"или войдите через","logout":"Выйти","welcome":"Добро пожаловать, {name}!","account":"Аккаунт","cloud_saved":"☁ Сохранено в облако","err_bad_login":"Логин: 3–32 символа (буквы, цифры, _ . -)","err_bad_email":"Некорректная электронная почта","err_weak":"Пароль минимум 6 символов","err_mismatch":"Пароли не совпадают","err_login_taken":"Такой логин уже занят","err_email_taken":"Эта почта уже зарегистрирована","err_bad_credentials":"Неверный логин или пароль","err_not_configured":"Вход через эту соцсеть пока не настроен на сервере (нужен client_id). Войдите по логину или настройте OAuth.","err_denied":"Вы отменили вход через соцсеть","err_state_mismatch":"Проверка безопасности не пройдена, попробуйте ещё раз","err_exchange_failed":"Сервер соцсети недоступен, попробуйте позже","err_no_identity":"Соцсеть не вернула профиль","err_offline":"Сервер недоступен — играйте локально, прогресс сохраняется в браузере","guest_skip":"Играть без аккаунта","sync_done":"☁ Прогресс загружен из облака","oauth_popup":"Разрешите всплывающее окно для входа через соцсеть","auth_hint":"Прогресс сохраняется в аккаунт и не потеряется","server_off":"Локальный режим: база данных недоступна","lang_label_auth":"Язык интерфейса","pw_show":"Показать пароль","local_guest":"Гость (локальная игра)"},
       title:'БАРКОИН', subtitle:'Кликер',
       rank_novice:'Новичок', rank_amateur:'Любитель', rank_trader:'Трейдер', rank_investor:'Инвестор',
       rank_tycoon:'Магнат', rank_baron:'Крипто-барон', rank_lord:'Барский лорд', rank_legend:'Легенда',
@@ -1480,6 +1515,7 @@
       lvl_15:'Звёздная', lvl_16:'Галактическая', lvl_17:'Вселенская'
     },
     en: {
+      _AUTH:{"auth_title":"Sign in","register_title":"Sign up","login_ph":"Login","password_ph":"Password","email_ph":"Email","confirm_ph":"Confirm password","to_register":"No account? Create one","to_login":"Already have an account? Sign in","btn_enter":"Sign in","btn_create":"Create account","or_social":"or sign in with","logout":"Log out","welcome":"Welcome, {name}!","account":"Account","cloud_saved":"☁ Saved to cloud","err_bad_login":"Login: 3–32 characters (letters, digits, _ . -)","err_bad_email":"Invalid email address","err_weak":"Password must be at least 6 characters","err_mismatch":"Passwords do not match","err_login_taken":"This login is already taken","err_email_taken":"This email is already registered","err_bad_credentials":"Wrong login or password","err_not_configured":"Sign-in with this social network is not configured on the server yet (client_id required). Use login/password or set up OAuth.","err_denied":"You cancelled the social sign-in","err_state_mismatch":"Security check failed, please try again","err_exchange_failed":"Social provider server unavailable, try later","err_no_identity":"The provider returned no profile","err_offline":"Server unavailable — playing locally, progress saved in browser","guest_skip":"Play without an account","sync_done":"☁ Progress loaded from cloud","oauth_popup":"Allow the popup window to sign in with a social network","auth_hint":"Your progress is stored in the account and won't be lost","server_off":"Local mode: database unavailable","lang_label_auth":"Language","pw_show":"Show password","local_guest":"Guest (local game)"},
       title:'BARCOIN', subtitle:'Clicker',
       rank_novice:'Novice', rank_amateur:'Amateur', rank_trader:'Trader', rank_investor:'Investor',
       rank_tycoon:'Tycoon', rank_baron:'Crypto Baron', rank_lord:'Barc Lord', rank_legend:'Legend',
@@ -1518,6 +1554,7 @@
       lvl_15:'Stellar', lvl_16:'Galactic', lvl_17:'Universal'
     },
     de: {
+      _AUTH:{"auth_title":"Anmelden","register_title":"Registrieren","login_ph":"Benutzername","password_ph":"Passwort","email_ph":"E-Mail","confirm_ph":"Passwort bestätigen","to_register":"Noch kein Konto? Konto erstellen","to_login":"Schon ein Konto? Anmelden","btn_enter":"Anmelden","btn_create":"Konto erstellen","or_social":"oder anmelden mit","logout":"Abmelden","welcome":"Willkommen, {name}!","account":"Konto","cloud_saved":"☁ In der Cloud gespeichert","err_bad_login":"Benutzername: 3–32 Zeichen (Buchstaben, Ziffern, _ . -)","err_bad_email":"Ungültige E-Mail-Adresse","err_weak":"Passwort mindestens 6 Zeichen","err_mismatch":"Passwörter stimmen nicht überein","err_login_taken":"Dieser Name ist bereits vergeben","err_email_taken":"Diese E-Mail ist bereits registriert","err_bad_credentials":"Falscher Name oder Passwort","err_not_configured":"Anmeldung über dieses Netzwerk ist auf dem Server noch nicht eingerichtet (client_id nötig). Melde dich per Benutzername an oder richte OAuth ein.","err_denied":"Du hast die Anmeldung abgebrochen","err_state_mismatch":"Sicherheitsprüfung fehlgeschlagen, bitte erneut versuchen","err_exchange_failed":"Server des Netzwerks nicht erreichbar, versuche es später","err_no_identity":"Netzwerk lieferte kein Profil","err_offline":"Server nicht erreichbar — lokales Spiel, Fortschritt im Browser gespeichert","guest_skip":"Ohne Konto spielen","sync_done":"☁ Fortschritt aus der Cloud geladen","oauth_popup":"Popup-Fenster für die Anmeldung erlauben","auth_hint":"Dein Fortschritt wird im Konto gespeichert und geht nicht verloren","server_off":"Lokaler Modus: Datenbank nicht verfügbar","lang_label_auth":"Sprache","pw_show":"Passwort anzeigen","local_guest":"Gast (lokales Spiel)"},
       title:"BARCOIN",
       subtitle:"Klicker",
       rank_novice:"Anfänger",
@@ -1627,6 +1664,7 @@
       lvl_17:"Universal"
     },
     fr: {
+      _AUTH:{"auth_title":"Connexion","register_title":"Inscription","login_ph":"Identifiant","password_ph":"Mot de passe","email_ph":"E-mail","confirm_ph":"Confirmer le mot de passe","to_register":"Pas de compte ? Créer un compte","to_login":"Déjà un compte ? Se connecter","btn_enter":"Se connecter","btn_create":"Créer le compte","or_social":"ou se connecter avec","logout":"Déconnexion","welcome":"Bienvenue, {name} !","account":"Compte","cloud_saved":"☁ Enregistré dans le cloud","err_bad_login":"Identifiant : 3 à 32 caractères (lettres, chiffres, _ . -)","err_bad_email":"Adresse e-mail invalide","err_weak":"Mot de passe : 6 caractères minimum","err_mismatch":"Les mots de passe ne correspondent pas","err_login_taken":"Cet identifiant est déjà pris","err_email_taken":"Cet e-mail est déjà enregistré","err_bad_credentials":"Identifiant ou mot de passe incorrect","err_not_configured":"La connexion via ce réseau n'est pas encore configurée sur le serveur (client_id requis). Connectez-vous par identifiant ou configurez OAuth.","err_denied":"Vous avez annulé la connexion sociale","err_state_mismatch":"Contrôle de sécurité échoué, réessayez","err_exchange_failed":"Serveur du réseau indisponible, réessayez plus tard","err_no_identity":"Le réseau n'a pas renvoyé de profil","err_offline":"Serveur indisponible — jeu local, progression enregistrée dans le navigateur","guest_skip":"Jouer sans compte","sync_done":"☁ Progression chargée depuis le cloud","oauth_popup":"Autorisez la fenêtre pop-up pour la connexion sociale","auth_hint":"Votre progression est sauvegardée dans le compte","server_off":"Mode local : base de données indisponible","lang_label_auth":"Langue","pw_show":"Afficher le mot de passe","local_guest":"Invité (jeu local)"},
       title:"BARCOIN",
       subtitle:"Clicker",
       rank_novice:"Débutant",
@@ -1736,6 +1774,7 @@
       lvl_17:"Universelle"
     },
     es: {
+      _AUTH:{"auth_title":"Iniciar sesión","register_title":"Registrarse","login_ph":"Usuario","password_ph":"Contraseña","email_ph":"Correo electrónico","confirm_ph":"Confirmar contraseña","to_register":"¿Sin cuenta? Crea una","to_login":"¿Ya tienes cuenta? Inicia sesión","btn_enter":"Entrar","btn_create":"Crear cuenta","or_social":"o entra con","logout":"Salir","welcome":"¡Bienvenido, {name}!","account":"Cuenta","cloud_saved":"☁ Guardado en la nube","err_bad_login":"Usuario: 3–32 caracteres (letras, números, _ . -)","err_bad_email":"Correo electrónico no válido","err_weak":"La contraseña debe tener al menos 6 caracteres","err_mismatch":"Las contraseñas no coinciden","err_login_taken":"Ese usuario ya existe","err_email_taken":"Ese correo ya está registrado","err_bad_credentials":"Usuario o contraseña incorrectos","err_not_configured":"El acceso con esta red social aún no está configurado en el servidor (se necesita client_id). Entra con usuario o configura OAuth.","err_denied":"Has cancelado el acceso social","err_state_mismatch":"Comprobación de seguridad fallida, inténtalo de nuevo","err_exchange_failed":"Servidor de la red no disponible, inténtalo más tarde","err_no_identity":"La red no devolvió perfil","err_offline":"Servidor no disponible — juego local, progreso guardado en el navegador","guest_skip":"Jugar sin cuenta","sync_done":"☁ Progreso cargado desde la nube","oauth_popup":"Permite la ventana emergente para entrar con la red social","auth_hint":"Tu progreso se guarda en la cuenta y no se perderá","server_off":"Modo local: base de datos no disponible","lang_label_auth":"Idioma","pw_show":"Mostrar contraseña","local_guest":"Invitado (juego local)"},
       title:"BARCOIN",
       subtitle:"Clicador",
       rank_novice:"Novato",
@@ -1845,6 +1884,7 @@
       lvl_17:"Universal"
     },
     pt: {
+      _AUTH:{"auth_title":"Entrar","register_title":"Cadastrar-se","login_ph":"Usuário","password_ph":"Senha","email_ph":"E-mail","confirm_ph":"Confirmar senha","to_register":"Sem conta? Crie uma","to_login":"Já tem conta? Entrar","btn_enter":"Entrar","btn_create":"Criar conta","or_social":"ou entre com","logout":"Sair","welcome":"Bem-vindo, {name}!","account":"Conta","cloud_saved":"☁ Salvo na nuvem","err_bad_login":"Usuário: 3–32 caracteres (letras, números, _ . -)","err_bad_email":"E-mail inválido","err_weak":"A senha deve ter pelo menos 6 caracteres","err_mismatch":"As senhas não coincidem","err_login_taken":"Esse usuário já existe","err_email_taken":"Esse e-mail já está cadastrado","err_bad_credentials":"Usuário ou senha incorretos","err_not_configured":"O acesso por esta rede ainda não está configurado no servidor (client_id necessário). Entre com usuário ou configure o OAuth.","err_denied":"Você cancelou o acesso pela rede","err_state_mismatch":"Verificação de segurança falhou, tente novamente","err_exchange_failed":"Servidor da rede indisponível, tente mais tarde","err_no_identity":"A rede não retornou perfil","err_offline":"Servidor indisponível — jogo local, progresso salvo no navegador","guest_skip":"Jogar sem conta","sync_done":"☁ Progresso carregado da nuvem","oauth_popup":"Permita a janela pop-up para entrar pela rede","auth_hint":"Seu progresso é salvo na conta e não será perdido","server_off":"Modo local: banco de dados indisponível","lang_label_auth":"Idioma","pw_show":"Mostrar senha","local_guest":"Convidado (jogo local)"},
       title:"BARCOIN",
       subtitle:"Clicador",
       rank_novice:"Novato",
@@ -1954,6 +1994,7 @@
       lvl_17:"Universal"
     },
     tr: {
+      _AUTH:{"auth_title":"Giriş","register_title":"Kayıt ol","login_ph":"Kullanıcı adı","password_ph":"Şifre","email_ph":"E-posta","confirm_ph":"Şifreyi onayla","to_register":"Hesabın yok mu? Hesap oluştur","to_login":"Zaten hesabın var mı? Giriş yap","btn_enter":"Giriş yap","btn_create":"Hesap oluştur","or_social":"veya şununla giriş yap","logout":"Çıkış","welcome":"Hoş geldin, {name}!","account":"Hesap","cloud_saved":"☁ Buluta kaydedildi","err_bad_login":"Kullanıcı adı: 3–32 karakter (harf, rakam, _ . -)","err_bad_email":"Geçersiz e-posta","err_weak":"Şifre en az 6 karakter olmalı","err_mismatch":"Şifreler eşleşmiyor","err_login_taken":"Bu kullanıcı adı alınmış","err_email_taken":"Bu e-posta zaten kayıtlı","err_bad_credentials":"Yanlış kullanıcı adı veya şifre","err_not_configured":"Bu ağ ile giriş sunucuda henüz yapılandırılmadı (client_id gerekli). Kullanıcı adı ile gir veya OAuth kur.","err_denied":"Sosyal girişi iptal ettiniz","err_state_mismatch":"Güvenlik doğrulaması başarısız, tekrar deneyin","err_exchange_failed":"Sağlayıcı sunucusu mevcut değil, sonra deneyin","err_no_identity":"Sağlayıcı profil döndürmedi","err_offline":"Sunucu erişilemez — yerel oyun, ilerleme tarayıcıda saklanır","guest_skip":"Hesapsız oyna","sync_done":"☁ İlerleme buluttan yüklendi","oauth_popup":"Sosyal giriş için açılır pencereye izin ver","auth_hint":"İlerlemen hesapta saklanır ve kaybolmaz","server_off":"Yerel mod: veritabanı erişilemez","lang_label_auth":"Dil","pw_show":"Şifreyi göster","local_guest":"Misafir (yerel oyun)"},
       title:"BARCOIN",
       subtitle:"Tıklayıcı",
       rank_novice:"Acemi",
@@ -2063,6 +2104,7 @@
       lvl_17:"Evrensel"
     },
     el: {
+      _AUTH:{"auth_title":"Σύνδεση","register_title":"Εγγραφή","login_ph":"Όνομα χρήστη","password_ph":"Κωδικός","email_ph":"E-mail","confirm_ph":"Επιβεβαίωση κωδικού","to_register":"Δεν έχεις λογαριασμό; Δημιουργία","to_login":"Έχεις ήδη λογαριασμό; Σύνδεση","btn_enter":"Σύνδεση","btn_create":"Δημιουργία λογαριασμού","or_social":"ή σύνδεση με","logout":"Αποσύνδεση","welcome":"Καλωσόρισμα, {name}!","account":"Λογαριασμός","cloud_saved":"☁ Αποθηκεύτηκε στο cloud","err_bad_login":"Όνομα χρήστη: 3–32 χαρακτήρες (γράμματα, ψηφία, _ . -)","err_bad_email":"Μη έγκυρο e-mail","err_weak":"Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες","err_mismatch":"Οι κωδικοί δεν ταιριάζουν","err_login_taken":"Αυτό το όνομα υπάρχει ήδη","err_email_taken":"Αυτό το e-mail είναι ήδη εγγεγραμμένο","err_bad_credentials":"Λάθος όνομα ή κωδικός","err_not_configured":"Η σύνδεση με αυτό το δίκτυο δεν έχει ρυθμιστεί ακόμα στον διακομιστή (χρειάζεται client_id). Συνδέσου με όνομα ή ρύθμισε το OAuth.","err_denied":"Ακυρώσατε τη σύνδεση","err_state_mismatch":"Ο έλεγχος ασφαλείας απέτυχε, δοκιμάστε ξανά","err_exchange_failed":"Ο διακομιστής δικτύου δεν είναι διαθέσιμος","err_no_identity":"Το δίκτυο δεν επέστρεψε προφίλ","err_offline":"Διακομιστής μη διαθέσιμος — τοπικό παιχνίδι, η πρόοδος αποθηκεύεται στον browser","guest_skip":"Παίξε χωρίς λογαριασμό","sync_done":"☁ Η πρόοδος φορτώθηκε από το cloud","oauth_popup":"Επιτρέψτε το pop-up για σύνδεση","auth_hint":"Η πρόοδός σας αποθηκεύεται στον λογαριασμό","server_off":"Τοπική λειτουργία: βάση δεδομένων μη διαθέσιμη","lang_label_auth":"Γλώσσα","pw_show":"Εμφάνιση κωδικού","local_guest":"Επισκέπτης (τοπικά)"},
       title:"BARCOIN",
       subtitle:"Κλικέρ",
       rank_novice:"Αρχάριος",
@@ -2172,6 +2214,7 @@
       lvl_17:"Καθολικό"
     },
     zh: {
+      _AUTH:{"auth_title":"登录","register_title":"注册","login_ph":"用户名","password_ph":"密码","email_ph":"电子邮箱","confirm_ph":"确认密码","to_register":"没有账号？创建账号","to_login":"已有账号？去登录","btn_enter":"登录","btn_create":"创建账号","or_social":"或使用以下方式登录","logout":"退出","welcome":"欢迎，{name}！","account":"账号","cloud_saved":"☁ 已保存到云端","err_bad_login":"用户名：3–32个字符（字母、数字、_ . -）","err_bad_email":"邮箱地址无效","err_weak":"密码至少6位","err_mismatch":"两次密码不一致","err_login_taken":"该用户名已被占用","err_email_taken":"该邮箱已注册","err_bad_credentials":"用户名或密码错误","err_not_configured":"服务器尚未配置该社交网络登录（需要 client_id）。请用用户名登录或配置 OAuth。","err_denied":"您取消了社交登录","err_state_mismatch":"安全校验失败，请重试","err_exchange_failed":"社交服务器不可用，请稍后再试","err_no_identity":"社交网络未返回资料","err_offline":"服务器不可用——本地游戏，进度保存在浏览器","guest_skip":"不登录直接玩","sync_done":"☁ 已从云端加载进度","oauth_popup":"允许弹出窗口以进行社交登录","auth_hint":"进度将保存在账号中，不会丢失","server_off":"本地模式：数据库不可用","lang_label_auth":"界面语言","pw_show":"显示密码","local_guest":"游客（本地游戏）"},
       title:"BARCOIN",
       subtitle:"点击器",
       rank_novice:"新手",
@@ -2281,6 +2324,7 @@
       lvl_17:"宇宙"
     },
     th: {
+      _AUTH:{"auth_title":"เข้าสู่ระบบ","register_title":"สมัครสมาชิก","login_ph":"ชื่อผู้ใช้","password_ph":"รหัสผ่าน","email_ph":"อีเมล","confirm_ph":"ยืนยันรหัสผ่าน","to_register":"ยังไม่มีบัญชี? สร้างบัญชี","to_login":"มีบัญชีแล้ว? เข้าสู่ระบบ","btn_enter":"เข้าสู่ระบบ","btn_create":"สร้างบัญชี","or_social":"หรือเข้าสู่ระบบด้วย","logout":"ออกจากระบบ","welcome":"ยินดีต้อนรับ {name}!","account":"บัญชี","cloud_saved":"☁ บันทึกลงคลาวด์แล้ว","err_bad_login":"ชื่อผู้ใช้: 3–32 ตัวอักษร (ตัวอักษร ตัวเลข _ . -)","err_bad_email":"ที่อยู่อีเมลไม่ถูกต้อง","err_weak":"รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร","err_mismatch":"รหัสผ่านไม่ตรงกัน","err_login_taken":"ชื่อผู้ใช้นี้ถูกใช้แล้ว","err_email_taken":"อีเมลนี้ลงทะเบียนแล้ว","err_bad_credentials":"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง","err_not_configured":"การเข้าสู่ระบบด้วยเครือข่ายนี้ยังไม่ได้รับการตั้งค่าบนเซิร์ฟเวอร์ (ต้องมี client_id) กรุณาเข้าสู่ระบบด้วยชื่อผู้ใช้หรือตั้งค่า OAuth","err_denied":"คุณยกเลิกการเข้าสู่ระบบ","err_state_mismatch":"การตรวจสอบความปลอดภัยไม่สำเร็จ ลองอีกครั้ง","err_exchange_failed":"เซิร์ฟเวอร์ของผู้ให้บริการไม่พร้อมใช้งาน ลองภายหลัง","err_no_identity":"ผู้ให้บริการไม่ส่งโปรไฟล์กลับมา","err_offline":"เซิร์ฟเวอร์ไม่พร้อมใช้งาน — เล่นในเครื่อง ความคืบหน้าบันทึกในเบราว์เซอร์","guest_skip":"เล่นโดยไม่ใช้บัญชี","sync_done":"☁ โหลดความคืบหน้าจากคลาวด์แล้ว","oauth_popup":"อนุญาตป๊อปอัพเพื่อเข้าสู่ระบบ","auth_hint":"ความคืบหน้าจะถูกบันทึกในบัญชีและไม่หาย","server_off":"โหมดโลคัล: ฐานข้อมูลไม่พร้อมใช้งาน","lang_label_auth":"ภาษา","pw_show":"แสดงรหัสผ่าน","local_guest":"แขก (เล่นในเครื่อง)"},
       title:"BARCOIN",
       subtitle:"คลิกเกอร์",
       rank_novice:"มือใหม่",
@@ -2390,6 +2434,7 @@
       lvl_17:"จักรวาล"
     },
     ja: {
+      _AUTH:{"auth_title":"ログイン","register_title":"新規登録","login_ph":"ユーザー名","password_ph":"パスワード","email_ph":"メールアドレス","confirm_ph":"パスワード確認","to_register":"アカウントをお持ちでない方はこちら","to_login":"すでにアカウントをお持ちの方","btn_enter":"ログイン","btn_create":"アカウント作成","or_social":"または次でログイン","logout":"ログアウト","welcome":"ようこそ、{name}さん！","account":"アカウント","cloud_saved":"☁ クラウドに保存しました","err_bad_login":"ユーザー名: 3〜32文字（英数字、_ . -）","err_bad_email":"メールアドレスが正しくありません","err_weak":"パスワードは6文字以上","err_mismatch":"パスワードが一致しません","err_login_taken":"このユーザー名は使われています","err_email_taken":"このメールは登録済みです","err_bad_credentials":"ユーザー名またはパスワードが違います","err_not_configured":"このSNSログインはサーバー側で未設定です（client_idが必要）。ユーザー名でログインするかOAuthを設定してください。","err_denied":"SNSログインがキャンセルされました","err_state_mismatch":"セキュリティ確認に失敗しました。もう一度お試しください","err_exchange_failed":"プロバイダーのサーバーを利用できません。後でお試しください","err_no_identity":"プロバイダーからプロフィールが返されませんでした","err_offline":"サーバーに接続できません—ローカルでプレイ中、進捗はブラウザに保存","guest_skip":"アカウントなしでプレイ","sync_done":"☁ クラウドから進捗を読み込みました","oauth_popup":"SNSログインのためのポップアップを許可してください","auth_hint":"進捗はアカウントに保存され失われません","server_off":"ローカルモード: データベース利用不可","lang_label_auth":"言語","pw_show":"パスワードを表示","local_guest":"ゲスト（ローカル）"},
       title:"BARCOIN",
       subtitle:"クリッカー",
       rank_novice:"初心者",
@@ -2499,6 +2544,7 @@
       lvl_17:"宇宙"
     },
     ko: {
+      _AUTH:{"auth_title":"로그인","register_title":"회원가입","login_ph":"아이디","password_ph":"비밀번호","email_ph":"이메일","confirm_ph":"비밀번호 확인","to_register":"계정이 없으신가요? 가입하기","to_login":"이미 계정이 있으신가요? 로그인","btn_enter":"로그인","btn_create":"계정 만들기","or_social":"또는 다음으로 로그인","logout":"로그아웃","welcome":"환영합니다, {name}님!","account":"계정","cloud_saved":"☁ 클라우드에 저장됨","err_bad_login":"아이디: 3–32자 (문자, 숫자, _ . -)","err_bad_email":"올바른 이메일이 아닙니다","err_weak":"비밀번호는 최소 6자","err_mismatch":"비밀번호가 일치하지 않습니다","err_login_taken":"이미 사용 중인 아이디입니다","err_email_taken":"이미 등록된 이메일입니다","err_bad_credentials":"아이디 또는 비밀번호가 잘못되었습니다","err_not_configured":"이 소셜 로그인은 서버에 아직 설정되지 않았습니다(client_id 필요). 아이디로 로그인하거나 OAuth를 설정하세요.","err_denied":"소셜 로그인이 취소되었습니다","err_state_mismatch":"보안 확인에 실패했습니다. 다시 시도하세요","err_exchange_failed":"제공자 서버를 사용할 수 없습니다. 나중에 시도하세요","err_no_identity":"제공자가 프로필을 반환하지 않았습니다","err_offline":"서버에 연결할 수 없습니다 — 로컬 플레이, 진행 상황은 브라우저에 저장","guest_skip":"계정 없이 플레이","sync_done":"☁ 클라우드에서 진행 상황을 불러왔습니다","oauth_popup":"소셜 로그인을 위해 팝업을 허용하세요","auth_hint":"진행 상황은 계정에 저장되어 사라지지 않습니다","server_off":"로컬 모드: 데이터베이스 사용 불가","lang_label_auth":"언어","pw_show":"비밀번호 표시","local_guest":"게스트 (로컬 게임)"},
       title:"BARCOIN",
       subtitle:"클릭커",
       rank_novice:"초보",
@@ -2608,6 +2654,7 @@
       lvl_17:"우주"
     },
     pl: {
+      _AUTH:{"auth_title":"Logowanie","register_title":"Rejestracja","login_ph":"Login","password_ph":"Hasło","email_ph":"E-mail","confirm_ph":"Potwierdź hasło","to_register":"Nie masz konta? Załóż konto","to_login":"Masz już konto? Zaloguj się","btn_enter":"Zaloguj się","btn_create":"Utwórz konto","or_social":"lub zaloguj przez","logout":"Wyloguj","welcome":"Witaj, {name}!","account":"Konto","cloud_saved":"☁ Zapisano w chmurze","err_bad_login":"Login: 3–32 znaki (litery, cyfry, _ . -)","err_bad_email":"Nieprawidłowy adres e-mail","err_weak":"Hasło musi mieć co najmniej 6 znaków","err_mismatch":"Hasła nie są takie same","err_login_taken":"Ten login jest zajęty","err_email_taken":"Ten e-mail jest już zarejestrowany","err_bad_credentials":"Zły login lub hasło","err_not_configured":"Logowanie przez tę sieć nie jest jeszcze skonfigurowane na serwerze (wymagany client_id). Zaloguj loginem lub skonfiguruj OAuth.","err_denied":"Anulowano logowanie społecznościowe","err_state_mismatch":"Kontrola bezpieczeństwa nie powiodła się, spróbuj ponownie","err_exchange_failed":"Serwer sieci niedostępny, spróbuj później","err_no_identity":"Sieć nie zwróciła profilu","err_offline":"Serwer niedostępny — gra lokalna, postęp zapisywany w przeglądarce","guest_skip":"Graj bez konta","sync_done":"☁ Wczytano postęp z chmury","oauth_popup":"Zezwól na okienko pop-up, aby zalogować się przez sieć","auth_hint":"Twój postęp jest zapisywany na koncie i nie zniknie","server_off":"Tryb lokalny: baza danych niedostępna","lang_label_auth":"Język","pw_show":"Pokaż hasło","local_guest":"Gość (gra lokalna)"},
       title:"BARCOIN",
       subtitle:"Klikacz",
       rank_novice:"Nowicjusz",
@@ -2717,6 +2764,7 @@
       lvl_17:"Uniwersalna"
     },
     hi: {
+      _AUTH:{"auth_title":"लॉगिन","register_title":"रजिस्टर","login_ph":"लॉगिन","password_ph":"पासवर्ड","email_ph":"ईमेल","confirm_ph":"पासवर्ड की पुष्टि करें","to_register":"खाता नहीं है? खाता बनाएँ","to_login":"पहले से खाता है? लॉगिन करें","btn_enter":"लॉगिन करें","btn_create":"खाता बनाएँ","or_social":"या इसके साथ लॉगिन करें","logout":"लॉग आउट","welcome":"स्वागत है, {name}!","account":"खाता","cloud_saved":"☁ क्लाउड में सहेजा गया","err_bad_login":"लॉगिन: 3–32 अक्षर (अक्षर, अंक, _ . -)","err_bad_email":"अमान्य ईमेल पता","err_weak":"पासवर्ड कम से कम 6 अक्षर का हो","err_mismatch":"पासवर्ड मेल नहीं खाते","err_login_taken":"यह लॉगिन पहले से लिया गया है","err_email_taken":"यह ईमेल पहले से पंजीकृत है","err_bad_credentials":"गलत लॉगिन या पासवर्ड","err_not_configured":"इस सोशल नेटवर्क से लॉगिन सर्वर पर अभी कॉन्फ़िगर नहीं है (client_id चाहिए)। लॉगिन से प्रवेश करें या OAuth सेट करें।","err_denied":"आपने सोशल लॉगिन रद्द किया","err_state_mismatch":"सुरक्षा जाँच विफल, फिर से कोशिश करें","err_exchange_failed":"प्रदाता सर्वर अनुपलब्ध, बाद में कोशिश करें","err_no_identity":"प्रदाता ने प्रोफ़ाइल नहीं लौटाई","err_offline":"सर्वर अनुपलब्ध — स्थानीय खेल, प्रगति ब्राउज़र में सहेजी जाती है","guest_skip":"खाते के बिना खेलें","sync_done":"☁ प्रगति क्लाउड से लोड हुई","oauth_popup":"सोशल लॉगिन के लिए पॉप-अप की अनुमति दें","auth_hint":"आपकी प्रगति खाते में सहेजी जाती है और नहीं खोएगी","server_off":"स्थानीय मोड: डेटाबेस अनुपलब्ध","lang_label_auth":"भाषा","pw_show":"पासवर्ड दिखाएँ","local_guest":"मेहमान (स्थानीय खेल)"},
       title:"BARCOIN",
       subtitle:"क्लिकर",
       rank_novice:"नौसिखिया",
@@ -2826,6 +2874,7 @@
       lvl_17:"ब्रह्मांडीय"
     },
     fi: {
+      _AUTH:{"auth_title":"Kirjaudu sisään","register_title":"Rekisteröidy","login_ph":"Tunnus","password_ph":"Salasana","email_ph":"Sähköposti","confirm_ph":"Vahvista salasana","to_register":"Eikö tilillä? Luo tili","to_login":"Onko tilisi jo olemassa? Kirjaudu","btn_enter":"Kirjaudu","btn_create":"Luo tili","or_social":"tai kirjaudu palvelulla","logout":"Kirjaudu ulos","welcome":"Tervetuloa, {name}!","account":"Tili","cloud_saved":"☁ Tallennettu pilveen","err_bad_login":"Tunnus: 3–32 merkkiä (kirjaimet, numerot, _ . -)","err_bad_email":"Virheellinen sähköposti","err_weak":"Salasanassa vähintään 6 merkkiä","err_mismatch":"Salasanat eivät täsmää","err_login_taken":"Tämä tunnus on jo käytössä","err_email_taken":"Tämä sähköposti on jo rekisteröity","err_bad_credentials":"Väärä tunnus tai salasana","err_not_configured":"Kirjautuminen tämän verkon kautta ei ole vielä palvelimella määritetty (client_id tarvitaan). Kirjaudu tunnuksella tai määritä OAuth.","err_denied":"Peruutit kirjautumisen","err_state_mismatch":"Turvatarkastus epäonnistui, yritä uudelleen","err_exchange_failed":"Palvelimen verkkoyhteys ei toimi, yritä myöhemmin","err_no_identity":"Verkko ei palauttanut profiilia","err_offline":"Palvin ei tavoitu — paikallinen peli, edistyminen tallentuu selaimeen","guest_skip":"Pelaa ilman tiliä","sync_done":"☁ Edistyminen ladattu pilvestä","oauth_popup":"Salli ponnahdusikkuna kirjautumista varten","auth_hint":"Edistymisesi tallentuu tilille eikä katoa","server_off":"Paikallinen tila: tietokanta ei tavoitettavissa","lang_label_auth":"Kieli","pw_show":"Näytä salasana","local_guest":"Vieras (paikallinen peli)"},
       title:"BARCOIN",
       subtitle:"Napsautuspeli",
       rank_novice:"Tulokas",
@@ -2935,6 +2984,7 @@
       lvl_17:"Maailmankaikkeus"
     },
     no: {
+      _AUTH:{"auth_title":"Logg inn","register_title":"Registrer","login_ph":"Brukernavn","password_ph":"Passord","email_ph":"E-post","confirm_ph":"Bekreft passord","to_register":"Ingen konto? Opprett konto","to_login":"Har du konto fra før? Logg inn","btn_enter":"Logg inn","btn_create":"Opprett konto","or_social":"eller logg inn med","logout":"Logg ut","welcome":"Velkommen, {name}!","account":"Konto","cloud_saved":"☁ Lagret i skyen","err_bad_login":"Brukernavn: 3–32 tegn (bokstaver, tall, _ . -)","err_bad_email":"Ugyldig e-postadresse","err_weak":"Passordet må ha minst 6 tegn","err_mismatch":"Passordene er ikke like","err_login_taken":"Dette brukernavnet er opptatt","err_email_taken":"Denne e-posten er allerede registrert","err_bad_credentials":"Feil brukernavn eller passord","err_not_configured":"Innlogging via dette nettverket er ikke konfigurert på serveren ennå (client_id trengs). Logg inn med brukernavn eller sett opp OAuth.","err_denied":"Du avbrøt innloggingen","err_state_mismatch":"Sikkerhetskontroll feilet, prøv igjen","err_exchange_failed":"Leverandørserver utilgjengelig, prøv senere","err_no_identity":"Leverandøren returnerte ingen profil","err_offline":"Server utilgjengelig — lokal spill, fremgang lagres i nettleseren","guest_skip":"Spill uten konto","sync_done":"☁ Fremgang lastet fra skyen","oauth_popup":"Tillat popup-vindu for innlogging","auth_hint":"Fremgangen din lagres på kontoen og går ikke tapt","server_off":"Lokal modus: database utilgjengelig","lang_label_auth":"Språk","pw_show":"Vis passord","local_guest":"Gjest (lokal spill)"},
       title:"BARCOIN",
       subtitle:"Klikker",
       rank_novice:"Nybegynner",
@@ -3044,6 +3094,7 @@
       lvl_17:"Universell"
     },
     he: {
+      _AUTH:{"auth_title":"התחברות","register_title":"הרשמה","login_ph":"שם משתמש","password_ph":"סיסמה","email_ph":"דואל","confirm_ph":"אימות סיסמה","to_register":"אין לך חשבון? צור חשבון","to_login":"כבר יש חשבון? התחבר","btn_enter":"התחבר","btn_create":"צור חשבון","or_social":"או התחבר עם","logout":"התנתק","welcome":"ברוך הבא, {name}!","account":"חשבון","cloud_saved":"☁ נשמר בענן","err_bad_login":"שם משתמש: 3–32 תווים (אותיות, ספרות, _ . -)","err_bad_email":"כתובת דואל לא תקינה","err_weak":"הסיסמה חייבת להכיל לפחות 6 תווים","err_mismatch":"הסיסמאות אינן תואמות","err_login_taken":"שם המשתמש תפוס","err_email_taken":"הדואל כבר רשום","err_bad_credentials":"שם משתמש או סיסמה שגויים","err_not_configured":"התחברות דרך הרשת החברתית הזו עדיין לא מוגדרת בשרת (נדרש client_id). התחבר עם שם משתמש או הגדר OAuth.","err_denied":"ביטלת את ההתחברות","err_state_mismatch":"בדיקת האבטחה נכשלה, נסה שוב","err_exchange_failed":"שרת הספק לא זמין, נסה מאוחר יותר","err_no_identity":"הספק לא החזיר פרופיל","err_offline":"השרת לא זמין — משחק מקומי, ההתקדמות נשמרת בדפדפן","guest_skip":"שחק ללא חשבון","sync_done":"☁ ההתקדמות נטענה מהענן","oauth_popup":"אפשר חלונית קופצת להתחברות חברתית","auth_hint":"ההתקדמות נשמרת בחשבון ולא תאבד","server_off":"מצב מקומי: מסד הנתונים לא זמין","lang_label_auth":"שפה","pw_show":"הצג סיסמה","local_guest":"אורח (משחק מקומי)"},
       title:"BARCOIN",
       subtitle:"קליקר",
       rank_novice:"מתחיל",
@@ -3153,6 +3204,7 @@
       lvl_17:"אוניברסלי"
     },
     ar: {
+      _AUTH:{"auth_title":"تسجيل الدخول","register_title":"إنشاء حساب","login_ph":"اسم المستخدم","password_ph":"كلمة المرور","email_ph":"البريد الإلكتروني","confirm_ph":"تأكيد كلمة المرور","to_register":"لا تملك حساباً؟ أنشئ حساباً","to_login":"لديك حساب بالفعل؟ سجّل الدخول","btn_enter":"دخول","btn_create":"إنشاء حساب","or_social":"أو سجّل الدخول عبر","logout":"خروج","welcome":"مرحباً، {name}!","account":"الحساب","cloud_saved":"☁ تم الحفظ في السحابة","err_bad_login":"اسم المستخدم: 3–32 حرفاً (أحرف وأرقام و _ . -)","err_bad_email":"عنوان بريد إلكتروني غير صالح","err_weak":"يجب أن تكون كلمة المرور 6 أحرف على الأقل","err_mismatch":"كلمتا المرور غير متطابقتين","err_login_taken":"اسم المستخدم محجوز","err_email_taken":"هذا البريد مسجل مسبقاً","err_bad_credentials":"اسم المستخدم أو كلمة المرور خاطئة","err_not_configured":"تسجيل الدخول عبر هذه الشبكة الاجتماعية غير مُهيأ بعد على الخادم (يلزم client_id). استخدم اسم المستخدم أو اضبط OAuth.","err_denied":"لقد ألغيت تسجيل الدخول الاجتماعي","err_state_mismatch":"فشل فحص الأمان، حاول مرة أخرى","err_exchange_failed":"خادم المزود غير متاح، حاول لاحقاً","err_no_identity":"لم يرجع المزود أي ملف شخصي","err_offline":"الخادم غير متاح — لعب محلي، يتم حفظ التقدم في المتصفح","guest_skip":"العب بدون حساب","sync_done":"☁ تم تحميل التقدم من السحابة","oauth_popup":"اسمح بالنافذة المنبثقة لتسجيل الدخول الاجتماعي","auth_hint":"يتم حفظ تقدمك في الحساب ولن يضيع","server_off":"الوضع المحلي: قاعدة البيانات غير متاحة","lang_label_auth":"اللغة","pw_show":"إظهار كلمة المرور","local_guest":"ضيف (لعب محلي)"},
       title:"باركوين",
       subtitle:"لعبة نقر",
       rank_novice:"مبتدئ",
@@ -3262,6 +3314,7 @@
       lvl_17:"كونية"
     },
         uk: {
+      _AUTH:{"auth_title":"Вхід","register_title":"Реєстрація","login_ph":"Логін","password_ph":"Пароль","email_ph":"Електронна пошта","confirm_ph":"Підтвердіть пароль","to_register":"Немає акаунта? Створити акаунт","to_login":"Вже є акаунт? Увійти","btn_enter":"Увійти","btn_create":"Створити акаунт","or_social":"або увійдіть через","logout":"Вийти","welcome":"Ласкаво просимо, {name}!","account":"Акаунт","cloud_saved":"☁ Збережено у хмарі","err_bad_login":"Логін: 3–32 символи (літери, цифри, _ . -)","err_bad_email":"Некоректна електронна пошта","err_weak":"Пароль щонайменше 6 символів","err_mismatch":"Паролі не збігаються","err_login_taken":"Такий логін уже зайнятий","err_email_taken":"Ця пошта вже зареєстрована","err_bad_credentials":"Невірний логін або пароль","err_not_configured":"Вхід через цю соцмережу ще не налаштований на сервері (потрібен client_id). Увійдіть за логіном або налаштуйте OAuth.","err_denied":"Ви скасували вхід через соцмережу","err_state_mismatch":"Перевірка безпеки не пройдена, спробуйте ще раз","err_exchange_failed":"Сервер соцмережі недоступний, спробуйте пізніше","err_no_identity":"Соцмережа не повернула профіль","err_offline":"Сервер недоступний — грайте локально, прогрес зберігається в браузері","guest_skip":"Грати без акаунта","sync_done":"☁ Прогрес завантажено з хмари","oauth_popup":"Дозвольте спливаюче вікно для входу через соцмережу","auth_hint":"Прогрес зберігається в акаунті й не загубиться","server_off":"Локальний режим: база даних недоступна","lang_label_auth":"Мова інтерфейсу","pw_show":"Показати пароль","local_guest":"Гість (локальна гра)"},
       title:"БАРКОІН",
       subtitle:"Клікер",
       rank_novice:"Новачок",
@@ -3377,7 +3430,9 @@
     const dict = TRANSLATIONS[currentLang] || {};
     const enDict = TRANSLATIONS.en;
     let s = dict[key] !== undefined ? dict[key]
-            : (enDict[key] !== undefined ? enDict[key] : key);
+            : ((dict._AUTH && dict._AUTH[key] !== undefined) ? dict._AUTH[key]
+            : ((enDict._AUTH && enDict._AUTH[key] !== undefined) ? enDict._AUTH[key]
+            : (enDict[key] !== undefined ? enDict[key] : key)));
     if (params) for (const k in params) s = s.replace(new RegExp('\\{' + k + '\\}', 'g'), params[k]);
     return s;
   }
@@ -3805,7 +3860,7 @@
     state.levelIndex++;
     renderCoin();
     updateUpgradesDisplay();
-    saveGame();
+    cloudSave();
     showToast(t('coin_unlocked', { name: coinName(state.levelIndex) }));
   }
 
@@ -3827,7 +3882,7 @@
       showToast(t('level_up', { n: state.playerLevel }));
     }
     renderPlayerBars();
-    saveGame();
+    cloudSave();
   }
 
   function updateRank() {
@@ -4010,7 +4065,7 @@
     updateBalanceDisplay();
     updateUpgradesDisplay();
     renderUpgradeMain();
-    saveGame();
+    cloudSave();
   }
 
   function renderUpgrades() {
@@ -4053,7 +4108,7 @@
     renderCoin();
     renderPlayerBars();
     updateUpgradesDisplay();
-    saveGame();
+    cloudSave();
     playSound('buy');
     showToast(t('upgrade_bought', { name: t('upg_' + u.id) }));
   }
@@ -4068,13 +4123,14 @@
     updateBalanceDisplay();
     updateUpgradesDisplay();
     renderUpgradeMain();
-    saveGame();
+    cloudSave();
     playSound('buy');
     showToast(t('sold_msg', { net: net.toFixed(2), tax: tax.toFixed(2) }));
   };
 
-  resetBtn.onclick = () => {
+  resetBtn.onclick = async () => {
     if (!confirm(t('confirm_reset'))) return;
+    try { await apiPost('/api/save', { save: {} }); } catch(e) {}
     localStorage.removeItem('barcoin_clicker_v5');
     location.reload();
   };
@@ -4088,7 +4144,7 @@
       updateBalanceDisplay();
       updateUpgradesDisplay();
       renderUpgradeMain();
-      saveGame();
+      cloudSave();
     }
 
     if (state.energy < state.maxEnergy) {
@@ -4157,7 +4213,278 @@
     } catch(e) { console.log('Ошибка загрузки', e); }
   }
 
-  // ===== Загрузка настроек (тема, язык, переключатели) до первого рендера =====
+  // ================================================================
+  // АВТОРИЗАЦИЯ / РЕГИСТРАЦИЯ / БАЗА ДАННЫХ (сервер server.py: SQLite)
+  // Вход в игру возможен только после авторизации (или как гость — локально).
+  // OAuth VK / Google / Яндекс / Discord — по-настоящему: сервер делает
+  // Authorization Code + PKCE редирект на страницу входа провайдера.
+  // ================================================================
+  const AUTH_TOKEN_KEY = 'barcoin_auth_token';
+  const GUEST_KEY = 'barcoin_guest_ok';
+  let currentUser = null;      // {id, login, email, provider, avatar_url}
+  let authToken = localStorage.getItem(AUTH_TOKEN_KEY) || '';
+  let serverOnline = false;
+  let cloudSaveTimer = null;
+
+  async function api(path, opts = {}) {
+    const headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+    if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+    const res = await fetch(path, { ...opts, headers });
+    let data = {};
+    try { data = await res.json(); } catch(e) {}
+    if (!res.ok) { const err = new Error(data.error || ('HTTP ' + res.status)); err.code = data.code; throw err; }
+    return data;
+  }
+  const apiPost = (path, body) => api(path, { method: 'POST', body: JSON.stringify(body || {}) });
+  const apiGet  = (path) => api(path);
+
+  // --- гейт: блокирует игру до входа ---
+  const authGateEl = $('authGate');
+  function lockGame() { authGateEl.classList.remove('hidden'); document.body.classList.add('locked'); }
+  function unlockGame() { authGateEl.classList.add('hidden'); document.body.classList.remove('locked'); }
+
+  // --- чип пользователя в шапке ---
+  function renderUserChip() {
+    const chip = $('userChip');
+    if (!chip) return;
+    if (!currentUser) { chip.hidden = true; chip.innerHTML = ''; return; }
+    chip.hidden = false;
+    chip.innerHTML = '';
+    const av = document.createElement('img');
+    av.style.cssText = 'width:22px;height:22px;border-radius:50%;object-fit:contain;background:var(--accent-soft)';
+    av.src = currentUser.avatar || 'image/coin.png';
+    av.alt = '';
+    const name = document.createElement('span');
+    name.className = 'chip-login';
+    name.textContent = currentUser.login;
+    const status = document.createElement('span');
+    status.className = 'chip-status' + (serverOnline ? '' : ' offline');
+    status.textContent = serverOnline ? t('cloud_saved') : t('server_off');
+    const out = document.createElement('button');
+    out.textContent = t('logout');
+    out.onclick = logout;
+    chip.append(av, name, status, out);
+  }
+
+  // --- облачное сохранение прогресса ---
+  function cloudSave() {
+    saveGame();                                  // локальная копия — всегда
+    if (!serverOnline || !currentUser) return;   // без аккаунта — только localStorage
+    clearTimeout(cloudSaveTimer);
+    cloudSaveTimer = setTimeout(async () => {
+      try { await apiPost('/api/save', { save: snapshotData() }); } catch(e) {}
+    }, 1500);
+  }
+
+  function snapshotData() {
+    return {
+      balance: state.balance, levelIndex: state.levelIndex, usdBalance: state.usdBalance,
+      totalClicks: state.totalClicks, energy: state.energy, maxEnergy: state.maxEnergy,
+      energyProgress: state.energyProgress, xp: state.xp, playerLevel: state.playerLevel,
+      critChance: state.critChance, critMult: state.critMult, price: state.price,
+      priceHistory: state.priceHistory.slice(-CHART_POINTS), autoPerSec, clickMultiplier,
+      upgrades: upgrades.map(u => ({ bought: u.bought, cost: u.cost }))
+    };
+  }
+  function applySnapshot(d) {
+    if (!d || typeof d !== 'object' || d.balance === undefined) return false;
+    Object.assign(state, {
+      balance: d.balance || 0, levelIndex: d.levelIndex || 0, usdBalance: d.usdBalance || 0,
+      totalClicks: d.totalClicks || 0, energy: d.energy ?? MAX_ENERGY,
+      maxEnergy: d.maxEnergy || MAX_ENERGY, energyProgress: d.energyProgress || 0,
+      xp: d.xp || 0, playerLevel: d.playerLevel || 1,
+      critChance: d.critChance || BASE_CRIT_CHANCE, critMult: d.critMult || BASE_CRIT_MULT,
+      price: d.price || 1.0, priceHistory: d.priceHistory || []
+    });
+    autoPerSec = d.autoPerSec || 0;
+    clickMultiplier = d.clickMultiplier || 1;
+    if (Array.isArray(d.upgrades)) d.upgrades.forEach((u, i) => {
+      if (upgrades[i]) { upgrades[i].bought = u.bought || 0; if (u.cost) upgrades[i].cost = u.cost; }
+    });
+    return true;
+  }
+
+  // --- вход/выход ---
+  async function pullCloudSave() {
+    try {
+      const d = await apiGet('/api/save');
+      if (d && d.ok && applySnapshot(d.save)) {
+        updateRank(); renderUpgrades(); renderCoin(); renderPlayerBars();
+        updateUpgradesDisplay(); updateBalanceDisplay(); drawChart();
+        saveGame();
+        showToast(t('sync_done'));
+      }
+    } catch(e) {}
+  }
+  function afterLogin(user) {
+    currentUser = user;
+    localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+    unlockGame();
+    renderUserChip();
+    showToast(t('welcome', { name: user.login }));
+    pullCloudSave();
+  }
+  async function logout() {
+    try { await apiPost('/api/logout', {}); } catch(e) {}
+    localStorage.removeItem(GUEST_KEY);          // после выхода — снова нужен вход
+    location.reload();
+  }
+
+  // --- переключение вкладок Вход/Регистрация ---
+  const tabLoginEl = $('tabLogin'), tabRegisterEl = $('tabRegister');
+  const loginFormEl = $('loginForm'), registerFormEl = $('registerForm');
+  function showAuthTab(reg) {
+    tabLoginEl.classList.toggle('active', !reg);
+    tabRegisterEl.classList.toggle('active', reg);
+    loginFormEl.style.display = reg ? 'none' : '';
+    registerFormEl.style.display = reg ? '' : 'none';
+    $('loginError').textContent = ''; $('regError').textContent = '';
+  }
+  tabLoginEl.onclick = () => showAuthTab(false);
+  tabRegisterEl.onclick = () => showAuthTab(true);
+  $('goRegister').onclick = e => { e.preventDefault(); showAuthTab(true); };
+  $('goLogin').onclick = e => { e.preventDefault(); showAuthTab(false); };
+
+  const LOGIN_RE = /^[A-Za-zА-Яа-яЁё0-9_.\-]{3,32}$/;
+  const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/;
+
+  loginFormEl.addEventListener('submit', async e => {
+    e.preventDefault();
+    const errEl = $('loginError'), btn = $('liSubmit');
+    errEl.textContent = ''; errEl.classList.remove('auth-ok');
+    const login = $('liLogin').value.trim(), pass = $('liPass').value;
+    if (!LOGIN_RE.test(login)) { errEl.textContent = t('err_bad_login'); return; }
+    if (pass.length < 6) { errEl.textContent = t('err_weak'); return; }
+    btn.disabled = true;
+    try {
+      const d = await apiPost('/api/login', { login, password: pass, lang: settings.lang });
+      authToken = d.token;
+      afterLogin(d.user);
+    } catch(err) {
+      serverOnline = !!(err && err.code);   // HTTP-ответ был => сервер жив
+      const code = err && err.code;
+      if (!serverOnline || code === undefined) errEl.textContent = t('err_offline');
+      else errEl.textContent = t(code === 'bad_credentials' ? 'err_bad_credentials'
+                                : code === 'weak_password' ? 'err_weak' : 'err_bad_login');
+    } finally { btn.disabled = false; }
+  });
+
+  registerFormEl.addEventListener('submit', async e => {
+    e.preventDefault();
+    const errEl = $('regError'), btn = $('rgSubmit');
+    errEl.textContent = ''; errEl.classList.remove('auth-ok');
+    const login = $('rgLogin').value.trim(), email = $('rgEmail').value.trim();
+    const pass = $('rgPass').value, pass2 = $('rgPass2').value;
+    if (!LOGIN_RE.test(login)) { errEl.textContent = t('err_bad_login'); return; }
+    if (!EMAIL_RE.test(email)) { errEl.textContent = t('err_bad_email'); return; }
+    if (pass.length < 6) { errEl.textContent = t('err_weak'); return; }
+    if (pass !== pass2) { errEl.textContent = t('err_mismatch'); return; }
+    btn.disabled = true;
+    try {
+      const d = await apiPost('/api/register', { login, email, password: pass, lang: settings.lang });
+      authToken = d.token;
+      afterLogin(d.user);
+    } catch(err) {
+      serverOnline = !!(err && err.code);   // HTTP-ответ был => сервер жив
+      const rmap = { bad_login: 'err_bad_login', bad_email: 'err_bad_email',
+                     weak_password: 'err_weak', password_mismatch: 'err_mismatch',
+                     login_taken: 'err_login_taken', email_taken: 'err_email_taken' };
+      const code = err && err.code;
+      errEl.textContent = (code && rmap[code]) ? t(rmap[code]) : t('err_offline');
+    } finally { btn.disabled = false; }
+  });
+
+  // --- соцсети: настоящий OAuth через сервер (/auth/<p>/start → редирект провайдера) ---
+  document.querySelectorAll('.social-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const provider = btn.dataset.provider;
+      const w = window.open('/auth/' + provider + '/start', 'oauth_' + provider, 'width=520,height=720');
+      if (!w) showToast(t('oauth_popup'), true);
+    });
+  });
+  // результат из localStorage (на случай, если postMessage не дошёл)
+  window.addEventListener('storage', ev => {
+    if (ev.key !== 'barcoin_oauth_result' || !ev.newValue) return;
+    let d = null; try { d = JSON.parse(ev.newValue); } catch(e) {}
+    if (!d) return;
+    localStorage.removeItem('barcoin_oauth_result');
+    if (d.ok && authToken) {
+      apiGet('/api/me').then(r => { if (r.ok && r.user) afterLogin(r.user); }).catch(() => {});
+    } else if (!d.ok) {
+      const map = { denied: 'err_denied', state_mismatch: 'err_state_mismatch',
+                    exchange_failed: 'err_exchange_failed', no_identity: 'err_no_identity',
+                    not_configured: 'err_not_configured' };
+      showToast(t(map[d.error] || 'err_exchange_failed'), true);
+    }
+  });
+
+  // --- приём результата OAuth из popup-окна ---
+  window.addEventListener('message', ev => {
+    const d = ev.data;
+    if (!d || d.type !== 'barcoin-oauth') return;
+    if (d.ok && d.token) {
+      authToken = d.token;
+      try { localStorage.setItem(AUTH_TOKEN_KEY, authToken); } catch(e) {}
+      apiGet('/api/me').then(r => afterLogin(r.user)).catch(() => location.reload());
+    } else if (d.ok) {
+      // успех пришёл через /?token=... в этом же окне — обработан ниже при старте
+    } else if (d.error) {
+      const map = { denied: 'err_denied', state: 'err_state_mismatch', state_mismatch: 'err_state_mismatch',
+                    exchange: 'err_exchange_failed', exchange_failed: 'err_exchange_failed',
+                    identity: 'err_no_identity', no_identity: 'err_no_identity',
+                    not_configured: 'err_not_configured' };
+      showToast(t(map[d.error] || 'err_exchange_failed'), true);
+    }
+  });
+
+  // --- гость (локальная игра без аккаунта) ---
+  $('guestSkip').onclick = () => {
+    localStorage.setItem(GUEST_KEY, '1');
+    unlockGame();
+    renderUserChip();
+  };
+
+  // --- язык внутри форм входа/регистрации ---
+  function buildAuthLangSelect() {
+    const sel = $('authLangSelect');
+    if (!sel) return;
+    sel.innerHTML = '';
+    Object.entries(LANG_NAMES).sort((a,b) => a[1].localeCompare(b[1])).forEach(([code, name]) => {
+      const opt = document.createElement('option');
+      opt.value = code; opt.textContent = name;
+      if (code === settings.lang) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+  $('authLangSelect').addEventListener('change', e => { if (e.target.value) setLanguage(e.target.value); });
+
+  // --- проверка сессии при старте; результат — в window.__authReady ---
+  window.__authReady = (async () => {
+    // параметры от OAuth-callback (?token=... или ошибка)
+    const qp = new URLSearchParams(location.search);
+    if (qp.get('oauth') === '1' && qp.get('token')) {
+      authToken = qp.get('token');
+      localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+      try { window.opener && window.opener.postMessage({ type: 'barcoin-oauth', ok: true, token: authToken }, '*'); } catch(e) {}
+      history.replaceState(null, '', location.pathname);
+    } else if (qp.get('oauth') === '1') {
+      const emap = { access_denied: 'err_denied', state: 'err_state_mismatch', exchange: 'err_exchange_failed', identity: 'err_no_identity' };
+      try { window.opener && window.opener.postMessage({ type: 'barcoin-oauth', ok: false, error: emap[qp.get('err')] || 'exchange' }, '*'); } catch(e) {}
+      history.replaceState(null, '', location.pathname);
+    }
+    try {
+      const d = await apiGet('/api/me');
+      serverOnline = true;
+      if (d.ok && d.user) { currentUser = d.user; return; }
+    } catch(e) {
+      serverOnline = false;
+      if (authToken) { localStorage.removeItem(AUTH_TOKEN_KEY); authToken = ''; }
+    }
+  })();
+
+  // ================================================================
+  // СТАРТ ИГРЫ
+  // ================================================================
   loadSettings();
   currentLang = settings.lang;
   document.documentElement.lang = currentLang;
@@ -4166,6 +4493,7 @@
   applyStaticTranslations();
   buildThemeGrid();
   buildLangSelect('');
+  buildAuthLangSelect();
 
   loadGame();
   updateRank();
@@ -4174,6 +4502,20 @@
   renderPlayerBars();
   updateUpgradesDisplay();
   coinEl.addEventListener('click', handleClick);
+
+  // Игра закрыта экраном входа, пока игрок не авторизуется (или не выберет гостевой режим)
+  lockGame();
+  window.__authReady.then(async () => {
+    renderUserChip();
+    if (currentUser) {
+      // аккаунт найден — грузим облачное сохранение (облако важнее локальной копии)
+      await pullCloudSave();
+      unlockGame();
+    } else if (localStorage.getItem(GUEST_KEY) === '1') {
+      unlockGame();
+    }
+    // иначе остаёмся на экране авторизации — в игру вход закрыт
+  });
 
   // ================================================================
   // НАСТРОЙКИ: открытие/закрытие, выбор темы, языка, переключатели

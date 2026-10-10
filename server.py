@@ -517,6 +517,7 @@ class Handler(SimpleHTTPRequestHandler):
         if len(parts) >= 3 and parts[2] == 'start':
             built = build_authorize_url(provider, base)
             if not built:
+                # не настроено — popup-страница с честным сообщением (frontend поймает postMessage)
                 return self._auth_result(False, provider, error='not_configured')
             url, state, verifier = built
             cookie = 'bc_oauth=%s|%s; Path=/auth/%s; SameSite=Lax; Max-Age=600' % (
@@ -568,10 +569,13 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def _auth_result(self, ok, provider, error=None):
-        # страница-постанщик для popup-окна: пишет результат в localStorage и закрывается
+        # страница-постанщик для popup-окна: пишет результат в localStorage
+        # и шлёт postMessage родителю (frontend слушает 'barcoin-oauth')
         html = '''<!doctype html><meta charset="utf-8"><title>OAuth</title>
 <script>
-try{localStorage.setItem('barcoin_oauth_result',JSON.stringify({ok:%s,provider:%r,error:%r}))}catch(e){}
+var payload={type:'barcoin-oauth',ok:%s,provider:%r,error:%r};
+try{localStorage.setItem('barcoin_oauth_result',JSON.stringify(payload))}catch(e){}
+try{if(window.opener)window.opener.postMessage(payload,'*')}catch(e){}
 document.body.innerHTML='<p style="font-family:sans-serif;padding:2em">%s</p>';
 setTimeout(function(){window.close()},400);
 </script>''' % (str(ok).lower(), provider, error,
