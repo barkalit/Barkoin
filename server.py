@@ -16,6 +16,8 @@ API:
   POST /api/logout
   GET  /api/save       -> {ok, save}
   POST /api/save       {save:{...}}                  -> {ok, saved_at}
+  GET  /api/online     -> {ok, online}               (игроков в сети за 2 мин)
+  GET  /api/leaderboard?limit=50 -> {ok, leaderboard[], online, total_players, me_rank}
   GET  /auth/<p>/start  -> OAuth-редирект на настоящую страницу входа провайдера
   GET  /auth/<p>/callback -> приём кода (PKCE), обмен токена, вход/регистрация
   /.well-known/oauth-authorization-server (для Discord)

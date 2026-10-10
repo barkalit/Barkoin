@@ -3501,7 +3501,8 @@
       lvl_14:"Планетарна",
       lvl_15:"Зоряна",
       lvl_16:"Галактична",
-      lvl_17:"Всесвітня"
+      lvl_17:"Всесвітня",
+      leaderboard_title:"Рейтинг гравців",lb_online:"Онлайн: {n}",lb_loading:"Онлайн: …",lb_my_rank:"Моє місце: {n}",lb_me:"Моє місце: —",lb_total:"Усього гравців: {n}",lb_earned:"зароблено",lb_level:"Рев. {n}",lb_clicks:"кліків",lb_empty:"Даних ще немає — станьте першим у рейтингу!",lb_offline:"Сервер недоступний",need_account:"Гра мережева — увійдіть або створіть акаунт",lb_top:"Топ заробітчан 🏆",lb_you:"Ви"
     }
   };
 
@@ -4356,7 +4357,7 @@
     if (!serverOnline || !currentUser) return;   // без аккаунта — только localStorage
     clearTimeout(cloudSaveTimer);
     cloudSaveTimer = setTimeout(async () => {
-      try { await apiPost('/api/save', { save: snapshotData() }); } catch(e) {}
+      try { await apiPost('/api/save', { save: snapshotData() }); refreshNetworkStats(); } catch(e) {}
     }, 1500);
   }
 
@@ -4571,6 +4572,109 @@
   })();
 
   // ================================================================
+  // СЕТЕВОЙ СЧЁТЧИК ИГРОКОВ + РЕЙТИНГ (данные с сервера, /api/leaderboard)
+  // ================================================================
+  let lbData = null;                 // последний ответ /api/leaderboard
+  const LB_REFRESH_MS = 15000;       // автообновление каждые 15 секунд
+
+  function renderLeaderboard() {
+    const list = $('lbList');
+    if (!list) return;
+    list.innerHTML = '';
+    const info = $('lbInfo'), hint = $('lbRefreshHint');
+    if (!serverOnline || !lbData) {
+      if (info) info.textContent = t('lb_offline');
+      if (hint) hint.textContent = '';
+      const empty = document.createElement('div');
+      empty.className = 'lb-empty';
+      empty.textContent = t('lb_offline');
+      list.appendChild(empty);
+      return;
+    }
+    if (info) info.textContent = t('lb_total', { n: lbData.total_players || 0 }) +
+                                 ' • ' + t('lb_online', { n: lbData.online || 0 });
+    if (hint) hint.textContent = t('lb_top');
+    const rows = lbData.leaderboard || [];
+    if (!rows.length) {
+      const empty = document.createElement('div');
+      empty.className = 'lb-empty';
+      empty.textContent = t('lb_empty');
+      list.appendChild(empty);
+      return;
+    }
+    rows.slice(0, 50).forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'lb-row' + (currentUser && p.login === currentUser.login ? ' me' : '');
+      const pos = document.createElement('span');
+      pos.className = 'lb-pos';
+      pos.textContent = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1);
+      const ava = document.createElement('img');
+      ava.className = 'lb-ava';
+      ava.src = p.avatar || 'image/coin.png';   // логотип-монетка как аватар по умолчанию
+      ava.alt = '';
+      ava.onerror = () => { ava.onerror = null; ava.src = 'image/coin.png'; };
+      const name = document.createElement('span');
+      name.className = 'lb-name';
+      name.textContent = p.login + (currentUser && p.login === currentUser.login ? ' (' + t('lb_you') + ')' : '');
+      const dot = document.createElement('span');
+      dot.className = p.online ? 'lb-online-tag' : 'lb-offline-tag';
+      dot.title = p.online ? t('lb_online', { n: 1 }) : t('lb_offline');
+      const earned = document.createElement('span');
+      earned.className = 'lb-earned';
+      earned.textContent = formatNumber(p.earned || 0) + ' ' + t('lb_earned');
+      const meta = document.createElement('span');
+      meta.className = 'lb-meta';
+      meta.textContent = t('lb_level', { n: p.level || 1 }) + ' • ' + (p.clicks || 0) + ' ' + t('lb_clicks');
+      row.append(pos, ava, name, dot, earned, meta);
+      list.appendChild(row);
+    });
+  }
+
+  async function refreshNetworkStats() {
+    try {
+      const d = await apiGet('/api/leaderboard');
+      serverOnline = true;
+      lbData = d;
+      const dot = $('onlineDot');
+      if (dot) { dot.classList.remove('dead'); dot.classList.add('live'); }
+      const oc = $('onlineCount');
+      if (oc) oc.textContent = t('lb_online', { n: d.online || 0 });
+      const mr = $('myRank');
+      if (mr) mr.textContent = d.me_rank ? t('lb_my_rank', { n: d.me_rank }) : t('lb_me');
+      const rowEl = $('onlineRow');
+      if (rowEl) rowEl.title = t('lb_total', { n: d.total_players || 0 });
+      renderUserChip();
+      if ($('lbOverlay') && $('lbOverlay').classList.contains('open')) renderLeaderboard();
+    } catch (err) {
+      // сервер недоступен — честно показываем это в счётчике
+      serverOnline = !!(err && err.code);   // HTTP-ответ был => сервер жив
+      const dot = $('onlineDot');
+      if (dot) { dot.classList.remove('live'); dot.classList.add('dead'); }
+      const oc = $('onlineCount');
+      if (oc) oc.textContent = t('lb_offline');
+      if ($('lbOverlay') && $('lbOverlay').classList.contains('open')) renderLeaderboard();
+    }
+  }
+  setInterval(refreshNetworkStats, LB_REFRESH_MS);
+
+  // открытие/закрытие окна рейтинга
+  const lbOverlayEl = $('lbOverlay');
+  function openLeaderboard() {
+    renderLeaderboard();
+    lbOverlayEl.classList.add('open');
+    requestAnimationFrame(() => lbOverlayEl.classList.add('visible'));
+    refreshNetworkStats();
+  }
+  function closeLeaderboard() {
+    lbOverlayEl.classList.remove('visible');
+    setTimeout(() => lbOverlayEl.classList.remove('open'), 250);
+  }
+  if ($('lbOpenBtn')) $('lbOpenBtn').onclick = openLeaderboard;
+  if ($('lbClose')) $('lbClose').onclick = closeLeaderboard;
+  if (lbOverlayEl) lbOverlayEl.addEventListener('click', e => { if (e.target === lbOverlayEl) closeLeaderboard(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLeaderboard(); });
+
+  // ================================================================
   // СТАРТ ИГРЫ
   // ================================================================
   loadSettings();
@@ -4594,6 +4698,7 @@
   // Игра закрыта экраном входа, пока игрок не авторизуется (или не выберет гостевой режим)
   lockGame();
   window.__authReady.then(async () => {
+    refreshNetworkStats();   // счётчик игроков и онлайн-статус — сразу при старте
     renderUserChip();
     if (currentUser) {
       // аккаунт найден — грузим облачное сохранение (облако важнее локальной копии)
